@@ -1,0 +1,15 @@
+@import "./base";
+@import "./responsive";
+
+@font-face {
+    font-family: 'Good Times W00 Bold';
+    src: url('./font/Good Times W00 Bold.eot');
+    src: url('./font/Good Times W00 Bold.eot?#iefix') format('embedded-opentype'),
+        url('./font/Good Times W00 Bold.woff2') format('woff2'),
+        url('./font/Good Times W00 Bold.woff') format('woff'),
+        url('./font/Good Times W00 Bold.ttf') format('truetype'),
+        url('./font/Good Times W00 Bold.svg#Good Times W00 Bold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
