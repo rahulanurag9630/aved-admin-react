@@ -80,11 +80,11 @@ export default function Login() {
   const loginSubmit = async (values) => {
     try {
       setIsLoading(true);
-  
+
       // Dummy login bypass
       const dummyEmail = "test@example.com";
       const userType = "ADMIN"; // or "USER"
-  
+
       if (values.email === dummyEmail) {
         // if (check) {
         //   let RememberMeString = JSON.stringify(values);
@@ -92,38 +92,38 @@ export default function Login() {
         // } else {
         //   window.localStorage.removeItem("RememberMeString");
         // }
-  
+
         // toast.success("Logged in successfully (bypassed).");
         // localStorage.removeItem("otpTimer");
-  
+
         // let permissions = { name: "Dashboard" }; // use actual permission name if needed
-  
+
         history.push(
           `/dashboard`
         );
       } else {
         toast.error("Invalid dummy email for bypass.");
       }
-  
+
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);
       console.log("Login bypass error", err);
     }
   };
-  
+
 
   const getBrowserName = () =>
     /Chrome/.test(navigator.userAgent)
       ? "Chrome"
       : /Firefox/.test(navigator.userAgent)
-      ? "Firefox"
-      : /Safari/.test(navigator.userAgent) &&
-        !/Chrome/.test(navigator.userAgent)
-      ? "Safari"
-      : /Edge/.test(navigator.userAgent)
-      ? "Edge"
-      : "Other";
+        ? "Firefox"
+        : /Safari/.test(navigator.userAgent) &&
+          !/Chrome/.test(navigator.userAgent)
+          ? "Safari"
+          : /Edge/.test(navigator.userAgent)
+            ? "Edge"
+            : "Other";
 
   useEffect(() => {
     setBrowserInfo(getBrowserName());
@@ -134,9 +134,8 @@ export default function Login() {
         fetch(`https://ipapi.co/${data.ip}/json/`) // Fetch location data
           .then((res) => res.json())
           .then((loc) => {
-            const formattedLocation = `${loc.country_name || "Unknown"}, ${
-              loc.city || loc.region || "Unknown"
-            }`;
+            const formattedLocation = `${loc.country_name || "Unknown"}, ${loc.city || loc.region || "Unknown"
+              }`;
             setLocation(formattedLocation);
           })
           .catch(console.error);
@@ -257,7 +256,7 @@ export default function Login() {
                   style={{ cursor: "pointer" }}
                   onClick={() => !isLoading && history.push("/forget")}
                 >
-                  <span style={{ color: "#11D9EF" }}>
+                  <span style={{ color: "#071c35" }}>
                     Forgot Password?
                   </span>
                 </Typography>

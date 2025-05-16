@@ -21,7 +21,7 @@ import Logo from "src/component/Logo";
 const useStyles = makeStyles((theme) => ({
   toolbar: {
     padding: "7px 30px 7px 30px",
-    background: "#181523",
+    background: "#5c4d44",
     [theme.breakpoints.down("sm")]: {
       padding: "0px 20px 0px 20px",
     },
@@ -105,7 +105,7 @@ const TopBar = ({ className, onMobileNavOpen, ...rest }) => {
             <Grid item lg={3} md={3} sm={4} xs={6}>
               <Box className="leftBox">
                 <Link to="/">
-                  <img src="/images/logo.png" width="60px" height={"60px"}  />
+                  <img src="/images/logo.png" width="60px" height={"60px"} />
                 </Link>
               </Box>
             </Grid>
@@ -120,7 +120,7 @@ TopBar.propTypes = {
   className: PropTypes.string,
 };
 TopBar.defaultProps = {
-  onMobileNavOpen: () => {},
+  onMobileNavOpen: () => { },
 };
 
 export default TopBar;

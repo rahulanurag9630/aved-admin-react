@@ -36,7 +36,7 @@ const useStyles = makeStyles(() => ({
       padding: "20px 0px",
     },
     "& .MuiSvgIcon-fontSizeSmall": {
-      color: "#11D9EF",
+      color: "#071c35",
     },
   },
 }));
@@ -192,7 +192,7 @@ export default function AddNewSubAdmin() {
             </Box>
             <Box>
               <Box className="basicInfoBox">
-               
+
               </Box>
               <TableContainer>
                 <Table className={classes.tableBox}>
@@ -200,11 +200,11 @@ export default function AddNewSubAdmin() {
                     <TableRow alignItems="center">
                       <TableCell>Sections</TableCell>
                       <TableCell>View</TableCell>
-                      <TableCell>Edit</TableCell>   
+                      <TableCell>Edit</TableCell>
 
 
 
-                              
+
                     </TableRow>
                   </TableHead>
                   <TableBody>

@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     zIndex: "999",
 
     "& .transparentbutton": {
-      color: "#11D9EF !important",
+      color: "#071c35 !important",
       backgroundColor: "#ffffff !important",
       border: "none !important",
       textDecoration: "underline !important",
@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
       },
     },
     "& .activeTab": {
-      background: "#11D9EF",
+      background: "#071c35",
       borderRadius: "10px",
 
       cursor: "pointer",

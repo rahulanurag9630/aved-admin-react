@@ -66,34 +66,34 @@ export default function MainFilter({
     { value: "All", name: "All" },
     ...(type === "fuelwallet"
       ? [
-          { value: "BUY", name: "Buy" },
-          { value: "SELL", name: "Sell" },
-        ]
+        { value: "BUY", name: "Buy" },
+        { value: "SELL", name: "Sell" },
+      ]
       : type === "sharedprofit"
-      ? [
+        ? [
           { value: "CREDIT", name: "Credit" },
           { value: "DEBIT", name: "Debit" },
         ]
-      : type === "rewardMgmt"
-      ? [
-          { value: "GROUP_VICE_PRESIDENT", name: "Group Vice President" },
-          { value: "SALES_MANAGER", name: "Sales Manager" },
-          { value: "SALES_DIRECTOR", name: "Sales Director" },
-        ]
-      : type === "rewardDistri"
-      ? [
-          { value: "Sales_Director", name: "Sales Director" },
-          { value: "Sales_Manager", name: "Sales Manager" },
-          { value: "Group_Vice_President", name: "Group Vice President" },
-          { value: "Trading_Pool", name: "Trading Pool" },
-          { value: "Management", name: "Management Pool" },
-          { value: "Owner_A", name: "Owner A" },
-          { value: "Owner_B", name: "Owner B" },
-        ]
-      : [
-          { value: "ACTIVE", name: "Active" },
-          { value: "BLOCK", name: "Blocked" },
-        ]),
+        : type === "rewardMgmt"
+          ? [
+            { value: "GROUP_VICE_PRESIDENT", name: "Group Vice President" },
+            { value: "SALES_MANAGER", name: "Sales Manager" },
+            { value: "SALES_DIRECTOR", name: "Sales Director" },
+          ]
+          : type === "rewardDistri"
+            ? [
+              { value: "Sales_Director", name: "Sales Director" },
+              { value: "Sales_Manager", name: "Sales Manager" },
+              { value: "Group_Vice_President", name: "Group Vice President" },
+              { value: "Trading_Pool", name: "Trading Pool" },
+              { value: "Management", name: "Management Pool" },
+              { value: "Owner_A", name: "Owner A" },
+              { value: "Owner_B", name: "Owner B" },
+            ]
+            : [
+              { value: "ACTIVE", name: "Active" },
+              { value: "BLOCK", name: "Blocked" },
+            ]),
   ];
 
   const selectWalletArray = [
@@ -106,7 +106,9 @@ export default function MainFilter({
   return (
     <Paper
       elevation={2}
-      style={{ backgroundColor: "#252233" }}
+      style={{
+        backgroundColor: "#746058"
+      }}
       className={classes.mainfilterBox}
     >
       <Grid container spacing={1} alignItems="flex-end">
@@ -134,7 +136,7 @@ export default function MainFilter({
             />
           </FormControl>
         </Grid>
-        
+
         {!showSelect.includes(type) && (
           <Grid item xs={12} sm={6} md={2}>
             <Typography

@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       height: "100vh",
       zIndex: 1,
       position: "relative",
-      background: "#181523",
+      background: "#5c4d44",
       overflow: "auto",
       display: "flex",
       alignItems: "center",
@@ -106,7 +106,7 @@ const LoginLayout = ({ children }) => {
           <Box className="sideLayout1">
             <Box href="/" onClick={() => history.push("/")}>
               <a>
-                <Box align="center" mb={0}  style={{ padding: "0 5px" }}>
+                <Box align="center" mb={0} style={{ padding: "0 5px" }}>
                   <Logo />
                 </Box>
               </a>

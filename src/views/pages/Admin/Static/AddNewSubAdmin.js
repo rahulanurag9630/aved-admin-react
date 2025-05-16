@@ -32,7 +32,7 @@ const useStyles = makeStyles(() => ({
       padding: "40px 0px",
     },
     "& .MuiSvgIcon-fontSizeSmall": {
-      color: "#11D9EF",
+      color: "#071c35",
     },
   },
   outlineborder1: {
@@ -54,9 +54,9 @@ const useStyles = makeStyles(() => ({
       },
     },
     "& .react-tel-input .selected-flag:hover, .react-tel-input .selected-flag:focus":
-      {
-        backgroundColor: "transparent !important",
-      },
+    {
+      backgroundColor: "transparent !important",
+    },
     "& .react-tel-input .selected-flag": {
       backgroundColor: "#202020",
     },

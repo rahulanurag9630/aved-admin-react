@@ -90,7 +90,7 @@ export default function Timer({ emailData }) {
               onClick={() => handleResendOtpSubmit()}
               disabled={isUpdating}
               style={{
-                color: "#11D9EF",
+                color: "#071c35",
                 fontSize: "13px",
                 cursor: "pointer",
                 fontWeight: "700",

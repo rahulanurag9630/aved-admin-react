@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
     },
     "&:hover": {
       color: "#ffffff !important",
-      background: "#11D9EF",
+      background: "#071c35",
 
       "& $icon": {
         color: "#ffffff !important",
@@ -106,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
   },
   active: {
     color: "#ffffff !important",
-    background: "#11D9EF",
+    background: "#071c35",
     fontWeight: theme.typography.fontWeightRegular,
 
     "& $title": {
@@ -189,7 +189,7 @@ const NavItem = ({
               //       ? true
               //       : rest?.item?.isEdit,
               // });
-              history.push(href, {isEdit: true});
+              history.push(href, { isEdit: true });
             }
           }}
         >

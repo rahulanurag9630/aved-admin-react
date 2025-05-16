@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     margin: 0,
     padding: 0,
     fontSize: "30px",
-    borderBottom: "1px solid #11D9EF4a",
+    borderBottom: "1px solid #071c354a",
     position: "relative !important",
     padding: "10px !important",
   },

@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     },
     "& .activeTab": {
       background: "transparent",
-      borderBottom: "2px solid #11D9EF",
+      borderBottom: "2px solid #071c35",
       borderRadius: "0px",
       padding: "0px 0 7px",
       cursor: "pointer",
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "0px",
       },
       "& p": {
-        color: "#11D9EF",
+        color: "#071c35",
       },
       "& span": {
         fontSize: "10px",

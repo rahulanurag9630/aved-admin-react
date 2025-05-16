@@ -152,7 +152,7 @@ const AddTipForm = () => {
                     </Avatar>
                     <Typography variant="body2" style={{
                       marginTop: 8, textAlign: "center",
-                      color: "#11D9EF",
+                      color: "#071c35",
                     }}  >
                       Click to upload image
                     </Typography>

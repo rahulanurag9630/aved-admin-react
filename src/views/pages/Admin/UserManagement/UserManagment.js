@@ -23,7 +23,7 @@ import { FaUser } from "react-icons/fa";
 const useStyles = makeStyles((theme) => ({
   userdashboardBox: {
     "& .countBox1": {
-      background: "#252233",
+      background: "#746058",
       borderRadius: "10px",
       padding: "20px",
       transition: "0.5s",
@@ -78,7 +78,7 @@ const tableHead = [
     column: 2,
     isMobile: true,
   },
-  
+
   {
     heading: "Status",
     column: 2,
@@ -160,7 +160,7 @@ export default function UserManagment() {
       count: dashboardData?.monthlyActive,
       color: "#ffb153",
       background1: "rgb(255 177 83 / 19%)",
-     
+
     },
     {
       title: "Total Verified Users",
@@ -408,20 +408,20 @@ export default function UserManagment() {
           },
           ...(checkEdit
             ? [
-                {
-                  icon: BlockIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen(true);
-                  },
+              {
+                icon: BlockIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen(true);
                 },
-              ]
+              },
+            ]
             : []),
         ],
       }))
     );
   }
-  
+
 
   const getDashboardData = async (source) => {
     try {
@@ -493,7 +493,7 @@ export default function UserManagment() {
         <Topheading heading="User management" />
       </Box>
 
-    
+
       <Box mt={1.5}>
         <Grid container spacing={2}>
           {!isLoading &&
@@ -546,7 +546,7 @@ export default function UserManagment() {
         </Grid>
       </Box>
 
-     
+
 
       <Box my={3}>
         <MainFilter
@@ -580,12 +580,10 @@ export default function UserManagment() {
         <ConfirmationDialogBox
           openModal={modalOpen}
           handleClose={() => setModalOpen(false)}
-          heading={`${
-            deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"
-          } User`}
-          description={`Are you sure, you want to ${
-            deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"
-          } User?`}
+          heading={`${deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"
+            } User`}
+          description={`Are you sure, you want to ${deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"
+            } User?`}
           HandleConfirm={(data) => handleBlockDeleteApi(data)}
           isLoading={isUpdating}
         />

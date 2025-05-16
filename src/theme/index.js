@@ -62,7 +62,7 @@ const baseOptions = {
     },
     MuiTableHead: {
       root: {
-        background: "#252233 !important",
+        background: "##746058 !important",
       },
     },
     MuiTable: {
@@ -313,7 +313,7 @@ const baseOptions = {
     MuiInputBase: {
       root: {
         width: "100%",
-        background:"#252233 !important",
+        background: "#746058    !important",
         border: "1px solid #4C4A53 !important"
       },
       input: {
@@ -592,7 +592,7 @@ const themesOptions = [
           },
         },
         containedSecondary: {
-          color: "#11D9EF",
+          color: "#071c35",
           backgroundColor: "#F4F3FF",
           padding: "14px 30px",
           border: "1px solid #D9D6FE",
@@ -606,7 +606,7 @@ const themesOptions = [
           "&:hover": {
             color: "#fff",
             paddingY: "15px !important",
-            backgroundColor: "#11D9EF",
+            backgroundColor: "#071c35",
             boxShadow: "none",
           },
           "@media(max-width:767px)": {
@@ -623,10 +623,10 @@ const themesOptions = [
           lineHeight: "18px",
           borderRadius: "8px",
           whiteSpace: "pre",
-          backgroundColor: "#11D9EF",
-          border: "1px solid #11D9EF",
+          backgroundColor: "#071c35",
+          border: "1px solid #071c35",
           "&:hover": {
-            color: "#11D9EF",
+            color: "#071c35",
             backgroundColor: "#F4F3FF",
 
             border: "1px solid #D9D6FE",
@@ -698,7 +698,7 @@ const themesOptions = [
         focus: "rgb(234 236 240)",
       },
       background: {
-        default: "#181523",
+        default: "#5c4d44",
         dark: "#212226",
         paper: "rgba(255, 255, 255, 0.1)",
         section: "#213743",

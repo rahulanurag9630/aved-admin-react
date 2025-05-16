@@ -234,7 +234,7 @@ export default function Profile(userData) {
                         <Typography
                           variant="body2"
                           color="secondary"
-                          style={{ color: "#11D9EF" }}
+                          style={{ color: "#071c35" }}
                         >
                           Profile picture should be at least 800x800 pixels.
                         </Typography>
@@ -273,7 +273,7 @@ export default function Profile(userData) {
                                       <Avatar className="editicon">
                                         <FiUpload
                                           style={{
-                                            color: "#11D9EF",
+                                            color: "#071c35",
                                             fontSize: "27px",
                                           }}
                                         />
@@ -288,7 +288,7 @@ export default function Profile(userData) {
                                           mt={3}
                                           style={{
                                             textAlign: "center",
-                                            color: "#11D9EF",
+                                            color: "#071c35",
                                           }}
                                         >
                                           Browse Files

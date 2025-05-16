@@ -321,7 +321,7 @@ const ConnectExchangeBox = ({ editExchangeData, setEditExchangeData }) => {
                       <LuCopy
                         style={{
                           cursor: "pointer",
-                          color: "#11D9EF",
+                          color: "#071c35",
                           fontSize: "20px",
                         }}
                       />
