@@ -149,15 +149,33 @@ export const routes = [
     component: lazy(() => import("src/views/pages/Admin/Static/Notification")),
   },
 
-  {
+   {
     exact: true,
     guard: true,
-    path: "/sub-admin-management",
+    path: "/blog-management",
     layout: DashboardLayout,
     component: lazy(() =>
-      import("src/views/pages/Admin/SubAdminManagement/index")
+      import("src/views/pages/Blog/index")
     ),
   },
+    {
+    exact: true,
+    guard: true,
+    path: "/add-blog-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/Blog/AddBlog")
+    ),
+  },
+  // {
+  //   exact: true,
+  //   guard: true,
+  //   path: "/sub-admin-management",
+  //   layout: DashboardLayout,
+  //   component: lazy(() =>
+  //     import("src/views/pages/Admin/SubAdminManagement/index")
+  //   ),
+  // },
 
   {
     exact: true,

@@ -137,12 +137,18 @@ export const sections = [
         isEdit: false,
       },
      
-      {
-        title: "Sub Admin Management",
+       {
+        title: "Blog Management",
         icon: HiUsers,
-        href: "/sub-admin-management",
+        href: "/blog-management",
         isEdit: false,
       },
+      // {
+      //   title: "Sub Admin Management",
+      //   icon: HiUsers,
+      //   href: "/sub-admin-management",
+      //   isEdit: false,
+      // },
       // {
       //   title: "Sub-Admin Activity",
       //   icon: MdSubscriptions,
