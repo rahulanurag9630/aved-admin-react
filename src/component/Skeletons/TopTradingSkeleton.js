@@ -4,7 +4,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 
 export default function TopTradingSkeleton({ skeleton }) {
   return (
-    <TableRow style={{ background: "#282435" }}>
+    <TableRow style={{ background: "#746058" }}>
       {skeleton &&
         skeleton?.map((data, index) => (
           <TableCell key={index}>

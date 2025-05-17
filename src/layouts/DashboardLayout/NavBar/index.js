@@ -60,12 +60,12 @@ export const sections = [
         href: "/dashboard",
         isEdit: false,
       },
-      {
-        title: "User Management",
-        icon: FaUserAlt,
-        href: "/usermanagement",
-        isEdit: false,
-      },
+      // {
+      //   title: "User Management",
+      //   icon: FaUserAlt,
+      //   href: "/usermanagement",
+      //   isEdit: false,
+      // },
 
       // {
       //   title: "Reward Management",
@@ -112,31 +112,36 @@ export const sections = [
       //   isEdit: false,
       // },
      
-      {
-        title: "Tips & Events Management",
+      // {
+      //   title: "Tips & Events Management",
+      //   icon: MdTipsAndUpdates,
+      //   href: "/tips-management",
+      //   isEdit: false,
+      // },
+      // {
+      //   title: "Chat Management",
+      //   icon: IoMdChatbubbles,
+      //   href: "/chat-management",
+      //   isEdit: false,
+      // },
+      // {
+      //   title: "Subscription Management",
+      //   icon: MdSubscriptions,
+      //   href: "/subscription-management",
+      //   isEdit: false,
+      // },
+      // {
+      //   title: "Transaction Management",
+      //   icon: GrTransaction,
+      //   href: "/transaction-management",
+      //   isEdit: false,
+      // },
+     {
+        title: "Property Management",
         icon: MdTipsAndUpdates,
-        href: "/tips-management",
+        href: "/property-management",
         isEdit: false,
       },
-      {
-        title: "Chat Management",
-        icon: IoMdChatbubbles,
-        href: "/chat-management",
-        isEdit: false,
-      },
-      {
-        title: "Subscription Management",
-        icon: MdSubscriptions,
-        href: "/subscription-management",
-        isEdit: false,
-      },
-      {
-        title: "Transaction Management",
-        icon: GrTransaction,
-        href: "/transaction-management",
-        isEdit: false,
-      },
-     
        {
         title: "Blog Management",
         icon: HiUsers,

@@ -149,6 +149,25 @@ export const routes = [
     component: lazy(() => import("src/views/pages/Admin/Static/Notification")),
   },
 
+  {
+    exact: true,
+    guard: true,
+    path: "/property-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/Property/index")
+    ),
+  },
+    {
+    exact: true,
+    guard: true,
+    path: "/add-property-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/Property/AddProperty")
+    ),
+  },
+
    {
     exact: true,
     guard: true,
@@ -177,15 +196,15 @@ export const routes = [
   //   ),
   // },
 
-  {
-    exact: true,
-    guard: true,
-    path: "/add-sub-admin",
-    layout: DashboardLayout,
-    component: lazy(() =>
-      import("src/views/pages/Admin/SubAdminManagement/AddNewSubAdmin")
-    ),
-  },
+  // {
+  //   exact: true,
+  //   guard: true,
+  //   path: "/add-sub-admin",
+  //   layout: DashboardLayout,
+  //   component: lazy(() =>
+  //     import("src/views/pages/Admin/SubAdminManagement/AddNewSubAdmin")
+  //   ),
+  // },
   {
     exact: true,
     guard: true,
@@ -213,33 +232,33 @@ export const routes = [
       import("src/views/pages/Admin/ChatManagement/ChatList")
     ),
   },
-  {
-    exact: true,
-    guard: true,
-    path: "/subscription-management",
-    layout: DashboardLayout,
-    component: lazy(() =>
-      import("src/views/pages/Admin/SubscriptionManagement/index")
-    ),
-  },
-  {
-    exact: true,
-    guard: true,
-    path: "/add-subscription",
-    layout: DashboardLayout,
-    component: lazy(() =>
-      import("src/views/pages/Admin/SubscriptionManagement/AddSubscription")
-    ),
-  },
-  {
-    exact: true,
-    guard: true,
-    path: "/transaction-management",
-    layout: DashboardLayout,
-    component: lazy(() =>
-      import("src/views/pages/Admin/TransactionManagement/index")
-    ),
-  },
+  // {
+  //   exact: true,
+  //   guard: true,
+  //   path: "/subscription-management",
+  //   layout: DashboardLayout,
+  //   component: lazy(() =>
+  //     import("src/views/pages/Admin/SubscriptionManagement/index")
+  //   ),
+  // },
+  // {
+  //   exact: true,
+  //   guard: true,
+  //   path: "/add-subscription",
+  //   layout: DashboardLayout,
+  //   component: lazy(() =>
+  //     import("src/views/pages/Admin/SubscriptionManagement/AddSubscription")
+  //   ),
+  // },
+  // {
+  //   exact: true,
+  //   guard: true,
+  //   path: "/transaction-management",
+  //   layout: DashboardLayout,
+  //   component: lazy(() =>
+  //     import("src/views/pages/Admin/TransactionManagement/index")
+  //   ),
+  // },
   {
     exact: true,
     guard: true,

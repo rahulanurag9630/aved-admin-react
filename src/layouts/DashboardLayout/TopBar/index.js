@@ -105,7 +105,7 @@ const TopBar = ({ className, onMobileNavOpen, ...rest }) => {
             <Grid item lg={3} md={3} sm={4} xs={6}>
               <Box className="leftBox">
                 <Link to="/">
-                  <img src="/images/logo.png" width="60px" height={"60px"} />
+                  <img src="/images/logo.png" width="60px"  />
                 </Link>
               </Box>
             </Grid>

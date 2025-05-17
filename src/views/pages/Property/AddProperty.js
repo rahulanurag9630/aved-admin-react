@@ -25,7 +25,6 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderRadius: "10px",
     textAlign: "center",
-    backgroundColor: "#746058",
   },
   previewImage: {
     height: "120px",
@@ -38,25 +37,17 @@ const useStyles = makeStyles((theme) => ({
 const validationSchema = yup.object().shape({
   title: yup.string().required("Title is required").min(3, "Enter at least 3 characters"),
   description: yup.string().required("Description is required").min(10, "Enter at least 10 characters"),
-  price: yup.number().required("Price is required").min(0, "Invalid price"),
-  durationLabel: yup.string().required("Duration label is required"),
-  durationValue: yup.number().required("Duration value is required"),
   image: yup.string().required("Image is required"),
-  badge: yup.string().required("Badge is required"),
 });
 
-const AddSubscriptionForm = () => {
+const AddProperty = () => {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialValues = {
     title: "",
     description: "",
-    price: "",
-    durationLabel: "",
-    durationValue: "",
     image: "",
-    badge: "",
   };
 
   const handleSubmit = async (values) => {
@@ -69,7 +60,7 @@ const AddSubscriptionForm = () => {
   return (
     <Paper elevation={2} className={classes.formWrapper}>
       <Typography variant="h6" color="secondary" gutterBottom>
-        Add New Subscription
+        Add New Property
       </Typography>
 
       <Formik
@@ -117,85 +108,6 @@ const AddSubscriptionForm = () => {
                 />
                 <FormHelperText error>{touched.description && errors.description}</FormHelperText>
               </Grid>
-
-              {/* Price */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Price ($)
-                </Typography>
-                <TextField
-                  fullWidth
-                  type="number"
-                  placeholder="Enter price"
-                  name="price"
-                  variant="outlined"
-                  value={values.price}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.price && errors.price)}
-                />
-                <FormHelperText error>{touched.price && errors.price}</FormHelperText>
-              </Grid>
-
-              {/* Duration Label */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Duration Label
-                </Typography>
-                <TextField
-                  fullWidth
-                  select
-                  name="durationLabel"
-                  variant="outlined"
-                  value={values.durationLabel}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.durationLabel && errors.durationLabel)}
-                >
-                  <MenuItem value="1 Day">1 Day</MenuItem>
-                  <MenuItem value="1 Month">1 Month</MenuItem>
-                  <MenuItem value="24 Hours">24 Hours</MenuItem>
-                </TextField>
-                <FormHelperText error>{touched.durationLabel && errors.durationLabel}</FormHelperText>
-              </Grid>
-
-              {/* Duration Value */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Duration Value
-                </Typography>
-                <TextField
-                  fullWidth
-                  type="number"
-                  placeholder="Enter duration in days"
-                  name="durationValue"
-                  variant="outlined"
-                  value={values.durationValue}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.durationValue && errors.durationValue)}
-                />
-                <FormHelperText error>{touched.durationValue && errors.durationValue}</FormHelperText>
-              </Grid>
-
-              {/* Badge */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Badge (e.g., Save 60%)
-                </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Enter badge text"
-                  name="badge"
-                  variant="outlined"
-                  value={values.badge}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.badge && errors.badge)}
-                />
-                <FormHelperText error>{touched.badge && errors.badge}</FormHelperText>
-              </Grid>
-
               {/* Image Upload */}
               <Grid item xs={7}>
                 <Box className={classes.imageUploadBox}>
@@ -250,4 +162,4 @@ const AddSubscriptionForm = () => {
   );
 };
 
-export default AddSubscriptionForm;
+export default AddProperty;

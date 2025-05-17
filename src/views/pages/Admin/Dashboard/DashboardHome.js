@@ -162,7 +162,7 @@ export default function DashdoardHome() {
       color: "rgb(39 195 87)",
       background1: "rgb(39 195 87 / 51%)",
     },
-    
+
   ];
 
   const getDashboardData = async (source) => {
@@ -247,7 +247,7 @@ export default function DashdoardHome() {
       </Grid>
       <Box
         mt={1.5}
-        style={{ background: "#282435", borderRadius: "10px", padding: "20px" }}
+        style={{ background: "#746058", borderRadius: "10px", padding: "20px" }}
       >
         <Grid container spacing={2}>
           {!isLoading &&
