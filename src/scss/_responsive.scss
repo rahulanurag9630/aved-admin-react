@@ -1,0 +1,119 @@
+@media (max-width: 1440px) {}
+
+@media (max-width: 1200px) {
+  .mapImgHolder {
+
+    height: 435px;
+  }
+
+
+}
+
+@media (max-width: 1024px) {
+  .currentStandingCard {
+    width: 32%;
+  }
+
+  .flexorder1 {
+    order: 2;
+  }
+
+  .flexorder2 {
+    order: 1;
+  }
+}
+
+@media (max-width: 991px) {}
+
+@media (max-width: 767px) {
+  .logoBox {
+    width: 140px;
+  }
+
+  .MuiPaginationItem-root {
+    height: 23px !important;
+    min-width: 23px !important;
+    width: 23px !important;
+    padding: 5px !important;
+  }
+
+  .MuiDialog-paperWidthSm {
+    max-width: 462px !important;
+    max-width: 474px !important;
+    width: calc(100% - 10px) !important;
+    margin: 0px !important;
+  }
+
+  .MuiPagination-ul {
+    background: transparent;
+    padding: 10px !important;
+    border-radius: 4px;
+    justify-content: center !important;
+    padding: 0px !important;
+  }
+
+  #main {
+    padding-top: 40px;
+  }
+
+  .environmentText {
+    text-align: -webkit-center;
+    margin-bottom: 51px !important;
+
+  }
+
+  .ractaboutBox {
+    margin-left: 0px;
+  }
+
+  .filterresponsiveButton {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .widthmainBox {
+    width: 100%;
+  }
+
+  .currentStandingCard {
+    width: 49%;
+  }
+
+  .activeTab2 {
+    min-width: 70px;
+  }
+
+  .mapImgHolder {
+    overflow-x: auto;
+  }
+
+  .tooltripNewText {
+    max-width: auto !important;
+  }
+
+  .slick-slider.Topimg {
+    width: 100% !important;
+
+    img {
+      width: 100%;
+      object-fit: contain;
+      position: relative;
+      z-index: 99999999;
+      top: 30px;
+    }
+  }
+
+  // .enterEventresponsive {
+  //   margin-top: -66px !important;
+  //   position: relative !important;
+  //   z-index: 99;
+  // }
+}
+
+@media (max-width: 425px) {
+  .currentStandingCard {
+    width: 100%;
+  }
+
+}
