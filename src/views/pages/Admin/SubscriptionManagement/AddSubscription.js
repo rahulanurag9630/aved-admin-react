@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderRadius: "10px",
     textAlign: "center",
-    backgroundColor: "#282435",
+    backgroundColor: "#746058",
   },
   previewImage: {
     height: "120px",

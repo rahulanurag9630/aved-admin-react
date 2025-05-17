@@ -149,7 +149,12 @@ export default function Login() {
     }
   }, []);
   return (
-    <Paper elevation={2}>
+
+
+    <Paper elevation={2} style={{
+      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+      zIndex: 1000
+    }}>
       <Box className="displayCenter" mb={3}>
         <Typography variant="h2" color="primary">
           Login
@@ -238,7 +243,7 @@ export default function Login() {
                 onClick={() => !isLoading && setCheck(!check)}
               >
                 <Box>
-                  <Checkbox checked={check} style={{ color: "#475569" }} />
+                  <Checkbox checked={check} style={{ color: "#FFFFF " }} />
                 </Box>
                 <Box>
                   <Typography
@@ -277,5 +282,7 @@ export default function Login() {
         )}
       </Formik>
     </Paper>
+
+
   );
 }

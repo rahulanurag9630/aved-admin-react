@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#282435",
+    backgroundColor: "#746058",
     borderRadius: "10px",
   },
   imgsection: {

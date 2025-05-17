@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     "& .loginlayoutleftSide": {
       width: "50%",
       height: "100vh",
-      background: "#282435",
+      background: "#746058",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",

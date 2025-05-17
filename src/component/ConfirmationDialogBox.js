@@ -82,13 +82,13 @@ export default function ConfirmationDialogBox({
         keepMounted
         onClose={() => !isLoading && handleClose()}
       >
-        <DialogTitle style={{background:"#282435"}}>
+        <DialogTitle style={{ background: "#746058" }}>
           <IconButton
             disabled={isLoading}
             onClick={() => handleClose()}
             className="closeButton"
           >
-            <RxCross2 color="#fff"/>
+            <RxCross2 color="#fff" />
           </IconButton>
         </DialogTitle>
 
@@ -109,7 +109,7 @@ export default function ConfirmationDialogBox({
               >
                 {blockDescription}
               </Typography>
-            ): heading.includes("Block") ? (
+            ) : heading.includes("Block") ? (
               <>
                 <TextField
                   fullWidth

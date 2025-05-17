@@ -10,7 +10,7 @@ const baseOptions = {
     MuiDialog: {
       paper: {
         borderRadius: "10px",
-        background: "#282435",
+        background: "#746058",
       },
       paperWidthSm: {
         maxWidth: "450px",
@@ -237,7 +237,7 @@ const baseOptions = {
       elevation2: {
         padding: "15px",
         borderRadius: "10px",
-        background: "#282435",
+        background: "#746058",
         boxShadow: "none",
         // border: "1px solid #80808036",
       },
@@ -314,12 +314,13 @@ const baseOptions = {
       root: {
         width: "100%",
         background: "#746058    !important",
-        border: "1px solid #4C4A53 !important"
+        border: "1px solid white !important",
       },
       input: {
         fontSize: "13px !important",
         fontWeight: "400 !important",
         color: "#dbdbdb !important",
+
         height: "1.1876em",
         "&:-webkit-autofill": {
           animationName: "mui-auto-fill",
@@ -488,7 +489,7 @@ const themesOptions = [
           "&:-webkit-autofill": {
             "-webkit-background-clip": "text !important",
             // transitionDelay: "9999s",
-            "caret-color": "transparent",
+            // "caret-color": "transparent",
             "-webkit-box-shadow": "0 0 0 100px #ffffff inset !importantt",
             "-webkit-text-fill-color": "#000",
           },

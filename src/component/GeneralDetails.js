@@ -115,16 +115,18 @@ const GeneralDetails = ({ userData }) => {
                       padding: "10px",
                       justifyContent: "center",
                       alignItems: "center",
-                      backgroundColor: "#282435",
+                      backgroundColor: "#746058",
                       borderRadius: "10px",
 
                     }}>
                       <figure className="figure">
                         <Avatar
-                          style={{ height: "120px",
+                          style={{
+                            height: "120px",
                             width: "120px",
                             borderRadius: "100px",
-                            marginTop: "40px",}}
+                            marginTop: "40px",
+                          }}
                           src={
                             "images/profile.png"
                           }
