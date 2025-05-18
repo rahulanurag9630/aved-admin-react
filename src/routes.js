@@ -167,6 +167,24 @@ export const routes = [
       import("src/views/pages/Property/AddProperty")
     ),
   },
+  {
+    exact: true,
+    guard: true,
+    path: "/amenities-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/Amenities/index")
+    ),
+  },
+    {
+    exact: true,
+    guard: true,
+    path: "/add-amenities-management",
+    layout: DashboardLayout,
+   component: lazy(() =>
+      import("src/views/pages/Amenities/AddAmenities")
+    ),
+  },
 
    {
     exact: true,
