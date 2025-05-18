@@ -106,61 +106,18 @@ export default function DashdoardHome() {
 
   const arrayData = [
     {
-      title: "Total Registered Users",
+      title: "Total Properties",
       count: 120000,
       background: "#846cf94d",
       color: "#846cf9cc",
       background1: "rgb(132 108 249 / 44%)",
     },
     {
-      title: "Active Subscriptions",
+      title: "Total Amenities",
       count: 7540,
       background: "rgb(255 199 129 / 15%)",
       color: "#ffb153",
       background1: "rgb(255 177 83 / 39%)",
-    },
-
-    {
-      title: "Total Matches Made",
-      count: 1000,
-      background: " #c1b6fc",
-      color: "rgb(55 226 235)",
-      background1: "rgb(55 226 235 / 45%)",
-    },
-    {
-      title: "Total Dates Initiated",
-      count: 2000,
-      background: " #2c09dc",
-      color: "rgb(55 226 235)",
-      background1: "rgb(55 226 235 / 45%)",
-    },
-    {
-      title: "New Signups (Today)",
-      count: 1000,
-      background: "rgb(255 199 129 / 15%)",
-      color: "#ffb153",
-      background1: "rgb(255 177 83 / 39%)",
-    },
-    {
-      title: "Revenue (This Month $)",
-      count: 200000,
-      background: " #2c09dc",
-      color: "rgb(55 226 235)",
-      background1: "rgb(55 226 235 / 45%)",
-    },
-    {
-      title: "Reported Issues",
-      count: 123,
-      color: "#846cf9cc",
-      background: "#846cf94d",
-      background1: "rgb(132 108 249 / 44%)",
-    },
-    {
-      title: "Pending Verifications",
-      count: 1010,
-      background: "#846cf94d",
-      color: "rgb(39 195 87)",
-      background1: "rgb(39 195 87 / 51%)",
     },
 
   ];

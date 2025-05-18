@@ -217,7 +217,7 @@ const AddSubscriptionForm = () => {
                     <Avatar>
                       <FiUpload />
                     </Avatar>
-                    <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#071c35" }}>
+                    <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
                       Click to upload image
                     </Typography>
                   </label>

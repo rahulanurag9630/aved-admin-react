@@ -14,6 +14,7 @@ import {
   FaNewspaper,
   FaTicketAlt,
   FaUserAlt,
+   FaWifi
 } from "react-icons/fa";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import PropTypes from "prop-types";
@@ -25,6 +26,7 @@ import {
   MdSettings,
   MdSubscriptions,
   MdTipsAndUpdates,
+    MdRoomService,
   
 } from "react-icons/md";
 import { IoMdChatbubbles } from "react-icons/io";
@@ -136,6 +138,7 @@ export const sections = [
       //   href: "/transaction-management",
       //   isEdit: false,
       // },
+
      {
         title: "Property Management",
         icon: MdTipsAndUpdates,
@@ -148,6 +151,13 @@ export const sections = [
         href: "/blog-management",
         isEdit: false,
       },
+      {
+        title: "Amenities Management",
+        icon:   MdRoomService,
+        href: "/amenities-management",
+        isEdit: false,
+      },
+
       // {
       //   title: "Sub Admin Management",
       //   icon: HiUsers,

@@ -71,89 +71,199 @@ const AddBlog = () => {
         {({ values, handleChange, handleBlur, setFieldValue, errors, touched }) => (
           <Form>
             <Grid container spacing={3}>
-              {/* Title */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Title
-                </Typography>
-                <TextField
-                  fullWidth
-                  placeholder="Enter title"
-                  name="title"
-                  variant="outlined"
-                  value={values.title}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.title && errors.title)}
-                />
-                <FormHelperText error>{touched.title && errors.title}</FormHelperText>
+              <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                {/* Title */}
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                    Title
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="Enter title"
+                    name="title"
+                    variant="outlined"
+                    value={values.title}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.title && errors.title)}
+                  />
+                  <FormHelperText error>{touched.title && errors.title}</FormHelperText>
+                </Grid>
+
+                {/* Title */}
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="secondary" dir='rtl' style={{ marginBottom: "5px" }}>
+                    العنوان
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    placeholder="أدخل العنوان"
+                    dir='rtl'
+                    name="title"
+                    variant="outlined"
+                    value={values.title}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.title && errors.title)}
+                  />
+                  <FormHelperText error>{touched.title && errors.title}</FormHelperText>
+                </Grid>
               </Grid>
 
               {/* Description */}
-              <Grid item xs={7}>
-                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                  Description
-                </Typography>
-                <TextField
-                  fullWidth
-                  multiline
-                  minRows={4}
-                  placeholder="Enter description"
-                  name="description"
-                  variant="outlined"
-                  value={values.description}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.description && errors.description)}
-                />
-                <FormHelperText error>{touched.description && errors.description}</FormHelperText>
-              </Grid>
-              {/* Image Upload */}
-              <Grid item xs={7}>
-                <Box className={classes.imageUploadBox}>
-                  <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        getBase64(file, (result) => {
-                          setFieldValue("image", result);
-                        });
-                      }
-                    }}
+
+              <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                    Description
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    placeholder="Enter description"
+                    name="description"
+                    variant="outlined"
+                    value={values.description}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.description && errors.description)}
                   />
-                  <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
-                    <Avatar>
-                      <FiUpload />
-                    </Avatar>
-                    <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#071c35" }}>
-                      Click to upload image
-                    </Typography>
-                  </label>
+                  <FormHelperText error>{touched.description && errors.description}</FormHelperText>
+                </Grid>
+                {/* Description */}
+                <Grid item xs={6}>
+                  <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                    الوصف
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    multiline
+                    minRows={4}
+                    dir='rtl'
+                    placeholder="أدخل الوصف"
+                    name="description"
+                    variant="outlined"
+                    value={values.description}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={Boolean(touched.description && errors.description)}
+                  />
+                  <FormHelperText error>{touched.description && errors.description}</FormHelperText>
+                </Grid>
 
-                  {values.image && (
-                    <img src={values.image} alt="Preview" className={classes.previewImage} />
-                  )}
-
-                  <FormHelperText error>{touched.image && errors.image}</FormHelperText>
-                </Box>
               </Grid>
+
+              {/* Image Upload */}
+
+
+              <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                <Grid item xs={6}>
+                  <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                    Image
+                  </Typography>
+                  <Box className={classes.imageUploadBox}>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          getBase64(file, (result) => {
+                            setFieldValue("image", result);
+                          });
+                        }
+                      }}
+                    />
+                    <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
+                      <Avatar>
+                        <FiUpload />
+                      </Avatar>
+                      <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
+                        Click to upload image
+                      </Typography>
+                    </label>
+
+                    {values.image && (
+                      <img src={values.image} alt="Preview" className={classes.previewImage} />
+                    )}
+
+                    <FormHelperText error>{touched.image && errors.image}</FormHelperText>
+                  </Box>
+                </Grid>
+                {/* Image */}
+                <Grid item xs={6}>
+                  <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                    الصورة
+                  </Typography>
+                  <Box className={classes.imageUploadBox}>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      dir='rtl'
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          getBase64(file, (result) => {
+                            setFieldValue("image", result);
+                          });
+                        }
+                      }}
+                    />
+                    <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
+                      <Avatar>
+                        <FiUpload />
+                      </Avatar>
+                      <Typography
+                        variant="body2"
+                        style={{ marginTop: 8, textAlign: "center", color: "#fff" }}
+                      >
+                        اضغط لتحميل الصورة
+                      </Typography>
+                    </label>
+
+                    {values.image && (
+                      <img src={values.image} alt="معاينة" className={classes.previewImage} />
+                    )}
+
+                    <FormHelperText error>{touched.image && errors.image}</FormHelperText>
+                  </Box>
+                </Grid>
+
+
+              </Grid>
+
 
               {/* Submit Button */}
-              <Grid item xs={7} className="displayCenter">
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  disabled={isSubmitting}
-                  style={{ marginTop: "20px" }}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit"}
-                </Button>
+
+              <Grid item xs={7}>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  {/* Back Button */}
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => window.history.back()}
+                  >
+                    Back
+                  </Button>
+
+                  {/* Submit Button */}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit"}
+                  </Button>
+                </div>
               </Grid>
+
+
             </Grid>
           </Form>
         )}
