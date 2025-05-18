@@ -16,48 +16,49 @@ import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
 
 const tableHead = [
-    {
-      heading: "Sr No.",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Title",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Description",
-      column: 0,
-      isMobile: true,
-      isCopy: true,
-    },
-    {
-      heading: "Price",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Duration",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Badge",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Created Date & Time",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Action",
-      column: 1,
-      isMobile: true,
-    },
-  ];
+  {
+    heading: "Sr No.",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "Property Name",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "Property Type",
+    column: 0,
+    isMobile: true,
+    isCopy: true,
+  },
+  {
+    heading: "Overview",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "No Of Floar",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "No Of BedRooms",
+    column: 1,
+    isMobile: true,
+  },
+  {
+    heading: "Created Date & Time",
+    column: 1,
+    isMobile: true,
+  },
+  {
+    heading: "Action",
+    column: 1,
+    isMobile: true,
+  },
+];
+
   
 
 export default function Property() {
@@ -118,118 +119,109 @@ export default function Property() {
       // }
       // setIsClear(false);
       // setIsLoading(false);
-      setTransactionList([
-        {
-          id: 1,
-          title: "Basic Plan",
-          description: "Access to limited features for casual users.",
-          price: "4.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Basic",
-          badge: "Starter",
-          createdAt: "2025-05-01 10:15 AM",
-        },
-        {
-          id: 2,
-          title: "Pro Plan",
-          description: "All features unlocked with ad-free experience.",
-          price: "9.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Pro",
-          badge: "Popular",
-          createdAt: "2025-05-01 10:30 AM",
-        },
-        {
-          id: 3,
-          title: "Gold Plan",
-          description: "Priority access to premium content and support.",
-          price: "24.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Gold",
-          badge: "Best Value",
-          createdAt: "2025-05-01 11:00 AM",
-        },
-        {
-          id: 4,
-          title: "Silver Plan",
-          description: "Ad-free experience with daily spark boosts.",
-          price: "19.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Silver",
-          badge: "Standard",
-          createdAt: "2025-05-01 11:15 AM",
-        },
-        {
-          id: 5,
-          title: "Premium 6M",
-          description: "6-month plan with all core features enabled.",
-          price: "44.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Premium",
-          badge: "Long-Term",
-          createdAt: "2025-05-01 12:00 PM",
-        },
-        {
-          id: 6,
-          title: "Ultimate Plan",
-          description: "Everything in Gold + conversation starters.",
-          price: "59.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Ultimate",
-          badge: "Exclusive",
-          createdAt: "2025-05-01 12:30 PM",
-        },
-        {
-          id: 7,
-          title: "Monthly Saver",
-          description: "Basic plan with limited-time discount.",
-          price: "3.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Saver",
-          badge: "Discount",
-          createdAt: "2025-05-01 01:00 PM",
-        },
-        {
-          id: 8,
-          title: "Elite Access",
-          description: "Access to premium features with extra perks.",
-          price: "69.99",
-          durationLabel: "1 Year",
-          durationValue: 12,
-          image: "https://via.placeholder.com/100x100?text=Elite",
-          badge: "Top Tier",
-          createdAt: "2025-05-01 01:30 PM",
-        },
-        {
-          id: 9,
-          title: "Student Plan",
-          description: "Affordable plan for verified students only.",
-          price: "2.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Student",
-          badge: "Student",
-          createdAt: "2025-05-01 02:00 PM",
-        },
-        {
-          id: 10,
-          title: "Family Pack",
-          description: "One subscription shared across 3 accounts.",
-          price: "29.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Family",
-          badge: "Group",
-          createdAt: "2025-05-01 02:30 PM",
-        },
-      ]);
+     setTransactionList([
+  {
+    id: 1,
+    propertyName: "Sunny Apartments",
+    propertyType: "Apartment",
+    overview: "Spacious 2BHK apartment with garden view.",
+    noOfFloar: 5,
+    noOfBedRooms: 2,
+    image: "https://via.placeholder.com/100x100?text=Sunny",
+    createdAt: "2025-05-01 10:15 AM",
+  },
+  {
+    id: 2,
+    propertyName: "Oceanview Villa",
+    propertyType: "Villa",
+    overview: "Luxury villa with private pool and sea view.",
+    noOfFloar: 2,
+    noOfBedRooms: 4,
+    image: "https://via.placeholder.com/100x100?text=Oceanview",
+    createdAt: "2025-05-01 10:30 AM",
+  },
+  {
+    id: 3,
+    propertyName: "Skyline Towers",
+    propertyType: "Penthouse",
+    overview: "Top-floor penthouse with skyline view.",
+    noOfFloar: 15,
+    noOfBedRooms: 3,
+    image: "https://via.placeholder.com/100x100?text=Skyline",
+    createdAt: "2025-05-01 11:00 AM",
+  },
+  {
+    id: 4,
+    propertyName: "Greenwood Homes",
+    propertyType: "Independent House",
+    overview: "3BHK house in a gated community.",
+    noOfFloar: 2,
+    noOfBedRooms: 3,
+    image: "https://via.placeholder.com/100x100?text=Greenwood",
+    createdAt: "2025-05-01 11:15 AM",
+  },
+  {
+    id: 5,
+    propertyName: "Metro Residency",
+    propertyType: "Studio",
+    overview: "Compact studio apartment near metro station.",
+    noOfFloar: 10,
+    noOfBedRooms: 1,
+    image: "https://via.placeholder.com/100x100?text=Metro",
+    createdAt: "2025-05-01 12:00 PM",
+  },
+  {
+    id: 6,
+    propertyName: "Hilltop Mansion",
+    propertyType: "Bungalow",
+    overview: "Massive bungalow on hilltop with garden.",
+    noOfFloar: 3,
+    noOfBedRooms: 5,
+    image: "https://via.placeholder.com/100x100?text=Hilltop",
+    createdAt: "2025-05-01 12:30 PM",
+  },
+  {
+    id: 7,
+    propertyName: "Budget Flats",
+    propertyType: "Apartment",
+    overview: "Affordable housing for small families.",
+    noOfFloar: 4,
+    noOfBedRooms: 2,
+    image: "https://via.placeholder.com/100x100?text=Budget",
+    createdAt: "2025-05-01 01:00 PM",
+  },
+  {
+    id: 8,
+    propertyName: "Elite Estate",
+    propertyType: "Villa",
+    overview: "Gated community villa with 24x7 security.",
+    noOfFloar: 2,
+    noOfBedRooms: 4,
+    image: "https://via.placeholder.com/100x100?text=Elite",
+    createdAt: "2025-05-01 01:30 PM",
+  },
+  {
+    id: 9,
+    propertyName: "Student Suites",
+    propertyType: "Hostel",
+    overview: "Furnished shared accommodations for students.",
+    noOfFloar: 3,
+    noOfBedRooms: 1,
+    image: "https://via.placeholder.com/100x100?text=Student",
+    createdAt: "2025-05-01 02:00 PM",
+  },
+  {
+    id: 10,
+    propertyName: "Family Residency",
+    propertyType: "Apartment",
+    overview: "3BHK flats designed for modern families.",
+    noOfFloar: 7,
+    noOfBedRooms: 3,
+    image: "https://via.placeholder.com/100x100?text=Family",
+    createdAt: "2025-05-01 02:30 PM",
+  },
+]);
+
     } catch (err) {
       setTransactionList([]);
       setIsLoading(false);
@@ -270,57 +262,58 @@ export default function Property() {
     }
   };
 
-  function tableDataFunction(arrayData, condition) {
-    return (
-      arrayData &&
-      arrayData.map((value, i) => ({
-        "Sr No.": (page - 1) * 10 + i + 1,
-        Title: value?.title,
-        Desctiption: value?.description,
-        Price: `$${value?.price}`,
-        Duration: value?.durationLabel,
-        Badge: value?.badge,
-        
-        "Created Date & Time": value?.createdAt,
-        Action: [
-          {
-            icon: VisibilityIcon,
-            onClick: () =>
-              history.push({
-                pathname: "/add-subscription",
-                state: { ...value, viewSubAdmin: true },
-              }),
-          },
-          ...(checkEdit
-            ? [
-                {
-                  icon: FaEdit,
-                  onClick: () =>
-                    history.push({
-                      pathname: "/add-subscription",
-                      state: { ...value, editSubAdmin: true },
-                    }),
+function tableDataFunction(arrayData, condition) {
+  return (
+    arrayData &&
+    arrayData.map((value, i) => ({
+      "Sr No.": (page - 1) * 10 + i + 1,
+      "Property Name": value?.propertyName,
+      "Property Type": value?.propertyType,
+      Overview: value?.overview,
+      "No Of Floar": value?.noOfFloar,
+      "No Of BedRooms": value?.noOfBedRooms,
+      "Created Date & Time": value?.createdAt,
+      Action: [
+        {
+          icon: VisibilityIcon,
+          onClick: () =>
+            history.push({
+              pathname: "/add-subscription",
+              state: { ...value, viewSubAdmin: true },
+            }),
+        },
+        ...(checkEdit
+          ? [
+              {
+                icon: FaEdit,
+                onClick: () =>
+                  history.push({
+                    pathname: "/add-subscription",
+                    state: { ...value, editSubAdmin: true },
+                  }),
+              },
+              {
+                icon: BlockIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen("block");
                 },
-                {
-                  icon: BlockIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen("block");
-                  },
+              },
+              {
+                icon: DeleteIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen("delete");
                 },
-                {
-                  icon: DeleteIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen("delete");
-                  },
-                },
-              ]
-            : []),
-        ],
-      }))
-    );
-  }
+              },
+            ]
+          : []),
+      ],
+    }))
+  );
+}
+
+
   
 
   const handleClearFilter = () => {
