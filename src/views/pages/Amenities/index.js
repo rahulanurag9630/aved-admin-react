@@ -16,48 +16,34 @@ import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
 
 const tableHead = [
-    {
-      heading: "Sr No.",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Title",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Description",
-      column: 0,
-      isMobile: true,
-      isCopy: true,
-    },
-    {
-      heading: "Price",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Duration",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Badge",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Created Date & Time",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Action",
-      column: 1,
-      isMobile: true,
-    },
-  ];
+  {
+    heading: "Sr No.",
+    column: 0,
+    isMobile: true,
+  },
+   {
+    heading: "Title",
+    column: 1,
+    isMobile: true,
+  },
+  {
+    heading: "Image",
+    column: 2,
+    isMobile: true,
+  },
+ 
+  {
+    heading: "Created Date & Time",
+    column: 3,
+    isMobile: true,
+  },
+  {
+    heading: "Action",
+    column: 4,
+    isMobile: true,
+  },
+];
+
   
 
 export default function Blogs() {
@@ -119,117 +105,78 @@ export default function Blogs() {
       // setIsClear(false);
       // setIsLoading(false);
       setTransactionList([
-        {
-          id: 1,
-          title: "Basic Plan",
-          description: "Access to limited features for casual users.",
-          price: "4.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Basic",
-          badge: "Starter",
-          createdAt: "2025-05-01 10:15 AM",
-        },
-        {
-          id: 2,
-          title: "Pro Plan",
-          description: "All features unlocked with ad-free experience.",
-          price: "9.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Pro",
-          badge: "Popular",
-          createdAt: "2025-05-01 10:30 AM",
-        },
-        {
-          id: 3,
-          title: "Gold Plan",
-          description: "Priority access to premium content and support.",
-          price: "24.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Gold",
-          badge: "Best Value",
-          createdAt: "2025-05-01 11:00 AM",
-        },
-        {
-          id: 4,
-          title: "Silver Plan",
-          description: "Ad-free experience with daily spark boosts.",
-          price: "19.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Silver",
-          badge: "Standard",
-          createdAt: "2025-05-01 11:15 AM",
-        },
-        {
-          id: 5,
-          title: "Premium 6M",
-          description: "6-month plan with all core features enabled.",
-          price: "44.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Premium",
-          badge: "Long-Term",
-          createdAt: "2025-05-01 12:00 PM",
-        },
-        {
-          id: 6,
-          title: "Ultimate Plan",
-          description: "Everything in Gold + conversation starters.",
-          price: "59.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Ultimate",
-          badge: "Exclusive",
-          createdAt: "2025-05-01 12:30 PM",
-        },
-        {
-          id: 7,
-          title: "Monthly Saver",
-          description: "Basic plan with limited-time discount.",
-          price: "3.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Saver",
-          badge: "Discount",
-          createdAt: "2025-05-01 01:00 PM",
-        },
-        {
-          id: 8,
-          title: "Elite Access",
-          description: "Access to premium features with extra perks.",
-          price: "69.99",
-          durationLabel: "1 Year",
-          durationValue: 12,
-          image: "https://via.placeholder.com/100x100?text=Elite",
-          badge: "Top Tier",
-          createdAt: "2025-05-01 01:30 PM",
-        },
-        {
-          id: 9,
-          title: "Student Plan",
-          description: "Affordable plan for verified students only.",
-          price: "2.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Student",
-          badge: "Student",
-          createdAt: "2025-05-01 02:00 PM",
-        },
-        {
-          id: 10,
-          title: "Family Pack",
-          description: "One subscription shared across 3 accounts.",
-          price: "29.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Family",
-          badge: "Group",
-          createdAt: "2025-05-01 02:30 PM",
-        },
-      ]);
+  {
+    id: 1,
+    title: "Swimming Pool",
+    image: "https://via.placeholder.com/100x100?text=Pool",
+    description: "Olympic-sized pool open from 6 AM to 10 PM.",
+    createdAt: "2025-05-01 10:15 AM",
+  },
+  {
+    id: 2,
+    title: "Gym",
+    image: "https://via.placeholder.com/100x100?text=Gym",
+    description: "24/7 fully equipped gym with trainers.",
+    createdAt: "2025-05-01 10:30 AM",
+  },
+  {
+    id: 3,
+    title: "Community Hall",
+    image: "https://via.placeholder.com/100x100?text=Hall",
+    description: "Available for resident events and parties.",
+    createdAt: "2025-05-01 11:00 AM",
+  },
+  {
+    id: 4,
+    title: "Children's Play Area",
+    image: "https://via.placeholder.com/100x100?text=Play+Area",
+    description: "Safe play area with modern equipment.",
+    createdAt: "2025-05-01 11:15 AM",
+  },
+  {
+    id: 5,
+    title: "Library",
+    image: "https://via.placeholder.com/100x100?text=Library",
+    description: "Quiet reading space with a wide range of books.",
+    createdAt: "2025-05-01 12:00 PM",
+  },
+  {
+    id: 6,
+    title: "Jogging Track",
+    image: "https://via.placeholder.com/100x100?text=Jogging",
+    description: "1.5 km paved track around the garden.",
+    createdAt: "2025-05-01 12:30 PM",
+  },
+  {
+    id: 7,
+    title: "Guest Parking",
+    image: "https://via.placeholder.com/100x100?text=Parking",
+    description: "Dedicated parking slots for visitors.",
+    createdAt: "2025-05-01 01:00 PM",
+  },
+  {
+    id: 8,
+    title: "Clubhouse",
+    image: "https://via.placeholder.com/100x100?text=Clubhouse",
+    description: "Multipurpose indoor recreational space.",
+    createdAt: "2025-05-01 01:30 PM",
+  },
+  {
+    id: 9,
+    title: "Security Room",
+    image: "https://via.placeholder.com/100x100?text=Security",
+    description: "Round-the-clock monitoring and control room.",
+    createdAt: "2025-05-01 02:00 PM",
+  },
+  {
+    id: 10,
+    title: "CCTV Surveillance",
+    image: "https://via.placeholder.com/100x100?text=CCTV",
+    description: "24/7 camera monitoring across premises.",
+    createdAt: "2025-05-01 02:30 PM",
+  },
+]);
+
     } catch (err) {
       setTransactionList([]);
       setIsLoading(false);

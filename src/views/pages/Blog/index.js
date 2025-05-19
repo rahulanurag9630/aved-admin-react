@@ -16,48 +16,35 @@ import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
 
 const tableHead = [
-    {
-      heading: "Sr No.",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Title",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Description",
-      column: 0,
-      isMobile: true,
-      isCopy: true,
-    },
-    {
-      heading: "Price",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Duration",
-      column: 0,
-      isMobile: true,
-    },
-    {
-      heading: "Badge",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Created Date & Time",
-      column: 1,
-      isMobile: true,
-    },
-    {
-      heading: "Action",
-      column: 1,
-      isMobile: true,
-    },
-  ];
+  {
+    heading: "Sr No.",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "Title",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "Description",
+    column: 0,
+    isMobile: true,
+    isCopy: true,
+  },
+  {
+    heading: "Created Date & Time",
+    column: 1,
+    isMobile: true,
+  },
+  {
+    heading: "Action",
+    column: 1,
+    isMobile: true,
+  },
+];
+
+
   
 
 export default function Blogs() {
@@ -68,7 +55,7 @@ export default function Blogs() {
   const [deleteBlockId, setDeleteBlockId] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [transactionList, setTransactionList] = useState([]);
+  const [transactionList, setBlogList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
   const checkEdit = location?.state?.isEdit;
@@ -118,120 +105,81 @@ export default function Blogs() {
       // }
       // setIsClear(false);
       // setIsLoading(false);
-      setTransactionList([
-        {
-          id: 1,
-          title: "Basic Plan",
-          description: "Access to limited features for casual users.",
-          price: "4.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Basic",
-          badge: "Starter",
-          createdAt: "2025-05-01 10:15 AM",
-        },
-        {
-          id: 2,
-          title: "Pro Plan",
-          description: "All features unlocked with ad-free experience.",
-          price: "9.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Pro",
-          badge: "Popular",
-          createdAt: "2025-05-01 10:30 AM",
-        },
-        {
-          id: 3,
-          title: "Gold Plan",
-          description: "Priority access to premium content and support.",
-          price: "24.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Gold",
-          badge: "Best Value",
-          createdAt: "2025-05-01 11:00 AM",
-        },
-        {
-          id: 4,
-          title: "Silver Plan",
-          description: "Ad-free experience with daily spark boosts.",
-          price: "19.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Silver",
-          badge: "Standard",
-          createdAt: "2025-05-01 11:15 AM",
-        },
-        {
-          id: 5,
-          title: "Premium 6M",
-          description: "6-month plan with all core features enabled.",
-          price: "44.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Premium",
-          badge: "Long-Term",
-          createdAt: "2025-05-01 12:00 PM",
-        },
-        {
-          id: 6,
-          title: "Ultimate Plan",
-          description: "Everything in Gold + conversation starters.",
-          price: "59.99",
-          durationLabel: "6 Months",
-          durationValue: 6,
-          image: "https://via.placeholder.com/100x100?text=Ultimate",
-          badge: "Exclusive",
-          createdAt: "2025-05-01 12:30 PM",
-        },
-        {
-          id: 7,
-          title: "Monthly Saver",
-          description: "Basic plan with limited-time discount.",
-          price: "3.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Saver",
-          badge: "Discount",
-          createdAt: "2025-05-01 01:00 PM",
-        },
-        {
-          id: 8,
-          title: "Elite Access",
-          description: "Access to premium features with extra perks.",
-          price: "69.99",
-          durationLabel: "1 Year",
-          durationValue: 12,
-          image: "https://via.placeholder.com/100x100?text=Elite",
-          badge: "Top Tier",
-          createdAt: "2025-05-01 01:30 PM",
-        },
-        {
-          id: 9,
-          title: "Student Plan",
-          description: "Affordable plan for verified students only.",
-          price: "2.99",
-          durationLabel: "1 Month",
-          durationValue: 1,
-          image: "https://via.placeholder.com/100x100?text=Student",
-          badge: "Student",
-          createdAt: "2025-05-01 02:00 PM",
-        },
-        {
-          id: 10,
-          title: "Family Pack",
-          description: "One subscription shared across 3 accounts.",
-          price: "29.99",
-          durationLabel: "3 Months",
-          durationValue: 3,
-          image: "https://via.placeholder.com/100x100?text=Family",
-          badge: "Group",
-          createdAt: "2025-05-01 02:30 PM",
-        },
-      ]);
+      setBlogList([
+  {
+    id: 1,
+    title: "Getting Started with React",
+    description: "A beginner's guide to building apps using React.js.",
+    image: "https://via.placeholder.com/100x100?text=React",
+    createdAt: "2025-05-01 10:00 AM",
+  },
+  {
+    id: 2,
+    title: "Understanding JavaScript Closures",
+    description: "An in-depth look into closures and lexical scoping in JS.",
+    image: "https://via.placeholder.com/100x100?text=JS",
+    createdAt: "2025-05-01 11:00 AM",
+  },
+  {
+    id: 3,
+    title: "Top 10 CSS Tricks for Developers",
+    description: "Enhance your UI with these effective CSS tricks.",
+    image: "https://via.placeholder.com/100x100?text=CSS",
+    createdAt: "2025-05-01 12:00 PM",
+  },
+  {
+    id: 4,
+    title: "State Management in React",
+    description: "Explore different ways to manage state in large apps.",
+    image: "https://via.placeholder.com/100x100?text=State",
+    createdAt: "2025-05-01 01:00 PM",
+  },
+  {
+    id: 5,
+    title: "Why TypeScript Matters",
+    description: "An overview of how TypeScript improves JavaScript codebases.",
+    image: "https://via.placeholder.com/100x100?text=TS",
+    createdAt: "2025-05-01 02:00 PM",
+  },
+  {
+    id: 6,
+    title: "Deploying with Vercel",
+    description: "Step-by-step guide to deploying your React app with Vercel.",
+    image: "https://via.placeholder.com/100x100?text=Vercel",
+    createdAt: "2025-05-01 03:00 PM",
+  },
+  {
+    id: 7,
+    title: "SEO Best Practices for Blogs",
+    description: "Learn how to optimize your blog content for search engines.",
+    image: "https://via.placeholder.com/100x100?text=SEO",
+    createdAt: "2025-05-01 04:00 PM",
+  },
+  {
+    id: 8,
+    title: "Next.js vs React",
+    description: "A detailed comparison of Next.js and React for new devs.",
+    image: "https://via.placeholder.com/100x100?text=Next",
+    createdAt: "2025-05-01 05:00 PM",
+  },
+  {
+    id: 9,
+    title: "Git & GitHub Essentials",
+    description: "Master version control with Git and GitHub basics.",
+    image: "https://via.placeholder.com/100x100?text=Git",
+    createdAt: "2025-05-01 06:00 PM",
+  },
+  {
+    id: 10,
+    title: "Building REST APIs with Node.js",
+    description: "How to create scalable REST APIs using Express.js.",
+    image: "https://via.placeholder.com/100x100?text=Node",
+    createdAt: "2025-05-01 07:00 PM",
+  },
+]);
+
     } catch (err) {
-      setTransactionList([]);
+      setBlogList([]);
       setIsLoading(false);
       console.log(err);
     }
@@ -276,7 +224,7 @@ export default function Blogs() {
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
         Title: value?.title,
-        Desctiption: value?.description,
+        Description: value?.description,
         Price: `$${value?.price}`,
         Duration: value?.durationLabel,
         Badge: value?.badge,

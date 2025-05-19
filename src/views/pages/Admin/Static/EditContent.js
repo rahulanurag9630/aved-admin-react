@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
     "& p": {
       textAlign: "left",
-      color: "#ffffff8c",
+
     },
   },
   imgsection: {
@@ -76,10 +76,10 @@ export default function EditProfile() {
     title:
       addFaq || editFaq
         ? yup
-            .string()
-            .trim()
-            .required("Question is required.")
-            .max(256, "Question should not exceed 256 characters.")
+          .string()
+          .trim()
+          .required("Question is required.")
+          .max(256, "Question should not exceed 256 characters.")
         : "",
     description: yup
       .string()
@@ -113,6 +113,10 @@ export default function EditProfile() {
     }
   };
 
+
+  // Separate refs for each editor
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
   return (
     <Box className={classes.viewcontentBox}>
       <Topheading
@@ -142,63 +146,157 @@ export default function EditProfile() {
         }) => (
           <form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Box mt={1} mb={1}>
-                  <Typography variant="body2">
-                    {addFaq || editFaq ? "Question" : "Title"}{" "}
-                  </Typography>
-                </Box>
+              {addFaq ? (
+                <Grid container spacing={2}>
+                  {/* English Question (Left) */}
+                  <Grid item xs={12} sm={6}>
+                    <Box mt={1} mb={1}>
+                      <Typography variant="body2">Question (English)</Typography>
+                    </Box>
+                    <FormControl fullWidth className="formControl">
+                      <TextField
+                        variant="outlined"
+                        placeholder="Enter question in English"
+                        fullWidth
+                        name="title_en"
+                        value={values.title_en}
+                        disabled={isEdit || isView || isLoading}
+                        error={Boolean(touched?.title_en && errors?.title_en)}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                      />
+                      <FormHelperText error>
+                        {touched?.title_en && errors?.title_en}
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
 
-                <FormControl fullWidth className="formControl">
-                  <TextField
-                    variant="outlined"
-                    placeholder={
-                      addFaq || editFaq
-                        ? "Enter question"
-                        : `Title of static content`
-                    }
+                  {/* Arabic Question (Right) */}
+                  <Grid item xs={12} sm={6}>
+                    <Box mt={1} mb={1} sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2">السؤال</Typography>
+                    </Box>
+                    <FormControl fullWidth className="formControl">
+                      <TextField
+                        variant="outlined"
+                        placeholder="أدخل السؤال بالعربية"
+                        fullWidth
+                        name="title_ar"
+                        value={values.title_ar}
+                        disabled={isEdit || isView || isLoading}
+                        error={Boolean(touched?.title_ar && errors?.title_ar)}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        inputProps={{ style: { textAlign: 'right' }, dir: 'rtl' }}
+                      />
+                      <FormHelperText error>
+                        {touched?.title_ar && errors?.title_ar}
+                      </FormHelperText>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              ) : (
+                // If not addFaq, show single Title field (default behavior)
+                <Grid item xs={12}>
+                  <Box mt={1} mb={1}>
+                    <Typography variant="body2">Title</Typography>
+                  </Box>
+                  <FormControl fullWidth className="formControl">
+                    <TextField
+                      variant="outlined"
+                      placeholder="Title of static content"
+                      fullWidth
+                      name="title"
+                      value={values.title}
+                      disabled={isEdit || isView || isLoading}
+                      error={Boolean(touched?.title && errors?.title)}
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                    />
+                    <FormHelperText error>
+                      {touched?.title && errors?.title}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+              )}
+
+
+              <Grid container spacing={2}>
+                {/* English / Default Description */}
+                <Grid item xs={6}>
+                  <Box mt={1} mb={1}>
+                    <Typography variant="body2">
+                      {addFaq || editFaq ? "Answer (English)" : "Description"}
+                    </Typography>
+                  </Box>
+
+                  <FormControl
                     fullWidth
-                    name="title"
-                    value={values.title}
-                    disabled={isEdit || isView || isLoading}
-                    error={Boolean(touched?.title && errors?.title)}
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                  />
-                  <FormHelperText error>
-                    {touched?.title && errors?.title}
-                  </FormHelperText>
-                </FormControl>
+                    className="formControl"
+                    error={touched.description && Boolean(errors.description)}
+                  >
+                    <JoditEditor
+                      ref={editor}
+                      value={values.description}
+                      tabIndex={1}
+                      config={{
+                        readonly: isView || isLoading,
+                        toolbar: true,
+                        iframe: true, // Enables isolated styling
+                        iframeStyle: `
+            * { color: black !important; }
+            body { background-color: white; color: black !important; }
+          `,
+                      }}
+                      name="description"
+                      onBlur={(e) => setFieldValue("description", e)}
+                    />
+
+                    {touched.description && (
+                      <FormHelperText>{errors.description}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+
+                {/* Arabic / RTL Description */}
+               
+                  <Grid item xs={6}>
+                    <Box mt={1} mb={1} textAlign="right">
+                      <Typography variant="body2">السؤال (Arabic)</Typography>
+                    </Box>
+
+                    <FormControl
+                      fullWidth
+                      className="formControl"
+                      error={touched.description_ar && Boolean(errors.description_ar)}
+                    >
+                      <JoditEditor
+                        ref={(instance) => (editorRefAr.current = instance)}
+                        value={values.description_ar}
+                        tabIndex={2}
+                        config={{
+                          readonly: isView || isLoading,
+                          toolbar: true,
+                          direction: "rtl",
+                          language: "ar",
+                          iframe: true,
+                          autofocus: false,
+                          iframeStyle: `
+              * { color: black !important; direction: rtl !important; }
+              body { background-color: white; color: black !important; direction: rtl; }
+            `,
+                        }}
+                        name="description_ar"
+                        onBlur={(e) => setFieldValue("description_ar", e)}
+                      />
+                      {touched.description_ar && (
+                        <FormHelperText>{errors.description_ar}</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+               
               </Grid>
 
-              <Grid item xs={12}>
-                <Box mt={1} mb={1}>
-                  <Typography variant="body2">
-                    {addFaq || editFaq ? "Answer" : "Description"}
-                  </Typography>
-                </Box>
-
-                <FormControl
-                  fullWidth
-                  className="formControl"
-                  error={touched.description && Boolean(errors.description)}
-                >
-                  <JoditEditor
-                    ref={editor}
-                    value={values.description}
-                    tabIndex={1}
-                    config={{
-                      readonly: isView || isLoading,
-                      toolbar: true,
-                    }}
-                    name="description"
-                    onBlur={(e) => setFieldValue("description", e)}
-                  />
-                  {touched.description && (
-                    <FormHelperText>{errors.description}</FormHelperText>
-                  )}
-                </FormControl>
-              </Grid>
 
               <Grid item xs={12}>
                 <Box className="displayCenter" mt={4}>
