@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(4),
   },
   imageUploadBox: {
-    border: "2px dashed #FFFFFF26",
+    border: "2px dashed #000",
     padding: theme.spacing(2),
     borderRadius: "10px",
     textAlign: "center",
@@ -91,7 +91,7 @@ const AddProperty = () => {
 
   return (
     <Paper elevation={2} className={classes.formWrapper}>
-      <Typography variant="h6" color="secondary" gutterBottom>
+      <Typography variant="h4" color="secondary" gutterBottom>
         Add New Property
       </Typography>
 

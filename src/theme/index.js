@@ -62,7 +62,7 @@ const baseOptions = {
     },
     MuiTableHead: {
       root: {
-        background: "##746058 !important",
+        background: "#746058 !important",
       },
     },
     MuiTable: {
@@ -228,7 +228,12 @@ const baseOptions = {
         lineHeight: "33px !important",
       },
     },
+    MuiFormHelperText: {
+      root: {
 
+        fontWeight: "600 !important",
+      },
+    },
     MuiPaper: {
       outlined: {
         padding: "20px",
@@ -237,8 +242,9 @@ const baseOptions = {
       elevation2: {
         padding: "15px",
         borderRadius: "10px",
-        background: "#746058",
+        background: "#FFFFF",
         boxShadow: "none",
+        color: "#000",
         // border: "1px solid #80808036",
       },
       root: {
@@ -313,13 +319,13 @@ const baseOptions = {
     MuiInputBase: {
       root: {
         width: "100%",
-        background: "#746058    !important",
-        border: "1px solid white !important",
+        // background: "#746058    !important",
+        border: "1px solid black !important",
       },
       input: {
         fontSize: "13px !important",
         fontWeight: "400 !important",
-        color: "#dbdbdb !important",
+        color: "#000 !important",
 
         height: "1.1876em",
         "&:-webkit-autofill": {
@@ -385,7 +391,7 @@ const baseOptions = {
       },
 
       colorSecondary: {
-        color: "#f7f7f7 !important",
+        color: "#000 !important",
       },
       subtitle1: {
         color: "#222",
@@ -500,7 +506,7 @@ const themesOptions = [
       },
       MuiInputBase: {
         root: {
-          backgroundColor: "#FFFFFF",
+          background: "#FFFFFF",
           color: "#000",
         },
         input: {

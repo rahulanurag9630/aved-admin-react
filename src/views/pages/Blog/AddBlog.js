@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(4),
   },
   imageUploadBox: {
-    border: "2px dashed #FFFFFF26",
+    border: "2px dashed #000",
     padding: theme.spacing(2),
     borderRadius: "10px",
     textAlign: "center",
@@ -179,7 +179,7 @@ const AddBlog = () => {
                     />
                     <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
                       <Avatar>
-                        <FiUpload />
+                        <FiUpload color="#FFF" />
                       </Avatar>
                       <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
                         Click to upload image
@@ -216,7 +216,7 @@ const AddBlog = () => {
                     />
                     <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
                       <Avatar>
-                        <FiUpload />
+                        <FiUpload color="#FFF" />
                       </Avatar>
                       <Typography
                         variant="body2"
