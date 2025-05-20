@@ -23,28 +23,23 @@ const tableHead = [
   },
   {
     heading: "Title",
+    column: 0,
+    isMobile: true,
+  },
+  {
+    heading: "Created Date & Time",
     column: 1,
     isMobile: true,
   },
   {
-    heading: "Image",
-    column: 2,
-    isMobile: true,
-  },
-
-  {
-    heading: "Created Date & Time",
-    column: 3,
-    isMobile: true,
-  },
-  {
     heading: "Action",
-    column: 4,
+    column: 1,
     isMobile: true,
   },
 ];
 
 
+  
 
 export default function Blogs() {
   const history = useHistory();
@@ -54,7 +49,7 @@ export default function Blogs() {
   const [deleteBlockId, setDeleteBlockId] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [transactionList, setTransactionList] = useState([]);
+  const [transactionList, setBlogList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
   const checkEdit = location?.state?.isEdit;
@@ -104,86 +99,78 @@ export default function Blogs() {
       // }
       // setIsClear(false);
       // setIsLoading(false);
-      setTransactionList([
-        {
-          id: 1,
-          title: "Swimming Pool",
-          image: "https://via.placeholder.com/100x100?text=Pool",
-          description: "Olympic-sized pool open from 6 AM to 10 PM.",
-          createdAt: "2025-05-01 10:15 AM",
-        },
-        {
-          id: 2,
-          title: "Gym",
-          image: "https://via.placeholder.com/100x100?text=Gym",
-          description: "24/7 fully equipped gym with trainers.",
-          createdAt: "2025-05-01 10:30 AM",
-        },
-        {
-          id: 3,
-          title: "Community Hall",
-          image: "https://via.placeholder.com/100x100?text=Hall",
-          description: "Available for resident events and parties.",
-          createdAt: "2025-05-01 11:00 AM",
-        },
-        {
-          id: 4,
-          title: "Children's Play Area",
-          image: "https://via.placeholder.com/100x100?text=Play+Area",
-          description: "Safe play area with modern equipment.",
-          createdAt: "2025-05-01 11:15 AM",
-        },
-        {
-          id: 5,
-          title: "Library",
-          image: "https://via.placeholder.com/100x100?text=Library",
-          description: "Quiet reading space with a wide range of books.",
-          createdAt: "2025-05-01 12:00 PM",
-        },
-        {
-          id: 6,
-          title: "Jogging Track",
-          image: "https://via.placeholder.com/100x100?text=Jogging",
-          description: "1.5 km paved track around the garden.",
-          createdAt: "2025-05-01 12:30 PM",
-        },
-        {
-          id: 7,
-          title: "Guest Parking",
-          image: "https://via.placeholder.com/100x100?text=Parking",
-          description: "Dedicated parking slots for visitors.",
-          createdAt: "2025-05-01 01:00 PM",
-        },
-        {
-          id: 8,
-          title: "Clubhouse",
-          image: "https://via.placeholder.com/100x100?text=Clubhouse",
-          description: "Multipurpose indoor recreational space.",
-          createdAt: "2025-05-01 01:30 PM",
-        },
-        {
-          id: 9,
-          title: "Security Room",
-          image: "https://via.placeholder.com/100x100?text=Security",
-          description: "Round-the-clock monitoring and control room.",
-          createdAt: "2025-05-01 02:00 PM",
-        },
-        {
-          id: 10,
-          title: "CCTV Surveillance",
-          image: "https://via.placeholder.com/100x100?text=CCTV",
-          description: "24/7 camera monitoring across premises.",
-          createdAt: "2025-05-01 02:30 PM",
-        },
-      ]);
+      setBlogList([
+  {
+    id: 1,
+    title: "Getting Started with React",
+    image: "https://via.placeholder.com/100x100?text=React",
+    createdAt: "2025-05-01 10:00 AM",
+  },
+  {
+    id: 2,
+    title: "Understanding JavaScript Closures",
+    image: "https://via.placeholder.com/100x100?text=JS",
+    createdAt: "2025-05-01 11:00 AM",
+  },
+  {
+    id: 3,
+    title: "Top 10 CSS Tricks for Developers",
+    image: "https://via.placeholder.com/100x100?text=CSS",
+    createdAt: "2025-05-01 12:00 PM",
+  },
+  {
+    id: 4,
+    title: "State Management in React",
+    description: "Explore different ways to manage state in large apps.",
+    image: "https://via.placeholder.com/100x100?text=State",
+    createdAt: "2025-05-01 01:00 PM",
+  },
+  {
+    id: 5,
+    title: "Why TypeScript Matters",
+    image: "https://via.placeholder.com/100x100?text=TS",
+    createdAt: "2025-05-01 02:00 PM",
+  },
+  {
+    id: 6,
+    title: "Deploying with Vercel",
+    image: "https://via.placeholder.com/100x100?text=Vercel",
+    createdAt: "2025-05-01 03:00 PM",
+  },
+  {
+    id: 7,
+    title: "SEO Best Practices for Blogs",
+    description: "Learn how to optimize your blog content for search engines.",
+    image: "https://via.placeholder.com/100x100?text=SEO",
+    createdAt: "2025-05-01 04:00 PM",
+  },
+  {
+    id: 8,
+    title: "Next.js vs React",
+    image: "https://via.placeholder.com/100x100?text=Next",
+    createdAt: "2025-05-01 05:00 PM",
+  },
+  {
+    id: 9,
+    title: "Git & GitHub Essentials",
+    image: "https://via.placeholder.com/100x100?text=Git",
+    createdAt: "2025-05-01 06:00 PM",
+  },
+  {
+    id: 10,
+    title: "Building REST APIs with Node.js",
+    image: "https://via.placeholder.com/100x100?text=Node",
+    createdAt: "2025-05-01 07:00 PM",
+  },
+]);
 
     } catch (err) {
-      setTransactionList([]);
+      setBlogList([]);
       setIsLoading(false);
       console.log(err);
     }
-    finally {
-      setIsClear(false);
+    finally{
+       setIsClear(false);
       setIsLoading(false);
     }
   };
@@ -223,11 +210,11 @@ export default function Blogs() {
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
         Title: value?.title,
-        Desctiption: value?.description,
+        Description: value?.description,
         Price: `$${value?.price}`,
         Duration: value?.durationLabel,
         Badge: value?.badge,
-
+        
         "Created Date & Time": value?.createdAt,
         Action: [
           {
@@ -240,35 +227,35 @@ export default function Blogs() {
           },
           ...(checkEdit
             ? [
-              {
-                icon: FaEdit,
-                onClick: () =>
-                  history.push({
-                    pathname: "/add-subscription",
-                    state: { ...value, editSubAdmin: true },
-                  }),
-              },
-              {
-                icon: BlockIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("block");
+                {
+                  icon: FaEdit,
+                  onClick: () =>
+                    history.push({
+                      pathname: "/add-subscription",
+                      state: { ...value, editSubAdmin: true },
+                    }),
                 },
-              },
-              {
-                icon: DeleteIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("delete");
+                {
+                  icon: BlockIcon,
+                  onClick: () => {
+                    setDeleteBlockId(value);
+                    setModalOpen("block");
+                  },
                 },
-              },
-            ]
+                {
+                  icon: DeleteIcon,
+                  onClick: () => {
+                    setDeleteBlockId(value);
+                    setModalOpen("delete");
+                  },
+                },
+              ]
             : []),
         ],
       }))
     );
   }
-
+  
 
   const handleClearFilter = () => {
     if (!isClear) {
@@ -309,9 +296,9 @@ export default function Blogs() {
     <Box>
       <Box className="tophead">
         <Topheading
-          heading="Amenities Management"
-          pathname={checkEdit ? "/add-amenities-management" : undefined}
-          addButton={"Add Amenities"}
+          heading="Tag Management"
+          pathname={checkEdit ? "/add-tag-management" : undefined}
+          addButton={"Tag Blog"}
         />
       </Box>
       <Box my={3}>
@@ -345,18 +332,20 @@ export default function Blogs() {
         <ConfirmationDialogBox
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
-          heading={`${modalOpen === "delete"
+          heading={`${
+            modalOpen === "delete"
               ? "Delete"
               : deleteBlockId.status !== "BLOCK"
-                ? "Block"
-                : "Unblock"
-            } Plan`}
-          description={`Are you sure, you want to ${modalOpen === "delete"
+              ? "Block"
+              : "Unblock"
+          } Plan`}
+          description={`Are you sure, you want to ${
+            modalOpen === "delete"
               ? "Delete"
               : deleteBlockId.status !== "BLOCK"
-                ? "Block"
-                : "Unblock"
-            } this plan?`}
+              ? "Block"
+              : "Unblock"
+          } this plan?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
           blockDescription={"Are you sure, you want to block this plan?"}
