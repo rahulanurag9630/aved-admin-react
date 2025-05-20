@@ -83,7 +83,7 @@ const baseOptions = {
           whiteSpace: "pre",
           lineHeight: "20px",
           textAlign: "center",
-          color: "#0e0e0e	 !important",
+          color: "#fff	 !important",
         },
         "& th:first-child": {
           borderRadius: "10px 0px 0px 0px",
