@@ -35,7 +35,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-    title: yup.string().required("Title is required").min(3, "Enter at least 3 characters"),
+    title: yup.string().required("Please enter title.").min(3, "Enter at least 3 characters"),
+    title_ar: yup
+        .string()
+        .required("الرجاء إدخال العنوان")
+        .min(3, "أدخل 3 أحرف على الأقل"),
     description: yup.string().required("Description is required").min(10, "Enter at least 10 characters"),
     image: yup.string().required("Image is required"),
 });
@@ -90,32 +94,32 @@ const AddAmenities = () => {
                                     <FormHelperText error>{touched.title && errors.title}</FormHelperText>
                                 </Grid>
 
-                                {/* Description */}
+                                {/* Title */}
                                 <Grid item xs={6}>
-                                    <Typography variant="body2" color="secondary" dir='rtl' style={{ marginBottom: "5px" }}>
+                                    <Typography variant="body2" color="secondary" dir="rtl" style={{ marginBottom: "5px" }}>
                                         العنوان
                                     </Typography>
                                     <TextField
                                         fullWidth
                                         placeholder="أدخل العنوان"
-                                        dir='rtl'
-                                        name="title"
+                                        dir="rtl"
+                                        name="title_ar"
                                         variant="outlined"
-                                        value={values.title}
+                                        value={values.title_ar}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        error={Boolean(touched.title && errors.title)}
+                                        error={Boolean(touched.title_ar && errors.title_ar)}
                                     />
-                                    <FormHelperText error>{touched.title && errors.title}</FormHelperText>
+                                    <FormHelperText error>{touched.title_ar && errors.title_ar}</FormHelperText>
                                 </Grid>
                             </Grid>
 
 
                             {/* Image Upload */}
                             <Grid item xs={6}>
-                                 <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                                       Image
-                                    </Typography>
+                                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                                    Image
+                                </Typography>
                                 <Box className={classes.imageUploadBox}>
                                     <input
                                         id="image-upload"
@@ -151,7 +155,7 @@ const AddAmenities = () => {
                             {/* Submit Button */}
                             <Grid item xs={7} className="displayCenter">
                                 <div style={{ display: 'flex', gap: '25px', marginTop: '25px' }}>
-                                      {/* Back Button */}
+                                    {/* Back Button */}
                                     <Button
                                         variant="contained"
                                         color="secondary"
@@ -170,7 +174,7 @@ const AddAmenities = () => {
                                         {isSubmitting ? "Submitting..." : "Submit"}
                                     </Button>
 
-                                  
+
                                 </div>
                             </Grid>
 

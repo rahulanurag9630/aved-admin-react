@@ -109,7 +109,7 @@ export default function DashdoardHome() {
       title: "Total Properties",
       count: 120000,
       background: "#846cf94d",
-      color: "#846cf9cc",
+      color: "#3e2d91",
       background1: "rgb(132 108 249 / 44%)",
     },
     {
@@ -196,7 +196,7 @@ export default function DashdoardHome() {
     <Box className={classes.dashboardBox}>
       <Grid container spacing={3}>
         <Grid item xs={11} sm={6} md={12}>
-          <Typography variant="h3" color="primary">
+          <Typography variant="h3" color="secondry">
             Dashboard
           </Typography>
           <Divider className="borderBox" />
