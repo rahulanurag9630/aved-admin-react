@@ -724,7 +724,7 @@ const themesOptions = [
         main: "rgba(255, 255, 255, 0.5)",
       },
       text: {
-        primary: "#88858c",
+        primary: "#FFFFFF",
         secondary: "#adb0bb",
       },
     },

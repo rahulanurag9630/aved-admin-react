@@ -18,6 +18,8 @@ import BarChart from "./BarChart";
 import AreaChart from "./AreaChart";
 import { AuthContext } from "src/context/Auth";
 import zIndex from "@material-ui/core/styles/zIndex";
+import MostViewedProperty from "./MostViewedProperty";
+import RecentalyAddedProperty from "./RecentalyAddedProperty";
 
 const useStyles = makeStyles((theme) => ({
   dashboardBox: {
@@ -113,7 +115,7 @@ export default function DashdoardHome() {
       background1: "rgb(132 108 249 / 44%)",
     },
     {
-      title: "Total Amenities",
+      title: "Total Amenities Amenities",
       count: 7540,
       background: "rgb(255 199 129 / 15%)",
       color: "#ffb153",
@@ -204,7 +206,7 @@ export default function DashdoardHome() {
       </Grid>
       <Box
         mt={1.5}
-        style={{ background: "#746058", borderRadius: "10px", padding: "20px" }}
+        style={{ background: "#F3F4F6", borderRadius: "10px", padding: "20px" }}
       >
         <Grid container spacing={2}>
           {!isLoading &&
@@ -220,9 +222,8 @@ export default function DashdoardHome() {
                     style={{ background: value.background1 }}
                   ></Box>
                   <Typography
-                    variant="subtitle1"
-                    className="trimText"
-                    style={{ color: "#f7f7f7 !important", marginTop: "10px" }}
+                    variant="h5"
+                    style={{ color: "#000 !important", marginTop: "10px" }}
                   >
                     {value?.title}
                   </Typography>
@@ -252,6 +253,28 @@ export default function DashdoardHome() {
                 </Grid>
               );
             })}
+        </Grid>
+        <Grid container spacing={2} style={{ background: "#F3F4F6", marginTop: "20px", }}>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box
+              style={{
+                padding: "30px",
+                background: "#FFF",
+                borderRadius: "15px",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <Typography variant="h5">Most Viewed Properties</Typography>
+              <MostViewedProperty />
+            </Box>
+
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box style={{ padding: "30px", background: "#FFF", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}><Typography variant="h5">Recentaly Added Properties
+            </Typography>
+              <RecentalyAddedProperty /></Box>
+
+          </Grid>
         </Grid>
       </Box>
       {/* 
