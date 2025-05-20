@@ -76,8 +76,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     position: "relative",
     padding: "20px",
-    backgroundColor: "#5c4d44",
-    color: "#fff",
+    backgroundColor: "#fff",
+    color: "#232423",
     // minHeight: "600px",
     minHeight: "calc(100vh - 75px)",
     "@media (max-width: 1280px)": {

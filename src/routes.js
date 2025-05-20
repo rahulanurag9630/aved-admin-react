@@ -204,6 +204,24 @@ export const routes = [
       import("src/views/pages/Blog/AddBlog")
     ),
   },
+  {
+    exact: true,
+    guard: true,
+    path: "/tag-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/TagManagement/index")
+    ),
+  },
+    {
+    exact: true,
+    guard: true,
+    path: "/add-tag-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/TagManagement/addTag")
+    ),
+  },
   // {
   //   exact: true,
   //   guard: true,

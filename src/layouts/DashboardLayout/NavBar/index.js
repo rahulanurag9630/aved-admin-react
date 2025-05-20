@@ -27,6 +27,7 @@ import {
   MdSubscriptions,
   MdTipsAndUpdates,
     MdRoomService,
+    MdLabel,
   
 } from "react-icons/md";
 import { IoMdChatbubbles } from "react-icons/io";
@@ -155,6 +156,12 @@ export const sections = [
         title: "Amenities Management",
         icon:   MdRoomService,
         href: "/amenities-management",
+        isEdit: false,
+      },
+       {
+        title: "Tag Management",
+        icon:   MdLabel,
+        href: "/tag-management",
         isEdit: false,
       },
 

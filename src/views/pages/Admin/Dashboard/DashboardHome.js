@@ -18,6 +18,8 @@ import BarChart from "./BarChart";
 import AreaChart from "./AreaChart";
 import { AuthContext } from "src/context/Auth";
 import zIndex from "@material-ui/core/styles/zIndex";
+import MostViewedProperty from "./MostViewedProperty";
+import RecentalyAddedProperty from "./RecentalyAddedProperty";
 
 const useStyles = makeStyles((theme) => ({
   dashboardBox: {
@@ -27,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: "5px !important",
       padding: "30px",
     },
-
     "& .MuiSelect-outlined": {
       display: "flex",
       minWidth: "106px",
@@ -73,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
     "& .pieBox": {
       padding: "20px 0px 12px",
     },
-
     "& .filterBox": {
       margin: "0px 20px",
       [theme.breakpoints.down("xs")]: {
@@ -94,8 +94,18 @@ const useStyles = makeStyles((theme) => ({
         },
       },
     },
+
+    // ✅ Move .trimText selector out here to apply globally within .dashboardBox
+
+
+  },
+
+  subTitleBox: {
+    display: "flex",
+    alignItems: "center",
   },
 }));
+
 
 export default function DashdoardHome() {
   const classes = useStyles();
@@ -107,20 +117,32 @@ export default function DashdoardHome() {
   const arrayData = [
     {
       title: "Total Properties",
-      count: 120000,
+      count: 160,
       background: "#846cf94d",
-      color: "#846cf9cc",
+      color: "#3e2d91",
       background1: "rgb(132 108 249 / 44%)",
+      active: 120,
+      draft: 30,
+      inactive: 50,
     },
     {
-      title: "Total Amenities",
-      count: 7540,
+      title: "Total Leads & Inquiries",
+      count: 245,
       background: "rgb(255 199 129 / 15%)",
       color: "#ffb153",
       background1: "rgb(255 177 83 / 39%)",
-    },
 
+    },
+    {
+      title: "Published Blogs",
+      count: 42,
+      background: "rgb(255 199 129 / 15%)",
+      color: "#ffb153",
+      background1: "rgb(255 177 83 / 39%)",
+
+    },
   ];
+
 
   const getDashboardData = async (source) => {
     try {
@@ -196,7 +218,7 @@ export default function DashdoardHome() {
     <Box className={classes.dashboardBox}>
       <Grid container spacing={3}>
         <Grid item xs={11} sm={6} md={12}>
-          <Typography variant="h3" color="primary">
+          <Typography variant="h3" color="secondry">
             Dashboard
           </Typography>
           <Divider className="borderBox" />
@@ -204,25 +226,24 @@ export default function DashdoardHome() {
       </Grid>
       <Box
         mt={1.5}
-        style={{ background: "#746058", borderRadius: "10px", padding: "20px" }}
+        style={{ background: "#f3f4f6", borderRadius: "10px", padding: "20px" }}
       >
         <Grid container spacing={2}>
           {!isLoading &&
             arrayData?.map((value) => (
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4} >
                 <Box
                   className="countBox1"
                   align="left"
-                  style={{ background: value.background }}
+                  style={{ background: value.background, height: "80%" }}
                 >
                   <Box
                     className="dashShadeBox"
                     style={{ background: value.background1 }}
                   ></Box>
                   <Typography
-                    variant="subtitle1"
-                    className="trimText"
-                    style={{ color: "#f7f7f7 !important", marginTop: "10px" }}
+                    variant="h6"
+                    style={{ color: "#000 !important", marginTop: "10px" }}
                   >
                     {value?.title}
                   </Typography>
@@ -241,6 +262,22 @@ export default function DashdoardHome() {
                       {value?.count?.toLocaleString() || "0"}
                     </Typography>
                   </Box>
+                  {value?.active && <Box className={classes.subTitleBox}>
+                    <Typography variant="body2">Active:</Typography>
+                    <Typography variant="subtitle1">{value?.active}</Typography>
+                  </Box>
+                  }
+                  {value?.draft && <Box className={classes.subTitleBox}>
+                    <Typography variant="body2">Draft:</Typography>
+                    <Typography variant="subtitle1">{value?.draft}</Typography>
+                  </Box>}
+                  {value?.inactive &&
+                    < Box className={classes.subTitleBox}>
+                      <Typography variant="body2">Inactive:</Typography>
+                      <Typography variant="subtitle1">{value?.inactive}</Typography>
+                    </Box>
+                  }
+
                 </Box>
               </Grid>
             ))}
@@ -252,6 +289,28 @@ export default function DashdoardHome() {
                 </Grid>
               );
             })}
+        </Grid>
+        <Grid container spacing={2} style={{ background: "#F3F4F6", marginTop: "20px", }}>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box
+              style={{
+                padding: "30px",
+                background: "#FFF",
+                borderRadius: "15px",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <Typography variant="h5">Most Viewed Properties</Typography>
+              <MostViewedProperty />
+            </Box>
+
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box style={{ padding: "30px", background: "#FFF", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}><Typography variant="h5">Recentaly Added Properties
+            </Typography>
+              <RecentalyAddedProperty /></Box>
+
+          </Grid>
         </Grid>
       </Box>
       {/* 
@@ -340,6 +399,6 @@ export default function DashdoardHome() {
           <BarChart />
         </Paper>
       </Box> */}
-    </Box>
+    </Box >
   );
 }
