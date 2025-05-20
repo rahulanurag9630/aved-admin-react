@@ -235,7 +235,7 @@ export default function DashdoardHome() {
                 <Box
                   className="countBox1"
                   align="left"
-                  style={{ background: value.background, height: "90%" }}
+                  style={{ background: value.background, height: "80%" }}
                 >
                   <Box
                     className="dashShadeBox"
