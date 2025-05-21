@@ -16,7 +16,7 @@ import Topheading from "src/component/TopHeading";
 import { apiRouterCall } from "src/ApiConfig/service";
 import ButtonCircularProgress from "src/component/ButtonCircularProgress";
 import toast from "react-hot-toast";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form } from "formik";
 import * as yup from "yup";
 
 const useStyles = makeStyles((theme) => ({
@@ -34,7 +34,6 @@ const useStyles = makeStyles((theme) => ({
     },
     "& p": {
       textAlign: "left",
-
     },
   },
   imgsection: {
@@ -64,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
 export default function EditProfile() {
   const classes = useStyles();
   const history = useHistory();
-  const editor = useRef(null);
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const isView = location?.state?.isView;
@@ -72,19 +70,39 @@ export default function EditProfile() {
   const addFaq = location?.state?.addFaq;
   const editFaq = location?.state?.editFaq;
 
+  // Separate refs for each editor
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
+
   const validationSchema = yup.object({
-    title:
-      addFaq || editFaq
-        ? yup
-          .string()
-          .trim()
-          .required("Question is required.")
-          .max(256, "Question should not exceed 256 characters.")
-        : "",
-    description: yup
+    title_en: addFaq || editFaq
+      ? yup
+        .string()
+        .trim()
+        .required("Question in English is required.")
+        .max(256, "Question should not exceed 256 characters.")
+      : yup
+        .string()
+        .trim()
+        .required("Title is required.")
+        .max(256, "Title should not exceed 256 characters."),
+    title_ar: addFaq || editFaq
+      ? yup
+        .string()
+        .trim()
+        .required("Question in Arabic is required.")
+        .max(256, "Question should not exceed 256 characters.")
+      : yup.string().trim(),
+    description_en: yup
       .string()
       .trim()
-      .required(`${addFaq || editFaq ? "Answer" : "Description"} is required.`),
+      .required(`${addFaq || editFaq ? "Answer in English" : "Description"} is required.`),
+    description_ar: addFaq || editFaq
+      ? yup
+        .string()
+        .trim()
+        .required("Answer in Arabic is required.")
+      : yup.string().trim(),
   });
 
   const handleStatic = async (values) => {
@@ -93,11 +111,14 @@ export default function EditProfile() {
       const response = await apiRouterCall({
         method: addFaq ? "POST" : "PUT",
         endPoint: addFaq ? "addFAQ" : editFaq ? "editFAQ" : "editStaticContent",
-
         bodyData: {
           _id: !addFaq ? location?.state?._id : undefined,
-          [addFaq || editFaq ? "question" : "title"]: values.title,
-          [addFaq || editFaq ? "answer" : "description"]: values.description,
+          question_en: addFaq || editFaq ? values.title_en : undefined,
+          question_ar: addFaq || editFaq ? values.title_ar : undefined,
+          title: !(addFaq || editFaq) ? values.title_en : undefined,
+          answer_en: addFaq || editFaq ? values.description_en : undefined,
+          answer_ar: addFaq || editFaq ? values.description_ar : undefined,
+          description: !(addFaq || editFaq) ? values.description_en : undefined,
         },
       });
       if (response?.data?.responseCode === 200) {
@@ -110,27 +131,26 @@ export default function EditProfile() {
     } catch (err) {
       console.error(err);
       setIsLoading(false);
+      toast.error("An error occurred while saving.");
     }
   };
 
-
-  // Separate refs for each editor
-  const editorRefEn = useRef(null);
-  const editorRefAr = useRef(null);
   return (
-    <Box className={classes.viewcontentBox}>
+    <Box className={classes.editprofileBox}>
       <Topheading
         heading={
           addFaq || editFaq
-            ? `${editFaq ? "Edit" : "Add"} Faq`
+            ? `${editFaq ? "Edit" : "Add"} FAQ`
             : `${isView ? "View" : "Edit"} Static Content`
         }
       />
       <Formik
         enableReinitialize
         initialValues={{
-          title: location?.state?.title || "",
-          description: location?.state?.description || "",
+          title_en: location?.state?.title || location?.state?.question_en || "",
+          title_ar: location?.state?.question_ar || "",
+          description_en: location?.state?.description || location?.state?.answer_en || "",
+          description_ar: location?.state?.answer_ar || "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleStatic}
@@ -144,11 +164,11 @@ export default function EditProfile() {
           handleSubmit,
           setFieldValue,
         }) => (
-          <form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              {addFaq ? (
+              {addFaq || editFaq ? (
                 <Grid container spacing={2}>
-                  {/* English Question (Left) */}
+                  {/* English Question */}
                   <Grid item xs={12} sm={6}>
                     <Box mt={1} mb={1}>
                       <Typography variant="body2">Question (English)</Typography>
@@ -161,20 +181,19 @@ export default function EditProfile() {
                         name="title_en"
                         value={values.title_en}
                         disabled={isEdit || isView || isLoading}
-                        error={Boolean(touched?.title_en && errors?.title_en)}
+                        error={Boolean(touched.title_en && errors.title_en)}
                         onBlur={handleBlur}
                         onChange={handleChange}
                       />
                       <FormHelperText error>
-                        {touched?.title_en && errors?.title_en}
+                        {touched.title_en && errors.title_en}
                       </FormHelperText>
                     </FormControl>
                   </Grid>
-
-                  {/* Arabic Question (Right) */}
+                  {/* Arabic Question */}
                   <Grid item xs={12} sm={6}>
-                    <Box mt={1} mb={1} sx={{ textAlign: 'right' }}>
-                      <Typography variant="body2">السؤال</Typography>
+                    <Box mt={1} mb={1} sx={{ textAlign: "right" }}>
+                      <Typography variant="body2">السؤال (العربية)</Typography>
                     </Box>
                     <FormControl fullWidth className="formControl">
                       <TextField
@@ -184,19 +203,18 @@ export default function EditProfile() {
                         name="title_ar"
                         value={values.title_ar}
                         disabled={isEdit || isView || isLoading}
-                        error={Boolean(touched?.title_ar && errors?.title_ar)}
+                        error={Boolean(touched.title_ar && errors.title_ar)}
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        inputProps={{ style: { textAlign: 'right' }, dir: 'rtl' }}
+                        inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
                       />
                       <FormHelperText error>
-                        {touched?.title_ar && errors?.title_ar}
+                        {touched.title_ar && errors.title_ar}
                       </FormHelperText>
                     </FormControl>
                   </Grid>
                 </Grid>
               ) : (
-                // If not addFaq, show single Title field (default behavior)
                 <Grid item xs={12}>
                   <Box mt={1} mb={1}>
                     <Typography variant="body2">Title</Typography>
@@ -206,97 +224,81 @@ export default function EditProfile() {
                       variant="outlined"
                       placeholder="Title of static content"
                       fullWidth
-                      name="title"
-                      value={values.title}
+                      name="title_en"
+                      value={values.title_en}
                       disabled={isEdit || isView || isLoading}
-                      error={Boolean(touched?.title && errors?.title)}
+                      error={Boolean(touched.title_en && errors.title_en)}
                       onBlur={handleBlur}
                       onChange={handleChange}
                     />
                     <FormHelperText error>
-                      {touched?.title && errors?.title}
+                      {touched.title_en && errors.title_en}
                     </FormHelperText>
                   </FormControl>
                 </Grid>
               )}
 
-
               <Grid container spacing={2}>
-                {/* English / Default Description */}
-                <Grid item xs={6}>
+                {/* English Description/Answer */}
+                <Grid item xs={12} sm={6}>
                   <Box mt={1} mb={1}>
                     <Typography variant="body2">
                       {addFaq || editFaq ? "Answer (English)" : "Description"}
                     </Typography>
                   </Box>
-
                   <FormControl
                     fullWidth
                     className="formControl"
-                    error={touched.description && Boolean(errors.description)}
+                    error={touched.description_en && Boolean(errors.description_en)}
                   >
                     <JoditEditor
-                      ref={editor}
-                      value={values.description}
+                      ref={editorRefEn}
+                      value={values.description_en}
                       tabIndex={1}
                       config={{
                         readonly: isView || isLoading,
                         toolbar: true,
-                        iframe: true, // Enables isolated styling
-                        iframeStyle: `
-            * { color: black !important; }
-            body { background-color: white; color: black !important; }
-          `,
-                      }}
-                      name="description"
-                      onBlur={(e) => setFieldValue("description", e)}
-                    />
 
-                    {touched.description && (
-                      <FormHelperText>{errors.description}</FormHelperText>
-                    )}
+                      }}
+                      onBlur={(newContent) => setFieldValue("description_en", newContent)}
+                    />
+                    <FormHelperText error>
+                      {touched.description_en && errors.description_en}
+                    </FormHelperText>
                   </FormControl>
                 </Grid>
-
-                {/* Arabic / RTL Description */}
-               
-                  <Grid item xs={6}>
-                    <Box mt={1} mb={1} textAlign="right">
-                      <Typography variant="body2">السؤال (Arabic)</Typography>
-                    </Box>
-
-                    <FormControl
-                      fullWidth
-                      className="formControl"
-                      error={touched.description_ar && Boolean(errors.description_ar)}
-                    >
-                      <JoditEditor
-                        ref={(instance) => (editorRefAr.current = instance)}
-                        value={values.description_ar}
-                        tabIndex={2}
-                        config={{
-                          readonly: isView || isLoading,
-                          toolbar: true,
-                          direction: "rtl",
-                          language: "ar",
-                          iframe: true,
-                          autofocus: false,
-                          iframeStyle: `
-              * { color: black !important; direction: rtl !important; }
-              body { background-color: white; color: black !important; direction: rtl; }
-            `,
-                        }}
-                        name="description_ar"
-                        onBlur={(e) => setFieldValue("description_ar", e)}
-                      />
-                      {touched.description_ar && (
-                        <FormHelperText>{errors.description_ar}</FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-               
+                {/* Arabic Description/Answer */}
+                <Grid item xs={12} sm={6}>
+                  <Box mt={1} mb={1}>
+                    <Typography variant="body2" dir="rtl">
+                      {addFaq || editFaq ? "الإجابة (العربية)" : "الوصف (العربية)"}
+                    </Typography>
+                  </Box>
+                  <FormControl
+                    fullWidth
+                    className="formControl"
+                    error={touched.description_ar && Boolean(errors.description_ar)}
+                  >
+                    <JoditEditor
+                      ref={editorRefAr}
+                      value={values.description_ar}
+                      tabIndex={2}
+                    
+                      config={{
+                        readonly: isView || isLoading,
+                        toolbar: true,
+                        direction: "rtl",
+                        language: "ar",
+                        
+                      }}
+                      onBlur={(newContent) => setFieldValue("description_ar", newContent)}
+                    />
+                    <FormHelperText error>
+                      {touched.description_ar && errors.description_ar}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
               </Grid>
-
 
               <Grid item xs={12}>
                 <Box className="displayCenter" mt={4}>
@@ -310,22 +312,19 @@ export default function EditProfile() {
                     Cancel
                   </Button>
                   {!isView && (
-                    <>
-                      &nbsp; &nbsp;
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        type="submit"
-                        disabled={isLoading}
-                      >
-                        Update {isLoading && <ButtonCircularProgress />}
-                      </Button>
-                    </>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      disabled={isLoading}
+                    >
+                      Update {isLoading && <ButtonCircularProgress />}
+                    </Button>
                   )}
                 </Box>
               </Grid>
             </Grid>
-          </form>
+          </Form>
         )}
       </Formik>
     </Box>
