@@ -43,6 +43,11 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  paperCustom: {
+  backgroundColor: "#071c359c !important",
+  
+},
+
 }));
 
 export default function Login() {
@@ -151,9 +156,10 @@ export default function Login() {
   return (
 
 
-    <Paper elevation={2} style={{
+    <Paper elevation={2}  className={classes.paperCustom} sx={{
       boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
-      zIndex: 1000
+      zIndex: 1000,
+     
     }}>
       <Box className="displayCenter" mb={3}>
         <Typography variant="h2" color="primary">
@@ -170,7 +176,7 @@ export default function Login() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Box mb={1}>
-                  <Typography variant="body2" color="secondary">
+                  <Typography variant="body2" color="primary">
                     Email <span style={{ color: "#FD3124" }}>*</span>
                   </Typography>
                 </Box>
@@ -198,7 +204,7 @@ export default function Login() {
               </Grid>
               <Grid item xs={12}>
                 <Box mt={1} mb={1}>
-                  <Typography variant="body2" color="secondary">
+                  <Typography variant="body2" color="primary">
                     Password <span style={{ color: "#FD3124" }}>*</span>
                   </Typography>
                 </Box>
@@ -248,7 +254,7 @@ export default function Login() {
                 <Box>
                   <Typography
                     variant="body2"
-                    color="secondary"
+                    color="primary"
                     style={{ cursor: "pointer" }}
                   >
                     Remember me
@@ -261,7 +267,7 @@ export default function Login() {
                   style={{ cursor: "pointer" }}
                   onClick={() => !isLoading && history.push("/forget")}
                 >
-                  <span style={{ color: "#071c35" }}>
+                  <span style={{ color: "#fff" }}>
                     Forgot Password?
                   </span>
                 </Typography>
