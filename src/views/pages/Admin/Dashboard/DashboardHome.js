@@ -20,6 +20,8 @@ import { AuthContext } from "src/context/Auth";
 import zIndex from "@material-ui/core/styles/zIndex";
 import MostViewedProperty from "./MostViewedProperty";
 import RecentalyAddedProperty from "./RecentalyAddedProperty";
+import DailyPropertyViewChart from "./DailyPropertyViewChart";
+import MonthlyPropertyViewChart from "./MonthlyPropertyViews";
 
 const useStyles = makeStyles((theme) => ({
   dashboardBox: {
@@ -243,7 +245,7 @@ export default function DashdoardHome() {
                   ></Box>
                   <Typography
                     variant="h6"
-                    style={{ color: "#000 !important", marginTop: "10px" }}
+                    style={{ color: "#000 !important", marginTop: "10px", fontWeight: "600" }}
                   >
                     {value?.title}
                   </Typography>
@@ -312,11 +314,35 @@ export default function DashdoardHome() {
 
           </Grid>
         </Grid>
+
+        <Grid container spacing={2} style={{ background: "#F3F4F6", marginTop: "20px", }}>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box
+              style={{
+                padding: "30px",
+                background: "#FFF",
+                borderRadius: "15px",
+                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)"
+              }}
+            >
+              <Typography variant="h5">Daily Property Views</Typography>
+              <DailyPropertyViewChart />
+            </Box>
+
+          </Grid>
+          <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
+            <Box style={{ padding: "30px", background: "#FFF", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}><Typography variant="h5">Monthly Property Views
+            </Typography>
+              <MonthlyPropertyViewChart />
+            </Box>
+
+          </Grid>
+        </Grid>
       </Box>
       {/* 
       <Box mt={3}>
         <Typography
-          variant="h3"
+          variant="h3"  
           color="primary"
           style={{ marginBottom: "16px" }}
         >
