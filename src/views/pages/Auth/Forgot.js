@@ -66,6 +66,9 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: "8px",
     },
   },
+   paperCustom: {
+  backgroundColor: "#071c359c !important",
+},
 }));
 
 export default function Forgot() {
@@ -116,14 +119,14 @@ export default function Forgot() {
   };
 
   return (
-    <Paper elevation={2}>
+    <Paper elevation={2} className={classes.paperCustom}>
       <Box className="displayStart" mb={1}>
         <Typography variant="h2" color="primary">
           Forgot Password
         </Typography>
       </Box>
       <Box textAlign={"left"}>
-        <Typography variant="body2" color="secondary">
+        <Typography variant="body2" color="primary">
           Enter your registered email here, we will send a verification link to
           retrieve your password.
         </Typography>
@@ -146,7 +149,7 @@ export default function Forgot() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Box mt={3} mb={1}>
-                  <Typography variant="body2" color="secondary">
+                  <Typography variant="body2" color="primary">
                     Email <span style={{ color: "#FD3124" }}>*</span>
                   </Typography>
                 </Box>
@@ -195,10 +198,10 @@ export default function Forgot() {
             </Button> */}
 
             <Box textAlign={"center"}>
-              <Typography variant="body2" color="secondary">
+              <Typography variant="body2" color="primary">
                 Forget it. Send me back to{" "}
                 <span
-                  style={{ color: "rgb(122 90 248)", cursor: "pointer" }}
+                  style={{ color: "rgb(0 217 255)", cursor: "pointer" }}
                   onClick={() => history.goBack()}
                   disabled={isLoading}
                 >

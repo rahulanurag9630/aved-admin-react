@@ -30,20 +30,9 @@ const useStyles = makeStyles((theme) => ({
         display: "none",
       },
     },
-    "& .rightlayoutleftSide": {
-      width: "100%",
-      height: "100vh",
-      zIndex: 1,
-      position: "relative",
-      background: "#5c4d44",
-      overflow: "auto",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      "@media(max-width:1200px)": {
-        width: "100%",
-      },
-    },
+    "& .rightlayoutleftSide": { width: "100%", height: "100vh", zIndex: 1, position: "relative", overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", backgroundImage: 'url("images/bg2.jpg")', backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat", "@media(max-width:1200px)": { width: "100%", }, },
+
+
     "& .loginLogo": {
       maxWidth: "350px",
       width: "100%",
