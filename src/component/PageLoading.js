@@ -4,7 +4,7 @@ import { makeStyles, Box } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
   root: {
     alignItems: "center",
-    backgroundColor: "#b1a9a9ed",
+    backgroundColor: "#071c35",
     display: "flex",
     flexDirection: "column",
     height: "100%",
