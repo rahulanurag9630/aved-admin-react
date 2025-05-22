@@ -10,7 +10,9 @@ import {
   FormHelperText,
   MenuItem,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
+import JoditEditor from "jodit-react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload } from "react-icons/fi";
@@ -35,9 +37,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Title is required").min(3, "Enter at least 3 characters"),
-  description: yup.string().required("Description is required").min(10, "Enter at least 10 characters"),
-  image: yup.string().required("Image is required"),
+  title: yup.string().required("Please enter title.").min(3, "Enter at least 3 characters"),
+  description: yup.string().required("Please enter description.").min(10, "Enter at least 10 characters"),
+  description_arb: yup
+    .string()
+    .required("يرجى إدخال الوصف.")
+    .min(10, "أدخل 10 أحرف على الأقل."),
+
+  image: yup.string().required("Please upload an image."),
+  title_ar: yup
+    .string()
+    .required("يرجى إدخال العنوان.")
+    .min(3, "أدخل 3 أحرف على الأقل."),
+
+  image_ar: yup
+    .string()
+    .required("يرجى تحميل صورة."),
+
+
 });
 
 const AddBlog = () => {
@@ -46,8 +63,11 @@ const AddBlog = () => {
 
   const initialValues = {
     title: "",
+    title_ar: "",
     description: "",
+    description_arb: "",
     image: "",
+    image_ar: "",
   };
 
   const handleSubmit = async (values) => {
@@ -57,6 +77,13 @@ const AddBlog = () => {
     setIsSubmitting(false);
   };
 
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const isView = location?.state?.isView;
+  const isEdit = location?.state?.isEdit;
+
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
   return (
     <Paper elevation={2} className={classes.formWrapper}>
       <Typography variant="h6" color="secondary" gutterBottom>
@@ -99,14 +126,14 @@ const AddBlog = () => {
                     fullWidth
                     placeholder="أدخل العنوان"
                     dir='rtl'
-                    name="title"
+                    name="title_ar"
                     variant="outlined"
-                    value={values.title}
+                    value={values.title_ar}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    error={Boolean(touched.title && errors.title)}
+                    error={Boolean(touched.title_ar && errors.title_ar)}
                   />
-                  <FormHelperText error>{touched.title && errors.title}</FormHelperText>
+                  <FormHelperText error>{touched.title_ar && errors.title_ar}</FormHelperText>
                 </Grid>
               </Grid>
 
@@ -117,18 +144,23 @@ const AddBlog = () => {
                   <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
                     Description
                   </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={4}
-                    placeholder="Enter description"
+
+
+                  <JoditEditor
+                    ref={editorRefEn}
+                    value={values.description}
+                    tabIndex={1}
                     name="description"
                     variant="outlined"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
+                    config={{
+                      readonly: isView || isLoading,
+                      toolbar: true,
+
+                    }}
                     error={Boolean(touched.description && errors.description)}
+                    onBlur={(newContent) => setFieldValue("description_en", newContent)}
                   />
+
                   <FormHelperText error>{touched.description && errors.description}</FormHelperText>
                 </Grid>
                 {/* Description */}
@@ -136,20 +168,26 @@ const AddBlog = () => {
                   <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
                     الوصف
                   </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    minRows={4}
-                    dir='rtl'
-                    placeholder="أدخل الوصف"
-                    name="description"
-                    variant="outlined"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={Boolean(touched.description && errors.description)}
+
+                  <JoditEditor
+                    ref={editorRefAr}
+                    value={values.description_ar}
+                    tabIndex={2}
+                    name="description_arb"
+                    config={{
+                      readonly: isView || isLoading,
+                      toolbar: true,
+                      direction: "rtl",
+                      language: "ar",
+
+                    }}
+                    error={Boolean(touched.description_arb && errors.description_arb)}
+
+                    onBlur={(newContent) => setFieldValue("description_arb", newContent)}
                   />
-                  <FormHelperText error>{touched.description && errors.description}</FormHelperText>
+
+
+                  <FormHelperText error>{touched.description_arb && errors.description_arb}</FormHelperText>
                 </Grid>
 
               </Grid>
@@ -230,7 +268,7 @@ const AddBlog = () => {
                       <img src={values.image} alt="معاينة" className={classes.previewImage} />
                     )}
 
-                    <FormHelperText error>{touched.image && errors.image}</FormHelperText>
+                    <FormHelperText error>{touched.image_ar && errors.image_ar}</FormHelperText>
                   </Box>
                 </Grid>
 

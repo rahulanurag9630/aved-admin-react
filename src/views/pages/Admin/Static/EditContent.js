@@ -32,9 +32,7 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: "100%",
       },
     },
-    "& p": {
-      textAlign: "left",
-    },
+
   },
   imgsection: {
     height: "150px",
@@ -90,7 +88,7 @@ export default function EditProfile() {
       ? yup
         .string()
         .trim()
-        .required("Question in Arabic is required.")
+        .required("السؤال باللغة العربية مطلوب.")
         .max(256, "Question should not exceed 256 characters.")
       : yup.string().trim(),
     description_en: yup
@@ -101,7 +99,7 @@ export default function EditProfile() {
       ? yup
         .string()
         .trim()
-        .required("Answer in Arabic is required.")
+        .required("الإجابة باللغة العربية مطلوبة.")
       : yup.string().trim(),
   });
 
@@ -192,8 +190,10 @@ export default function EditProfile() {
                   </Grid>
                   {/* Arabic Question */}
                   <Grid item xs={12} sm={6}>
-                    <Box mt={1} mb={1} sx={{ textAlign: "right" }}>
-                      <Typography variant="body2">السؤال (العربية)</Typography>
+                    <Box mt={1} mb={1} >
+                      <Typography variant="body2" color="secondary" dir='rtl' style={{ marginBottom: "5px" }}>
+                        العنوان
+                      </Typography>
                     </Box>
                     <FormControl fullWidth className="formControl">
                       <TextField
@@ -206,13 +206,18 @@ export default function EditProfile() {
                         error={Boolean(touched.title_ar && errors.title_ar)}
                         onBlur={handleBlur}
                         onChange={handleChange}
-                        inputProps={{ style: { textAlign: "right" }, dir: "rtl" }}
+                        inputProps={{
+                          style: { textAlign: "right" },
+                          dir: "rtl", // Ensures right-to-left input
+                          lang: "ar", // Helps browsers/readers understand this is Arabic
+                        }}
                       />
                       <FormHelperText error>
                         {touched.title_ar && errors.title_ar}
                       </FormHelperText>
                     </FormControl>
                   </Grid>
+
                 </Grid>
               ) : (
                 <Grid item xs={12}>
@@ -283,13 +288,13 @@ export default function EditProfile() {
                       ref={editorRefAr}
                       value={values.description_ar}
                       tabIndex={2}
-                    
+
                       config={{
                         readonly: isView || isLoading,
                         toolbar: true,
                         direction: "rtl",
                         language: "ar",
-                        
+
                       }}
                       onBlur={(newContent) => setFieldValue("description_ar", newContent)}
                     />
