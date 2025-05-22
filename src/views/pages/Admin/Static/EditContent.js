@@ -283,13 +283,13 @@ export default function EditProfile() {
                       ref={editorRefAr}
                       value={values.description_ar}
                       tabIndex={2}
-                    
+
                       config={{
                         readonly: isView || isLoading,
                         toolbar: true,
                         direction: "rtl",
                         language: "ar",
-                        
+
                       }}
                       onBlur={(newContent) => setFieldValue("description_ar", newContent)}
                     />

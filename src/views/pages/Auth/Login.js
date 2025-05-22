@@ -44,9 +44,10 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   paperCustom: {
-  backgroundColor: "#071c359c !important",
-  
-},
+    backgroundColor: "#071c359c !important",
+    backdropFilter: "blur(2px) !important",
+
+  },
 
 }));
 
@@ -156,10 +157,12 @@ export default function Login() {
   return (
 
 
-    <Paper elevation={2}  className={classes.paperCustom} sx={{
-      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+    <Paper elevation={2} className={classes.paperCustom} sx={{
       zIndex: 1000,
-     
+      backdropFilter: "blur(2px) !important",
+      backgroundColor: "rgba(255, 255, 255, 0.7)", // semi-transparent for blur to show
+      WebkitBackdropFilter: "blur(10px)" // for Safari support
+
     }}>
       <Box className="displayCenter" mb={3}>
         <Typography variant="h2" color="primary">

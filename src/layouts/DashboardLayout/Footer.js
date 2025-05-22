@@ -12,7 +12,7 @@ const Footer = () => {
             color="primary"
             style={{ fontSize: "14px" }}
           >
-            &copy;2025 MUIRL. All Right Reserved
+            &copy;2025 AVED. All Right Reserved
           </Typography>
         </Box>
       </Container>
