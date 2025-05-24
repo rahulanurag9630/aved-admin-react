@@ -10,11 +10,13 @@ import {
   FormHelperText,
   MenuItem,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload } from "react-icons/fi";
 import { getBase64 } from "src/utils";
+import JoditEditor from "jodit-react";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -36,23 +38,146 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Title is required"),
-  description: yup.string().required("Description is required"),
-  propertyName: yup.string().required("Property Name is required"),
-  apartmentNumber: yup.string().required("Apartment Number is required"),
-  propertyType: yup.string().required("Property Type is required"),
-  address: yup.string().required("Address is required"),
-  latitude: yup.string().required("Latitude is required"),
-  longitude: yup.string().required("Longitude is required"),
-  area: yup.number().required("Area is required"),
-  overview: yup.string().required("Overview is required"),
-  noOfFloors: yup.number().required("Number of floors is required"),
-  noOfBedrooms: yup.number().required("Number of bedrooms is required"),
-  noOfBathrooms: yup.number().required("Number of bathrooms is required"),
-  yearBuilt: yup.number().required("Year of built is required"),
-  price: yup.number().required("Price is required"),
-});
+  propertyName: yup
+    .string()
+    .required("Property name is required")
+    .min(3, "Property name must be at least 3 characters"),
 
+  propertyName_ar: yup
+    .string()
+    .required("Property name (Arabic) is required")
+    .min(3, "Property name (Arabic) must be at least 3 characters"),
+
+  description: yup
+    .string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+
+  description_ar: yup
+    .string()
+    .required("Description (Arabic) is required")
+    .min(10, "Description (Arabic) must be at least 10 characters"),
+
+  detailDescription: yup
+    .string()
+    .required("Detailed description is required")
+    .min(20, "Detailed description must be at least 20 characters"),
+
+  detailDescription_ar: yup
+    .string()
+    .required("Detailed description (Arabic) is required")
+    .min(20, "Detailed description (Arabic) must be at least 20 characters"),
+
+  price: yup
+    .number()
+    .required("Price is required")
+    .min(0, "Price must be a positive number"),
+
+  apartmentNumber: yup
+    .string()
+    .required("Apartment number is required")
+    .matches(/^[a-zA-Z0-9\- ]+$/, "Apartment number can only contain letters, numbers, hyphens, and spaces"),
+
+  noOfBedrooms: yup
+    .number()
+    .required("Number of bedrooms is required")
+    .min(0, "Number of bedrooms cannot be negative"),
+
+  noOfBathrooms: yup
+    .number()
+    .required("Number of bathrooms is required")
+    .min(0, "Number of bathrooms cannot be negative"),
+
+  yearBuilt: yup
+    .number()
+    .required("Year built is required")
+    .min(1800, "Year built must be after 1800")
+    .max(new Date().getFullYear(), `Year built cannot be in the future`),
+
+  amenities: yup
+    .array()
+    .of(yup.string())
+    .nullable()
+    .default([]),
+
+  area: yup
+    .number()
+    .required("Area is required")
+    .min(0, "Area must be a positive number"),
+
+  parkingSpace: yup
+    .string()
+    .oneOf(["Yes", "No"], "Parking space must be either 'Yes' or 'No'")
+    .required("Parking space selection is required"),
+
+  propertyType: yup
+    .string()
+    .required("Property type is required")
+    .min(3, "Property type must be at least 3 characters"),
+
+  listingType: yup
+    .string()
+    .required("Listing type is required")
+    .oneOf(["Sale", "Rent"], "Listing type must be either 'Sale' or 'Rent'"),
+
+  availabilityStatus: yup
+    .string()
+    .required("Availability status is required")
+    .oneOf(["Available", "Sold", "Pending"], "Invalid availability status"),
+
+  status: yup
+    .string()
+    .required("Status is required")
+    .oneOf(["Active", "Inactive"], "Status must be either 'Active' or 'Inactive'"),
+
+  address: yup
+    .string()
+    .required("Address is required")
+    .min(5, "Address must be at least 5 characters"),
+
+  latitude: yup
+    .string()
+    .required("Latitude is required")
+    .matches(
+      /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)/,
+      "Invalid latitude format"
+    ),
+
+  longitude: yup
+    .string()
+    .required("Longitude is required")
+    .matches(
+      /^-?((1[0-7]\d)|(\d{1,2}))(\.\d+)?|180(\.0+)?/,
+      "Invalid longitude format"
+    ),
+
+  images: yup
+    .array()
+    .of(yup.mixed().required("Image is required"))
+    .min(1, "At least one image is required")
+    .required("Images are required"),
+
+  noOfFloors: yup
+    .number()
+    .required("Number of floors is required")
+    .min(0, "Number of floors cannot be negative"),
+
+  floorPlans: yup
+    .array()
+    .of(yup.mixed().required("Floor plan image is required"))
+    .nullable()
+    .default([]),
+
+  metaTitle: yup
+    .string()
+    .required("Meta title is required")
+    .min(3, "Meta title must be at least 3 characters"),
+
+  metaTags: yup
+    .string()
+    .required("Meta tags are required")
+    .min(3, "Meta tags must be at least 3 characters"),
+});
 const propertyTypes = ["Apartment", "Villa", "Studio"];
 const amenitiesOptions = ["Gym", "Swimming Pool", "Parking"];
 const tagOptions = ["For Sale", "For Rent", "New Launch"];
@@ -60,31 +185,41 @@ const tagOptions = ["For Sale", "For Rent", "New Launch"];
 const AddProperty = () => {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const isView = location?.state?.isView;
+  const isEdit = location?.state?.isEdit;
+
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
 
   const initialValues = {
-    title: "",
+    propertyName: "",
+    propertyName_ar: "",
     description: "",
     description_ar: "",
     detailDescription: "",
     detailDescription_ar: "",
-    propertyName: "",
-    propertyName_ar: "",
+    price: "",
     apartmentNumber: "",
-    propertyType: "",
-    address: "",
-    latitude: "",
-    longitude: "",
-    area: "",
-    overview: "",
-    images: [],
-    noOfFloors: 0,
-    floorPlans: [],
     noOfBedrooms: 0,
     noOfBathrooms: 0,
     yearBuilt: "",
-    price: "",
     amenities: [],
-    tags: [],
+    area: "",
+    parkingSpace: "Yes",
+    propertyType: "",
+    listingType: "",
+    availabilityStatus: "",
+    status: "",
+    address: "",
+    latitude: "",
+    longitude: "",
+    images: [],
+    noOfFloors: 0,
+    floorPlans: [],
+    metaTitle: "",
+    metaTags: "",
   };
 
   const handleSubmit = async (values) => {
@@ -133,22 +268,61 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Overview</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.overview} onChange={handleChange} />
-                <FormHelperText error>{touched.overview && errors.overview}</FormHelperText>
+                <TextField fullWidth multiline minRows={3} name="description" variant="outlined" value={values.description} onChange={handleChange} />
+                <FormHelperText error>{touched.description && errors.description}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary" dir="rtl">نظرة عامة</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.overview_ar} onChange={handleChange} />
-                <FormHelperText error>{touched.overview_ar && errors.overview_ar}</FormHelperText>
+                <TextField fullWidth multiline minRows={3} name="description_ar" variant="outlined" value={values.description_ar} onChange={handleChange} />
+                <FormHelperText error>{touched.description_ar && errors.description_ar}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Detailed Description</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.detailDescription} onChange={handleChange} />
+                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                 Detailed Description
+                </Typography>
+
+
+                <JoditEditor
+                  ref={editorRefEn}
+                  value={values.detailDescription}
+                  tabIndex={1}
+                  name="description"
+                  variant="outlined"
+                  config={{
+                    readonly: isView || isLoading,
+                    toolbar: true,
+
+                  }}
+                  error={Boolean(touched.detailDescription && errors.detailDescription)}
+                  onBlur={(newContent) => setFieldValue("detailDescription", newContent)}
+                />
+
                 <FormHelperText error>{touched.detailDescription && errors.detailDescription}</FormHelperText>
               </Grid>
+              {/* Description */}
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary" dir="rtl">نظرة عامة</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.detailDescription_ar} onChange={handleChange} />
+                <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                  الوصف
+                </Typography>
+
+                <JoditEditor
+                  ref={editorRefAr}
+                  value={values.detailDescription_ar}
+                  tabIndex={2}
+                  name="detailDescription_ar"
+                  config={{
+                    readonly: isView || isLoading,
+                    toolbar: true,
+                    direction: "rtl",
+                    language: "ar",
+
+                  }}
+                  error={Boolean(touched.detailDescription_ar && errors.detailDescription_ar)}
+
+                  onBlur={(newContent) => setFieldValue("detailDescription_ar", newContent)}
+                />
+
+
                 <FormHelperText error>{touched.detailDescription_ar && errors.detailDescription_ar}</FormHelperText>
               </Grid>
               {/* Apartment Number */}
@@ -161,6 +335,8 @@ const AddProperty = () => {
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Price</Typography>
                 <TextField fullWidth name="price" variant="outlined" type="number" value={values.price} onChange={handleChange} />
+                <FormHelperText error>{touched.price && errors.price}</FormHelperText>
+
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Apartment Number</Typography>
@@ -175,27 +351,56 @@ const AddProperty = () => {
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">No of Bedrooms</Typography>
                 <TextField fullWidth type="number" name="noOfBedrooms" variant="outlined" value={values.noOfBedrooms} onChange={handleChange} />
+                <FormHelperText error>{touched.noOfBedrooms && errors.noOfBedrooms}</FormHelperText>
+
               </Grid>
 
               {/* Bathrooms */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">No of Bathrooms</Typography>
                 <TextField fullWidth type="number" name="noOfBathrooms" variant="outlined" value={values.noOfBathrooms} onChange={handleChange} />
+                <FormHelperText error>{touched.noOfBathrooms && errors.noOfBathrooms}</FormHelperText>
+
               </Grid>
 
               {/* Year Built */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Year of Built</Typography>
                 <TextField fullWidth type="number" name="yearBuilt" variant="outlined" value={values.yearBuilt} onChange={handleChange} />
+                <FormHelperText error>{touched.yearBuilt && errors.yearBuilt}</FormHelperText>
+
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Amenities</Typography>
-                <TextField select fullWidth name="amenities" variant="outlined" multiple value={values.amenities} onChange={handleChange}>
+                <TextField
+                  select
+                  fullWidth
+                  name="amenities"
+                  variant="outlined"
+                  value={values.amenities}
+                  onChange={handleChange}
+                  SelectProps={{
+                    multiple: true,
+                    MenuProps: {
+                      anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "left",
+                      },
+                      transformOrigin: {
+                        vertical: "top",
+                        horizontal: "left",
+                      },
+                      getContentAnchorEl: null, // Ensures correct positioning
+                    },
+                  }}
+                >
                   {amenitiesOptions.map((item) => (
                     <MenuItem key={item} value={item}>{item}</MenuItem>
                   ))}
                 </TextField>
+                <FormHelperText error>{touched.amenities && errors.amenities}</FormHelperText>
               </Grid>
+
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Area (sq ft)</Typography>
                 <TextField fullWidth name="area" variant="outlined" value={values.area} onChange={handleChange} />
@@ -203,11 +408,13 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Parking Space</Typography>
-                <TextField select fullWidth name="amenities" variant="outlined" multiple value={values.amenities} onChange={handleChange}>
+                <TextField select fullWidth name="parkingSpace" variant="outlined" multiple value={values.parkingSpace} onChange={handleChange}>
                   {["Yes", "No"].map((item) => (
                     <MenuItem key={item} value={item}>{item}</MenuItem>
                   ))}
                 </TextField>
+                <FormHelperText error>{touched.parkingSpace && errors.parkingSpace}</FormHelperText>
+
               </Grid>
 
               <Grid item xs={12}>
@@ -220,7 +427,19 @@ const AddProperty = () => {
               {/* Property Type */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Property Type</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {propertyTypes.map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
@@ -229,30 +448,54 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Listing Type</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="listingType" variant="outlined" value={values.listingType} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {["For Sale", "Rent", "Fetured"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.listingType && errors.listingType}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Availability Status</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="availabilityStatus" variant="outlined" value={values.propertyType} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {["Available", "Sold", "Rented"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.availabilityStatus && errors.availabilityStatus}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Availability Status</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <Typography variant="body2" color="secondary">Status</Typography>
+                <TextField select fullWidth name="status" variant="outlined" value={values.status} onChange={handleChange}>
                   {["Published", "Draft"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.status && errors.status}</FormHelperText>
               </Grid>
 
               {/* Address */}
@@ -265,6 +508,16 @@ const AddProperty = () => {
                 <Typography variant="body2" color="secondary">Address</Typography>
                 <TextField fullWidth name="address" variant="outlined" value={values.address} onChange={handleChange} />
                 <FormHelperText error>{touched.address && errors.address}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">Latitude</Typography>
+                <TextField fullWidth name="latitude" variant="outlined" value={values.latitude} onChange={handleChange} />
+                <FormHelperText error>{touched.latitude && errors.latitude}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">Longitude</Typography>
+                <TextField fullWidth name="longitude" variant="outlined" value={values.longitude} onChange={handleChange} />
+                <FormHelperText error>{touched.longitude && errors.longitude}</FormHelperText>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" color="secondary">Google Maps Preview</Typography>
@@ -317,6 +570,8 @@ const AddProperty = () => {
                       <img key={i} src={img} alt="preview" className={classes.previewImage} />
                     ))}
                   </Box>
+                  <FormHelperText error>{touched.images && errors.images}</FormHelperText>
+
                 </Box>
               </Grid>
               <Grid item xs={6}>
@@ -380,16 +635,18 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={12} mt={2}>
                 <Typography variant="h6" color="secondary" gutterBottom>
-                  Media
+                  Tags
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Tags</Typography>
-                <TextField select fullWidth name="tags" variant="outlined" multiple value={values.tags} onChange={handleChange}>
-                  {tagOptions.map((tag) => (
-                    <MenuItem key={tag} value={tag}>{tag}</MenuItem>
-                  ))}
-                </TextField>
+                <Typography variant="body2" color="secondary">SEO Meta Titles</Typography>
+                <TextField fullWidth name="metaTitle" variant="outlined" value={values.metaTitle} onChange={handleChange} />
+                <FormHelperText error>{touched.metaTitle && errors.metaTitle}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">SEO Meta Tags</Typography>
+                <TextField fullWidth name="metaTags" variant="outlined" value={values.metaTags} onChange={handleChange} />
+                <FormHelperText error>{touched.metaTags && errors.metaTags}</FormHelperText>
               </Grid>
 
               <Grid item xs={12} className="displayCenter">

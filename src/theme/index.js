@@ -259,6 +259,19 @@ const baseOptions = {
         color: "#222",
       },
       selectMenu: { height: "17px" },
+      defaultProps: {
+        MenuProps: {
+          anchorOrigin: {
+            vertical: "bottom !important",
+            horizontal: "left !important",
+          },
+          transformOrigin: {
+            vertical: "top !important",
+            horizontal: "left !important",
+          },
+          getContentAnchorEl: null,
+        },
+      },
     },
     MuiMenuItem: {
       root: {
