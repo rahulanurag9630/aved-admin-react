@@ -87,23 +87,15 @@ export default function Login() {
     try {
       setIsLoading(true);
 
-      // Dummy login bypass
-      const dummyEmail = "test@example.com";
-      const userType = "ADMIN"; // or "USER"
 
-      if (values.email === dummyEmail) {
-        // if (check) {
-        //   let RememberMeString = JSON.stringify(values);
-        //   window.localStorage.setItem("RememberMeString", RememberMeString);
-        // } else {
-        //   window.localStorage.removeItem("RememberMeString");
-        // }
+      const res = await apiRouterCall({ method: "POST", endPoint: "login", bodyData: { emailUsernameOrPhone: values.email, password: values.password, ip } });
+      console.log(res)
 
-        // toast.success("Logged in successfully (bypassed).");
-        // localStorage.removeItem("otpTimer");
 
-        // let permissions = { name: "Dashboard" }; // use actual permission name if needed
+      if (res?.data?.responseCode === 200) {
 
+        auth.userLogIn(true, res?.data?.result?.token);
+        console.log(auth)
         history.push(
           `/dashboard`
         );
