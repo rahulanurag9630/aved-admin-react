@@ -17,6 +17,8 @@ import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload } from "react-icons/fi";
 import { getBase64 } from "src/utils";
+import toast from "react-hot-toast";
+import { apiRouterCall } from "../../../ApiConfig/service";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -72,8 +74,46 @@ const AddBlog = () => {
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
-    console.log("Subscription data submitted:", values);
-    // Submit to backend here
+    console.log("Blog data submitted:", values);
+
+    try {
+      setIsLoading(true);
+
+      const bodyData = {
+        id: values.id || undefined, // for update
+        title: values.title,
+        title_ar: values.title_ar,
+        description: values.description, // fixed
+        description_ar: values.description_arb, // fixed
+        image: values.image,
+        image_ar: values.image_ar, // fixed: separate field
+      };
+
+      const res = await apiRouterCall({
+        method: "POST",
+        endPoint: "addOrUpdateBlog",
+        bodyData,
+      });
+
+      console.log("Blog API response:", res);
+
+      if (res?.data?.responseCode === 200) {
+        if (values.id) {
+          toast.success("Blog updated successfully.");
+        } else {
+          toast.success("Blog added successfully.");
+        }
+      } else {
+        toast.error(res?.data?.responseMessage || "Something went wrong.");
+      }
+
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      console.error("Blog add/update error:", err);
+      toast.error("Server error. Please try again.");
+    }
+
     setIsSubmitting(false);
   };
 
@@ -158,7 +198,7 @@ const AddBlog = () => {
 
                     }}
                     error={Boolean(touched.description && errors.description)}
-                    onBlur={(newContent) => setFieldValue("description_en", newContent)}
+                    onBlur={(newContent) => setFieldValue("description", newContent)}
                   />
 
                   <FormHelperText error>{touched.description && errors.description}</FormHelperText>
@@ -201,8 +241,9 @@ const AddBlog = () => {
                     Image
                   </Typography>
                   <Box className={classes.imageUploadBox}>
+                    {/* English Image Upload */}
                     <input
-                      id="image-upload"
+                      id="image-upload-en"
                       type="file"
                       accept="image/*"
                       style={{ display: "none" }}
@@ -215,7 +256,7 @@ const AddBlog = () => {
                         }
                       }}
                     />
-                    <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
+                    <label htmlFor="image-upload-en" className="displayCenter" style={{ flexDirection: "column" }}>
                       <Avatar>
                         <FiUpload color="#FFF" />
                       </Avatar>
@@ -223,6 +264,7 @@ const AddBlog = () => {
                         Click to upload image
                       </Typography>
                     </label>
+
 
                     {values.image && (
                       <img src={values.image} alt="Preview" className={classes.previewImage} />
@@ -237,22 +279,22 @@ const AddBlog = () => {
                     الصورة
                   </Typography>
                   <Box className={classes.imageUploadBox}>
+                    {/* Arabic Image Upload */}
                     <input
-                      id="image-upload"
+                      id="image-upload-ar"
                       type="file"
                       accept="image/*"
-                      dir='rtl'
                       style={{ display: "none" }}
                       onChange={(e) => {
                         const file = e.target.files[0];
                         if (file) {
                           getBase64(file, (result) => {
-                            setFieldValue("image", result);
+                            setFieldValue("image_ar", result);
                           });
                         }
                       }}
                     />
-                    <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
+                    <label htmlFor="image-upload-ar" className="displayCenter" style={{ flexDirection: "column" }}>
                       <Avatar>
                         <FiUpload color="#FFF" />
                       </Avatar>
@@ -264,8 +306,9 @@ const AddBlog = () => {
                       </Typography>
                     </label>
 
-                    {values.image && (
-                      <img src={values.image} alt="معاينة" className={classes.previewImage} />
+
+                    {values.image_ar && (
+                      <img src={values.image_ar} alt="معاينة" className={classes.previewImage} />
                     )}
 
                     <FormHelperText error>{touched.image_ar && errors.image_ar}</FormHelperText>
