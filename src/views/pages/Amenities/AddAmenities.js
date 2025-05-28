@@ -14,7 +14,10 @@ import React, { useState } from "react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload } from "react-icons/fi";
-import { getBase64 } from "src/utils";
+import uploadFile, { getBase64 } from "src/utils";
+import { apiRouterCall } from "../../../ApiConfig/service";
+import toast from "react-hot-toast";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const useStyles = makeStyles((theme) => ({
     formWrapper: {
@@ -40,25 +43,66 @@ const validationSchema = yup.object().shape({
         .string()
         .required("الرجاء إدخال العنوان")
         .min(3, "أدخل 3 أحرف على الأقل"),
-    description: yup.string().required("Description is required").min(10, "Enter at least 10 characters"),
     image: yup.string().required("Image is required"),
 });
 
 const AddAmenities = () => {
     const classes = useStyles();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(false)
+    const histroy = useHistory()
+
+    // const uploadFile = async (file) => {
+
+    //     try {
+    //         setLoading(true)
+    //         const formData = new FormData();
+    //         formData.append("file", file); // "file" is the key the backend expects
+    //         const res = await apiRouterCall({ method: "POST", endPoint: "uploadFile", bodyData: formData, })
+    //         console.log(res)
+    //         if (res?.data?.responseCode === 200) {
+    //             return res?.data?.result
+    //         }
+    //         else {
+    //             toast.error(res?.data?.responseMessage || "Error while uploading file")
+    //         }
+
+    //     } catch (error) {
+
+    //     }
+    //     finally {
+    //         setLoading(false)
+    //     }
+    // }
 
     const initialValues = {
         title: "",
-        description: "",
+        title_ar: "",
         image: "",
     };
 
     const handleSubmit = async (values) => {
         setIsSubmitting(true);
         console.log("Subscription data submitted:", values);
-        // Submit to backend here
-        setIsSubmitting(false);
+        try {
+            setLoading(true)
+
+            const res = await apiRouterCall({ method: "POST", endPoint: "addUpdateAmenities", bodyData: values, token: localStorage.getItem("token") })
+            console.log(res)
+            if (res?.data?.responseCode === 200) {
+                toast.success(res?.data?.responseMessage || "Amenities created successfully!")
+                histroy.push("/amenities-management")
+            }
+            else {
+                toast.error(res?.data?.responseMessage || "Error while uploading file")
+            }
+
+        } catch (error) {
+
+        }
+        finally {
+            setLoading(false)
+        }
     };
 
     return (
@@ -126,18 +170,21 @@ const AddAmenities = () => {
                                         type="file"
                                         accept="image/*"
                                         style={{ display: "none" }}
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
+
                                             const file = e.target.files[0];
                                             if (file) {
+                                                const url = await uploadFile(file, setLoading)
                                                 getBase64(file, (result) => {
-                                                    setFieldValue("image", result);
+                                                    setFieldValue("image", url);
                                                 });
                                             }
+                                            console.log(errors)
                                         }}
                                     />
                                     <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
                                         <Avatar>
-                                            <FiUpload color="#fff"/>
+                                            <FiUpload color="#fff" />
                                         </Avatar>
                                         <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
                                             Click to upload image
@@ -153,7 +200,7 @@ const AddAmenities = () => {
                             </Grid>
 
                             {/* Submit Button */}
-                            <Grid item xs={7} className="displayCenter">
+                            <Grid item xs={12} className="displayCenter">
                                 <div style={{ display: 'flex', gap: '25px', marginTop: '25px' }}>
                                     {/* Back Button */}
                                     <Button
@@ -169,9 +216,9 @@ const AddAmenities = () => {
                                         variant="contained"
                                         color="primary"
                                         type="submit"
-                                        disabled={isSubmitting}
+                                        disabled={loading}
                                     >
-                                        {isSubmitting ? "Submitting..." : "Submit"}
+                                        {loading ? "Submitting..." : "Submit"}
                                     </Button>
 
 

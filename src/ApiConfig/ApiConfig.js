@@ -1,5 +1,5 @@
-export const baseurl = process.env.REACT_APP_BASE_URL;
-// export const baseurl = "http://localhost:2211"
+// export const baseurl = process.env.REACT_APP_BASE_URL;
+export const baseurl = "http://localhost:2211"
 
 ///////////////////local///////////////
 // export const baseurl = "http://172.16.1.254:2154";
@@ -67,5 +67,9 @@ const ApiConfig = {
   userExchangeManagement: `${base}/wallet/userExchangeManagement`,
   orderHistoryAdmin: `${base}/wallet/orderHistoryAdmin`,
   closePosition: `${base}/wallet/closePosition`,
+  addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
+  listAmenities: `${base}/admin/listAmenities`,
+  uploadFile: `${base}/user/uploadFile`,
 };
+
 export default ApiConfig;
