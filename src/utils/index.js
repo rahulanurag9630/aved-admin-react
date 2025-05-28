@@ -581,4 +581,20 @@ const uploadFile = async (file, setLoading) => {
   }
 }
 
+export function formatDate(isoDate) {
+  const date = new Date(isoDate);
+
+  // Format day
+  const day = date.getDate().toString().padStart(2, "0");
+
+  // Format month
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[date.getMonth()];
+
+  // Format year
+  const year = date.getFullYear();
+
+  return `${day} ${month} ${year}`;
+};
 export default uploadFile
