@@ -15,7 +15,7 @@ export const apiRouterCall = async ({
       method: method,
       url: id ? `${ApiConfig[endPoint]}/${id}` : ApiConfig[endPoint],
       headers: {
-        token: token ? token : window.localStorage.getItem("token"),
+        token: token ? token : localStorage.getItem("token"),
       },
       data: bodyData ? bodyData : null,
       params: paramsData ? paramsData : null,

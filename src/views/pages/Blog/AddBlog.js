@@ -16,7 +16,7 @@ import JoditEditor from "jodit-react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload } from "react-icons/fi";
-import { getBase64 } from "src/utils";
+import uploadFile, { getBase64 } from "src/utils";
 import toast from "react-hot-toast";
 import { apiRouterCall } from "../../../ApiConfig/service";
 
@@ -62,6 +62,8 @@ const validationSchema = yup.object().shape({
 const AddBlog = () => {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const initialValues = {
     title: "",
@@ -98,11 +100,13 @@ const AddBlog = () => {
       console.log("Blog API response:", res);
 
       if (res?.data?.responseCode === 200) {
+
         if (values.id) {
           toast.success("Blog updated successfully.");
         } else {
           toast.success("Blog added successfully.");
         }
+       
       } else {
         toast.error(res?.data?.responseMessage || "Something went wrong.");
       }
@@ -241,18 +245,23 @@ const AddBlog = () => {
                     Image
                   </Typography>
                   <Box className={classes.imageUploadBox}>
-                    {/* English Image Upload */}
                     <input
                       id="image-upload-en"
                       type="file"
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          getBase64(file, (result) => {
-                            setFieldValue("image", result);
-                          });
+                          try {
+                            setLoading(true);
+                            const url = await uploadFile(file, setLoading);
+                            if (url) {
+                              setFieldValue("image", url);
+                            }
+                          } catch (err) {
+                            toast.error("Image upload failed!");
+                          }
                         }
                       }}
                     />
@@ -265,7 +274,6 @@ const AddBlog = () => {
                       </Typography>
                     </label>
 
-
                     {values.image && (
                       <img src={values.image} alt="Preview" className={classes.previewImage} />
                     )}
@@ -273,6 +281,7 @@ const AddBlog = () => {
                     <FormHelperText error>{touched.image && errors.image}</FormHelperText>
                   </Box>
                 </Grid>
+
                 {/* Image */}
                 <Grid item xs={6}>
                   <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
@@ -285,14 +294,21 @@ const AddBlog = () => {
                       type="file"
                       accept="image/*"
                       style={{ display: "none" }}
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          getBase64(file, (result) => {
-                            setFieldValue("image_ar", result);
-                          });
+                          try {
+                            setLoading(true);
+                            const url = await uploadFile(file, setLoading);
+                            if (url) {
+                              setFieldValue("image_ar", url);
+                            }
+                          } catch (err) {
+                            toast.error("Image upload failed!");
+                          }
                         }
                       }}
+
                     />
                     <label htmlFor="image-upload-ar" className="displayCenter" style={{ flexDirection: "column" }}>
                       <Avatar>

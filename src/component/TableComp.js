@@ -92,7 +92,7 @@ function TableComp({
                                       onClick={action?.onClick}
                                       disabled={!action?.icon}
                                     >
-                                      <Icon />
+                                      <Icon style={action?.style}/>
                                     </IconButton>
                                   </Tooltip>
                                 );

@@ -87,18 +87,18 @@ export default function Blogs() {
   // };
 
   const filterData = {
-  page: page,
-  limit: 10,
-  fromDate: selectFilter.fromDate
-    ? selectFilter.fromDate.toISOString()
-    : undefined,
-  toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
-  search: deb && deb.trim() !== "" ? deb.trim() : undefined,
-  status: selectFilter.status !== "All" ? selectFilter.status : undefined,
-};
+    page: page,
+    limit: 10,
+    fromDate: selectFilter.fromDate
+      ? selectFilter.fromDate.toISOString()
+      : undefined,
+    toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
+    search: deb && deb.trim() !== "" ? deb.trim() : undefined,
+    status: selectFilter.status !== "All" ? selectFilter.status : undefined,
+  };
 
 
-      
+
   const handleGetTransaction = async (source, checkFilter) => {
     try {
       const response = await apiRouterCall({
@@ -126,51 +126,52 @@ export default function Blogs() {
   };
 
 
-const handleBlockDeleteApi = async (reason) => {
-  try {
-    setIsUpdating(true);
+  const handleBlockDeleteApi = async (reason) => {
+    console.log("blocking")
+    try {
+      setIsUpdating(true);
 
-    const isDelete = modalOpen === "delete";
-    const endPoint = isDelete ? "deleteBlog" : "toggleBlockStatus";
-    const method = isDelete ? "POST" : "PUT";
+      const isDelete = modalOpen === "delete";
+      const endPoint = isDelete ? "deleteBlog" : "toggleBlockStatus";
+      const method = "POST";
 
-    const response = await apiRouterCall({
-      method,
-      endPoint,
-      bodyData: {
-        id: deleteBlockId?._id,
-        reason: reason || undefined,
-      },
-      headers: {
-        authToken: localStorage.getItem("authToken"), // ✅ Add this line to send authToken
-      },
-    });
+      const response = await apiRouterCall({
+        method,
+        endPoint,
+        bodyData: {
+          id: deleteBlockId?._id,
+          reason: reason || undefined,
+        },
+        headers: {
+          authToken: localStorage.getItem("authToken"), // ✅ Add this line to send authToken
+        },
+      });
 
-    console.log("API Response:", response);
+      console.log("API Response:", response);
 
-    if (response?.data?.responseCode === 200) {
-      toast.success(response.data.responseMessage);
-      setModalOpen("");
-
-      if (isDelete && page > 1 && transactionList.length === 1) {
-        setPage((prevPage) => {
-          const newPage = prevPage - 1;
-          setTimeout(() => handleGetTransaction(), 0);
-          return newPage;
-        });
+      if (response?.data?.responseCode === 200) {
+        toast.success(response.data.responseMessage);
+        setModalOpen("");
+        handleGetTransaction();
+        if (isDelete && page > 1 && transactionList.length === 1) {
+          setPage((prevPage) => {
+            const newPage = prevPage - 1;
+            setTimeout(() => handleGetTransaction(), 0);
+            return newPage;
+          });
+        } else {
+          await handleGetTransaction();
+        }
       } else {
-        await handleGetTransaction();
+        toast.error(response?.data?.responseMessage || "Something went wrong.");
       }
-    } else {
-      toast.error(response?.data?.responseMessage || "Something went wrong.");
+    } catch (error) {
+      console.error("API Error:", error);
+      toast.error("Server error. Please try again later.");
+    } finally {
+      setIsUpdating(false);
     }
-  } catch (error) {
-    console.error("API Error:", error);
-    toast.error("Server error. Please try again later.");
-  } finally {
-    setIsUpdating(false);
-  }
-};
+  };
 
   function tableDataFunction(arrayData, condition) {
     return (
@@ -209,6 +210,7 @@ const handleBlockDeleteApi = async (reason) => {
                   setDeleteBlockId(value);
                   setModalOpen("block");
                 },
+                style:{ color: value.status === "ACTIVE" ? "green" : "red" }
               },
               {
                 icon: DeleteIcon,
@@ -296,30 +298,28 @@ const handleBlockDeleteApi = async (reason) => {
         NoDataFoundText="default"
         isLoading={isLoading}
       />
-     {modalOpen && deleteBlockId && (
-  <ConfirmationDialogBox
-    openModal={["delete", "block"].includes(modalOpen)}
-    handleClose={() => setModalOpen("")}
-    heading={`${
-      modalOpen === "delete"
-        ? "Delete"
-        : deleteBlockId?.status === "BLOCK"
-        ? "Unblock"
-        : "Block"
-    } Blog`}
-    description={`Are you sure you want to ${
-      modalOpen === "delete"
-        ? "delete"
-        : deleteBlockId?.status === "BLOCK"
-        ? "unblock"
-        : "block"
-    } this blog?`}
-    HandleConfirm={handleBlockDeleteApi}
-    isLoading={isUpdating}
-    blockDescription={"Are you sure, you want to block this blog?"}
-    showBlock={modalOpen === "block"}
-  />
-)}
+      {modalOpen && deleteBlockId && (
+        <ConfirmationDialogBox
+          openModal={["delete", "block"].includes(modalOpen)}
+          handleClose={() => setModalOpen("")}
+          heading={`${modalOpen === "delete"
+              ? "Delete"
+              : deleteBlockId?.status === "BLOCK"
+                ? "Unblock"
+                : "Block"
+            } Blog`}
+          description={`Are you sure you want to ${modalOpen === "delete"
+              ? "delete"
+              : deleteBlockId?.status === "BLOCK"
+                ? "unblock"
+                : "block"
+            } this blog?`}
+          HandleConfirm={handleBlockDeleteApi}
+          isLoading={isUpdating}
+          blockDescription={"Are you sure, you want to block this blog?"}
+          showBlock={modalOpen === "block"}
+        />
+      )}
 
     </Box>
   );

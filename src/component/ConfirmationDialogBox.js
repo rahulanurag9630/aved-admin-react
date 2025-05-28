@@ -177,10 +177,13 @@ export default function ConfirmationDialogBox({
                     variant="contained"
                     color="primary"
                     style={{ minWidth: "133px" }}
-                    onClick={() =>
+                    onClick={() =>{
+                      console.log("kdkdk")
+                      HandleConfirm()
                       heading.includes("Block")
                         ? handleConfirmReply()
                         : HandleConfirm()
+                    }
                     }
                     disabled={isLoading}
                   >

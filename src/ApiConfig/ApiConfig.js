@@ -74,5 +74,9 @@ listBlogs: `${base}/admin/listBlogs`,
   userExchangeManagement: `${base}/wallet/userExchangeManagement`,
   orderHistoryAdmin: `${base}/wallet/orderHistoryAdmin`,
   closePosition: `${base}/wallet/closePosition`,
+  addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
+  listAmenities: `${base}/admin/listAmenities`,
+  uploadFile: `${base}/user/uploadFile`,
 };
+
 export default ApiConfig;

@@ -4,6 +4,7 @@ import moment from "moment";
 import { apiRouterCall } from "src/ApiConfig/service";
 import * as XLSX from "xlsx";
 import CryptoJS from "crypto-js";
+import toast from "react-hot-toast";
 
 const secret = process.env.REACT_APP_SECRET_KEY || "000x";
 
@@ -117,9 +118,9 @@ export const exponentialToDecimal = (exponential) => {
       let i = 0;
       i <
       +exponentialSplitted[1] -
-        (exponentialSplitted[0].includes(".")
-          ? exponentialSplitted[0].split(".")[1].length
-          : 0);
+      (exponentialSplitted[0].includes(".")
+        ? exponentialSplitted[0].split(".")[1].length
+        : 0);
       i++
     ) {
       postfix += "0";
@@ -557,3 +558,27 @@ export function funConEx(exchanges) {
   }
   return filteredExchanges;
 }
+const uploadFile = async (file, setLoading) => {
+
+  try {
+    setLoading(true)
+    const formData = new FormData();
+    formData.append("file", file); // "file" is the key the backend expects
+    const res = await apiRouterCall({ method: "POST", endPoint: "uploadFile", bodyData: formData, })
+    console.log(res)
+    if (res?.data?.responseCode === 200) {
+      return res?.data?.result
+    }
+    else {
+      toast.error(res?.data?.responseMessage || "Error while uploading file")
+    }
+
+  } catch (error) {
+
+  }
+  finally {
+    setLoading(false)
+  }
+}
+
+export default uploadFile
