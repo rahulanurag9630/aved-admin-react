@@ -68,6 +68,7 @@ const ApiConfig = {
   orderHistoryAdmin: `${base}/wallet/orderHistoryAdmin`,
   closePosition: `${base}/wallet/closePosition`,
   addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
+  toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
   listAmenities: `${base}/admin/listAmenities`,
   uploadFile: `${base}/user/uploadFile`,
 };

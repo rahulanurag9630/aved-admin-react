@@ -14,6 +14,8 @@ import moment from "moment";
 import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
+import { formatDate } from "src/utils";
+
 
 const tableHead = [
   {
@@ -57,8 +59,9 @@ export default function Blogs() {
   const [transactionList, setTransactionList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
-  const checkEdit = location?.state?.isEdit;
-  console.log("checkEdit", checkEdit);
+  const [status, setStatus] = useState("ACTIVE")
+  // const checkEdit = location?.state?.isEdit;
+  // console.log("checkEdit", checkEdit);
 
   const [selectFilter, setSelectFilter] = useState({
     fromDate: null,
@@ -119,18 +122,31 @@ export default function Blogs() {
   useEffect(() => {
     handleGetAmenities()
   }, [])
-  const handleBlockDeleteApi = async (reason) => {
+  const handleBlockDeleteApi = async () => {
     try {
       setIsUpdating(true);
+
+      let bodyData = {};
+      console.log("blocking")
+      if (modalOpen === "delete") {
+        bodyData = {
+          id: deleteBlockId?._id,
+        };
+      } else {
+        bodyData = {
+          id: deleteBlockId?._id,
+          status: status, // status should be either "ACTIVE" or "BLOCK"
+        };
+      }
+
       const response = await apiRouterCall({
-        method: modalOpen === "delete" ? "DELETE" : "PUT",
-        endPoint: modalOpen === "delete" ? "deleteUser" : "blockUnblockUser",
-        bodyData: {
-          _id: deleteBlockId ? deleteBlockId?._id : undefined,
-          reason: reason || undefined,
-        },
+        method: "PATCH",
+        endPoint: modalOpen === "delete" ? "deleteUser" : "toggleAmenityStatus",
+        bodyData,
+        token: localStorage.getItem("token"),
       });
-      if (response.data.responseCode == 200) {
+
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
         modalOpen !== "delete" && handleGetAmenities();
         setModalOpen("");
@@ -148,53 +164,42 @@ export default function Blogs() {
     }
   };
 
+
   function tableDataFunction(arrayData, condition) {
     return (
       arrayData &&
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
         Title: value?.title,
-        Desctiption: value?.description,
-        Price: `$${value?.price}`,
-        Duration: value?.durationLabel,
-        Badge: value?.badge,
+        Image: (<img src={`${value?.image}`} alt="img" height={"50px"} style={{ borderRadius: "10px" }} />),
 
-        "Created Date & Time": value?.createdAt,
+
+        "Created Date & Time": formatDate(value?.createdAt),
         Action: [
+
+
           {
-            icon: VisibilityIcon,
+            icon: FaEdit,
             onClick: () =>
               history.push({
-                pathname: "/add-subscription",
-                state: { ...value, viewSubAdmin: true },
+                pathname: "/add-amenities-management",
+                state: { ...value, editAmenities: true },
               }),
           },
-          ...(checkEdit
-            ? [
-              {
-                icon: FaEdit,
-                onClick: () =>
-                  history.push({
-                    pathname: "/add-subscription",
-                    state: { ...value, editSubAdmin: true },
-                  }),
-              },
-              {
-                icon: BlockIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("block");
-                },
-              },
-              {
-                icon: DeleteIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("delete");
-                },
-              },
-            ]
-            : []),
+          {
+            icon: BlockIcon,
+            onClick: () => {
+              setStatus(value?.status === "ACTIVE" ? "BLOCK" : "ACTIVE");
+              setDeleteBlockId(value);
+              setModalOpen("block");
+            },
+            // ADD color property here based on status
+            style: {
+              color: value?.status === "BLOCK" ? "red" : "green",
+            },
+          },
+
+
         ],
       }))
     );
@@ -241,7 +246,8 @@ export default function Blogs() {
       <Box className="tophead">
         <Topheading
           heading="Amenities Management"
-          pathname={checkEdit ? "/add-amenities-management" : undefined}
+          // pathname={checkEdit ? "/add-amenities-management" : undefined}
+          pathname={true ? "/add-amenities-management" : undefined}
           addButton={"Add Amenities"}
         />
       </Box>
@@ -290,7 +296,7 @@ export default function Blogs() {
             } this plan?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
-          blockDescription={"Are you sure, you want to block this plan?"}
+          blockDescription={"Are you sure, you want to block this amenity?"}
           showBlock={true}
         />
       )}
