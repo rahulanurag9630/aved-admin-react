@@ -15,6 +15,10 @@ const ApiConfig = {
   forgotPassword: `${base}/admin/forgotPassword`,
   resetPassword: `${base}/admin/resetPassword`,
   addOrUpdateBlog: `${base}/admin/addOrUpdateBlog`,
+  toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
+  deleteBlog: `${base}/admin/deleteBlog`,
+listBlogs: `${base}/admin/listBlogs`,
+
 
   
   dashboard: `${base}/admin/dashboard`,

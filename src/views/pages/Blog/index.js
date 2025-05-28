@@ -45,7 +45,7 @@ const tableHead = [
 ];
 
 
-  
+
 
 export default function Blogs() {
   const history = useHistory();
@@ -55,9 +55,10 @@ export default function Blogs() {
   const [deleteBlockId, setDeleteBlockId] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [transactionList, setBlogList] = useState([]);
+  const [transactionList, setTransactionList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
+
   const checkEdit = location?.state?.isEdit;
   console.log("checkEdit", checkEdit);
 
@@ -74,149 +75,102 @@ export default function Blogs() {
     totalPages: 1,
   });
 
-  let filterData = {
-    page: page,
-    limit: 10,
-    fromDate: selectFilter.fromDate
-      ? selectFilter.fromDate.toISOString()
-      : undefined,
-    toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
-    search: selectFilter.search !== "" ? selectFilter.search : undefined,
-    status: selectFilter.status !== "All" ? selectFilter.status : undefined,
-    userType1: "SUBADMIN",
-  };
+  // let filterData = {
+  //   page: page,
+  //   limit: 10,
+  //   fromDate: selectFilter.fromDate
+  //     ? selectFilter.fromDate.toISOString()
+  //     : undefined,
+  //   toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
+  //   search: selectFilter.search !== "" ? selectFilter.search : undefined,
+  //   status: selectFilter.status !== "All" ? selectFilter.status : undefined,
+  // };
 
+  const filterData = {
+  page: page,
+  limit: 10,
+  fromDate: selectFilter.fromDate
+    ? selectFilter.fromDate.toISOString()
+    : undefined,
+  toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
+  search: deb && deb.trim() !== "" ? deb.trim() : undefined,
+  status: selectFilter.status !== "All" ? selectFilter.status : undefined,
+};
+
+
+      
   const handleGetTransaction = async (source, checkFilter) => {
     try {
-      // const response = await apiRouterCall({
-      //   method: "GET",
-      //   endPoint: "getUserList",
-      //   source: source,
-      //   paramsData: filterData,
-      // });
-      // if (response.data.responseCode === 200) {
-      //   setTransactionList(response.data.result.docs);
-      //   setNoOfPages({
-      //     pages: response.data.result.pages,
-      //     totalPages: response.data.result.total,
-      //   });
-      // } else {
-      //   setTransactionList([]);
-      // }
-      // setIsClear(false);
-      // setIsLoading(false);
-      setBlogList([
-  {
-    id: 1,
-    title: "Getting Started with React",
-    description: "A beginner's guide to building apps using React.js.",
-    image: "https://via.placeholder.com/100x100?text=React",
-    createdAt: "2025-05-01 10:00 AM",
-  },
-  {
-    id: 2,
-    title: "Understanding JavaScript Closures",
-    description: "An in-depth look into closures and lexical scoping in JS.",
-    image: "https://via.placeholder.com/100x100?text=JS",
-    createdAt: "2025-05-01 11:00 AM",
-  },
-  {
-    id: 3,
-    title: "Top 10 CSS Tricks for Developers",
-    description: "Enhance your UI with these effective CSS tricks.",
-    image: "https://via.placeholder.com/100x100?text=CSS",
-    createdAt: "2025-05-01 12:00 PM",
-  },
-  {
-    id: 4,
-    title: "State Management in React",
-    description: "Explore different ways to manage state in large apps.",
-    image: "https://via.placeholder.com/100x100?text=State",
-    createdAt: "2025-05-01 01:00 PM",
-  },
-  {
-    id: 5,
-    title: "Why TypeScript Matters",
-    description: "An overview of how TypeScript improves JavaScript codebases.",
-    image: "https://via.placeholder.com/100x100?text=TS",
-    createdAt: "2025-05-01 02:00 PM",
-  },
-  {
-    id: 6,
-    title: "Deploying with Vercel",
-    description: "Step-by-step guide to deploying your React app with Vercel.",
-    image: "https://via.placeholder.com/100x100?text=Vercel",
-    createdAt: "2025-05-01 03:00 PM",
-  },
-  {
-    id: 7,
-    title: "SEO Best Practices for Blogs",
-    description: "Learn how to optimize your blog content for search engines.",
-    image: "https://via.placeholder.com/100x100?text=SEO",
-    createdAt: "2025-05-01 04:00 PM",
-  },
-  {
-    id: 8,
-    title: "Next.js vs React",
-    description: "A detailed comparison of Next.js and React for new devs.",
-    image: "https://via.placeholder.com/100x100?text=Next",
-    createdAt: "2025-05-01 05:00 PM",
-  },
-  {
-    id: 9,
-    title: "Git & GitHub Essentials",
-    description: "Master version control with Git and GitHub basics.",
-    image: "https://via.placeholder.com/100x100?text=Git",
-    createdAt: "2025-05-01 06:00 PM",
-  },
-  {
-    id: 10,
-    title: "Building REST APIs with Node.js",
-    description: "How to create scalable REST APIs using Express.js.",
-    image: "https://via.placeholder.com/100x100?text=Node",
-    createdAt: "2025-05-01 07:00 PM",
-  },
-]);
-
-    } catch (err) {
-      setBlogList([]);
-      setIsLoading(false);
-      console.log(err);
-    }
-    finally{
-       setIsClear(false);
-      setIsLoading(false);
-    }
-  };
-
-  const handleBlockDeleteApi = async (reason) => {
-    try {
-      setIsUpdating(true);
       const response = await apiRouterCall({
-        method: modalOpen === "delete" ? "DELETE" : "PUT",
-        endPoint: modalOpen === "delete" ? "deleteUser" : "blockUnblockUser",
-        bodyData: {
-          _id: deleteBlockId ? deleteBlockId?._id : undefined,
-          reason: reason || undefined,
-        },
+        method: "GET",
+        endPoint: "listBlogs",
+        source: source,
+        paramsData: filterData,
       });
-      if (response.data.responseCode == 200) {
-        toast.success(response.data.responseMessage);
-        modalOpen !== "delete" && handleGetTransaction();
-        setModalOpen("");
-        modalOpen === "delete" && page > 1
-          ? setPage((prePage) => prePage - 1)
-          : handleGetTransaction();
+      if (response.data.responseCode === 200) {
+        setTransactionList(response.data.result.docs);
+        setNoOfPages({
+          pages: response.data.result.pages,
+          totalPages: response.data.result.total,
+        });
       } else {
-        toast.error(response.data.responseMessage);
+        setTransactionList([]);
       }
-
-      setIsUpdating(false);
-    } catch (error) {
-      setIsUpdating(false);
-      console.log(error);
+    } catch (err) {
+      setTransactionList([]);
+      console.log(err);
+    } finally {
+      setIsClear(false);
+      setIsLoading(false);
     }
   };
+
+
+const handleBlockDeleteApi = async (reason) => {
+  try {
+    setIsUpdating(true);
+
+    const isDelete = modalOpen === "delete";
+    const endPoint = isDelete ? "deleteBlog" : "toggleBlockStatus";
+    const method = isDelete ? "POST" : "PUT";
+
+    const response = await apiRouterCall({
+      method,
+      endPoint,
+      bodyData: {
+        id: deleteBlockId?._id,
+        reason: reason || undefined,
+      },
+      headers: {
+        authToken: localStorage.getItem("authToken"), // ✅ Add this line to send authToken
+      },
+    });
+
+    console.log("API Response:", response);
+
+    if (response?.data?.responseCode === 200) {
+      toast.success(response.data.responseMessage);
+      setModalOpen("");
+
+      if (isDelete && page > 1 && transactionList.length === 1) {
+        setPage((prevPage) => {
+          const newPage = prevPage - 1;
+          setTimeout(() => handleGetTransaction(), 0);
+          return newPage;
+        });
+      } else {
+        await handleGetTransaction();
+      }
+    } else {
+      toast.error(response?.data?.responseMessage || "Something went wrong.");
+    }
+  } catch (error) {
+    console.error("API Error:", error);
+    toast.error("Server error. Please try again later.");
+  } finally {
+    setIsUpdating(false);
+  }
+};
 
   function tableDataFunction(arrayData, condition) {
     return (
@@ -228,7 +182,7 @@ export default function Blogs() {
         Price: `$${value?.price}`,
         Duration: value?.durationLabel,
         Badge: value?.badge,
-        
+
         "Created Date & Time": value?.createdAt,
         Action: [
           {
@@ -241,35 +195,35 @@ export default function Blogs() {
           },
           ...(checkEdit
             ? [
-                {
-                  icon: FaEdit,
-                  onClick: () =>
-                    history.push({
-                      pathname: "/add-subscription",
-                      state: { ...value, editSubAdmin: true },
-                    }),
+              {
+                icon: FaEdit,
+                onClick: () =>
+                  history.push({
+                    pathname: "/add-subscription",
+                    state: { ...value, editSubAdmin: true },
+                  }),
+              },
+              {
+                icon: BlockIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen("block");
                 },
-                {
-                  icon: BlockIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen("block");
-                  },
+              },
+              {
+                icon: DeleteIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen("delete");
                 },
-                {
-                  icon: DeleteIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen("delete");
-                  },
-                },
-              ]
+              },
+            ]
             : []),
         ],
       }))
     );
   }
-  
+
 
   const handleClearFilter = () => {
     if (!isClear) {
@@ -342,30 +296,31 @@ export default function Blogs() {
         NoDataFoundText="default"
         isLoading={isLoading}
       />
-      {modalOpen && (
-        <ConfirmationDialogBox
-          openModal={["delete", "block"].includes(modalOpen)}
-          handleClose={() => setModalOpen("")}
-          heading={`${
-            modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
-              ? "Block"
-              : "Unblock"
-          } Plan`}
-          description={`Are you sure, you want to ${
-            modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
-              ? "Block"
-              : "Unblock"
-          } this plan?`}
-          HandleConfirm={handleBlockDeleteApi}
-          isLoading={isUpdating}
-          blockDescription={"Are you sure, you want to block this plan?"}
-          showBlock={true}
-        />
-      )}
+     {modalOpen && deleteBlockId && (
+  <ConfirmationDialogBox
+    openModal={["delete", "block"].includes(modalOpen)}
+    handleClose={() => setModalOpen("")}
+    heading={`${
+      modalOpen === "delete"
+        ? "Delete"
+        : deleteBlockId?.status === "BLOCK"
+        ? "Unblock"
+        : "Block"
+    } Blog`}
+    description={`Are you sure you want to ${
+      modalOpen === "delete"
+        ? "delete"
+        : deleteBlockId?.status === "BLOCK"
+        ? "unblock"
+        : "block"
+    } this blog?`}
+    HandleConfirm={handleBlockDeleteApi}
+    isLoading={isUpdating}
+    blockDescription={"Are you sure, you want to block this blog?"}
+    showBlock={modalOpen === "block"}
+  />
+)}
+
     </Box>
   );
 }
