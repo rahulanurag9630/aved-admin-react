@@ -12,7 +12,7 @@ const ApiConfig = {
   getProfile: `${base}/admin/getProfile`,
   resendOTP: `${base}/admin/resendOTP`,
   verifyOTP: `${base}/admin/verifyOTP`,
-  forgotPassword: `${base}/admin/forgotPassword`,
+  forgotPassword: `${base}/admin/forgetPassword`,
   resetPassword: `${base}/admin/resetPassword`,
   dashboard: `${base}/admin/dashboard`,
   getUserList: `${base}/admin/getUserList`,
@@ -38,12 +38,13 @@ const ApiConfig = {
   checkEmail: `${base}/user/checkEmail`,
 
   ///////////static//////
-  listStaticContent: `${base}/static/listStaticContent`,
+  listStaticContent: `${base}/staticContent/getAllStaticContent`,
+  addStaticContent: `${base}/staticContent/addStaticContent`,
   editStaticContent: `${base}/static/editStaticContent`,
   addFAQ: `${base}/static/addFAQ`,
-  faqList: `${base}/static/faqList`,
-  editFAQ: `${base}/static/editFAQ`,
-  deleteFAQ: `${base}/static/deleteFAQ`,
+  faqList: `${base}/staticContent/getAllStaticContentByType`,
+  updateStaticContent: `${base}/staticContent/updateStaticContent`,
+  deleteStaticContent: `${base}/staticContent/deleteStaticContent`,
   listAllContactUsRequest: `${base}/static/listAllContactUsRequest`,
   replyContactUs: `${base}/static/replyContactUs`,
 

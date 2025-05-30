@@ -92,7 +92,7 @@ export default function Static() {
 
           <TableBody>
             {
-              [{ title: "About Us" }, { title: "Privacy Policy" }, { title: "Terms and conditions" }, { title: "Teams" }]?.map((value, i) => (
+              staticContentData?.filter((value) => value?.contentType !== "faq")?.map((value, i) => (
                 <TableRow>
                   <TableCell> {i + 1}</TableCell>
                   <TableCell>{value?.title}</TableCell>

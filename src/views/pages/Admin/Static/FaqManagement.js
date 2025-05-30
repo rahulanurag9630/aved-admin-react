@@ -46,7 +46,8 @@ export default function FaqManagement() {
     try {
       filterData = {
         page: page,
-        limit: 10,
+        limit: Number.MAX_SAFE_INTEGER,
+        contentType: "faq"
       };
       const response = await apiRouterCall({
         method: "GET",
@@ -76,9 +77,9 @@ export default function FaqManagement() {
       setIsUpdating(true);
       const response = await apiRouterCall({
         method: "DELETE",
-        endPoint: "deleteFAQ",
+        endPoint: "deleteStaticContent",
         bodyData: {
-          _id: deleteBlockId ? deleteBlockId?._id : undefined,
+          id: deleteBlockId ? deleteBlockId?._id : undefined,
         },
       });
       if (response.data.responseCode == 200) {
@@ -132,27 +133,27 @@ export default function FaqManagement() {
           },
           ...(checkEdit
             ? [
-                {
-                  icon: FaEdit,
-                  onClick: () =>
-                    history.push({
-                      pathname: "/static-content",
-                      state: {
-                        ...value,
-                        editFaq: true,
-                        title: value?.question,
-                        description: value?.answer,
-                      },
-                    }),
+              {
+                icon: FaEdit,
+                onClick: () =>
+                  history.push({
+                    pathname: "/static-content",
+                    state: {
+                      ...value,
+                      editFaq: true,
+                      title: value?.question,
+                      description: value?.answer,
+                    },
+                  }),
+              },
+              {
+                icon: DeleteIcon,
+                onClick: () => {
+                  setDeleteBlockId(value);
+                  setModalOpen(true);
                 },
-                {
-                  icon: DeleteIcon,
-                  onClick: () => {
-                    setDeleteBlockId(value);
-                    setModalOpen(true);
-                  },
-                },
-              ]
+              },
+            ]
             : []),
         ],
       }))
@@ -175,9 +176,9 @@ export default function FaqManagement() {
           pathname={
             checkEdit
               ? {
-                  pathname: "/static-content",
-                  state: { addFaq: true },
-                }
+                pathname: "/static-content",
+                state: { addFaq: true },
+              }
               : undefined
           }
           addButton="Add FAQ"

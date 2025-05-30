@@ -67,6 +67,7 @@ export default function EditProfile() {
   const isEdit = location?.state?.isEdit;
   const addFaq = location?.state?.addFaq;
   const editFaq = location?.state?.editFaq;
+  console.log(location.state)
 
   // Separate refs for each editor
   const editorRefEn = useRef(null);
@@ -108,13 +109,14 @@ export default function EditProfile() {
       setIsLoading(true);
       const response = await apiRouterCall({
         method: addFaq ? "POST" : "PUT",
-        endPoint: addFaq ? "addFAQ" : editFaq ? "editFAQ" : "editStaticContent",
+        endPoint: addFaq ? "addStaticContent" : "updateStaticContent",
         bodyData: {
-          _id: !addFaq ? location?.state?._id : undefined,
-          question_en: addFaq || editFaq ? values.title_en : undefined,
+          staticContentId: !addFaq ? location?.state?._id : undefined,
+          contentType: addFaq ? "faq" : undefined,
+          question: addFaq || editFaq ? values.title_en : undefined,
           question_ar: addFaq || editFaq ? values.title_ar : undefined,
           title: !(addFaq || editFaq) ? values.title_en : undefined,
-          answer_en: addFaq || editFaq ? values.description_en : undefined,
+          answer: addFaq || editFaq ? values.description_en : undefined,
           answer_ar: addFaq || editFaq ? values.description_ar : undefined,
           description: !(addFaq || editFaq) ? values.description_en : undefined,
         },
@@ -148,7 +150,7 @@ export default function EditProfile() {
           title_en: location?.state?.title || location?.state?.question_en || "",
           title_ar: location?.state?.question_ar || "",
           description_en: location?.state?.description || location?.state?.answer_en || "",
-          description_ar: location?.state?.answer_ar || "",
+          description_ar: location?.state?.answer_ar || location?.state?.description_ar,
         }}
         validationSchema={validationSchema}
         onSubmit={handleStatic}
@@ -164,7 +166,7 @@ export default function EditProfile() {
         }) => (
           <Form onSubmit={handleSubmit}>
             <Grid container spacing={2}>
-              {addFaq || editFaq ? (
+              {addFaq || editFaq || isView ? (
                 <Grid container spacing={2}>
                   {/* English Question */}
                   <Grid item xs={12} sm={6}>
@@ -323,7 +325,7 @@ export default function EditProfile() {
                       type="submit"
                       disabled={isLoading}
                     >
-                      Update {isLoading && <ButtonCircularProgress />}
+                      {addFaq ? "Add" : "Update"} {isLoading && <ButtonCircularProgress />}
                     </Button>
                   )}
                 </Box>

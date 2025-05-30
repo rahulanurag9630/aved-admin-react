@@ -278,7 +278,7 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
-                 Detailed Description
+                  Detailed Description
                 </Typography>
 
 
@@ -291,7 +291,17 @@ const AddProperty = () => {
                   config={{
                     readonly: isView || isLoading,
                     toolbar: true,
-
+                    buttons: [
+                      'bold', 'italic', 'underline', '|',
+                      'ul', 'ol', '|',
+                      'link', 'image', '|',
+                      'undo', 'redo', '|',
+                      'source'
+                    ],
+                    paste: {
+                      cleanHTML: true,
+                      cleanOnPaste: true,
+                    }
                   }}
                   error={Boolean(touched.detailDescription && errors.detailDescription)}
                   onBlur={(newContent) => setFieldValue("detailDescription", newContent)}
@@ -313,9 +323,17 @@ const AddProperty = () => {
                   config={{
                     readonly: isView || isLoading,
                     toolbar: true,
-                    direction: "rtl",
-                    language: "ar",
-
+                    buttons: [
+                      'bold', 'italic', 'underline', '|',
+                      'ul', 'ol', '|',
+                      'link', 'image', '|',
+                      'undo', 'redo', '|',
+                      'source'
+                    ],
+                    paste: {
+                      cleanHTML: true,
+                      cleanOnPaste: true,
+                    }
                   }}
                   error={Boolean(touched.detailDescription_ar && errors.detailDescription_ar)}
 
