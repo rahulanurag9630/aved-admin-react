@@ -14,6 +14,13 @@ const ApiConfig = {
   verifyOTP: `${base}/admin/verifyOTP`,
   forgotPassword: `${base}/admin/forgetPassword`,
   resetPassword: `${base}/admin/resetPassword`,
+  addOrUpdateBlog: `${base}/admin/addOrUpdateBlog`,
+  toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
+  deleteBlog: `${base}/admin/deleteBlog`,
+listBlogs: `${base}/admin/listBlogs`,
+
+
+  
   dashboard: `${base}/admin/dashboard`,
   getUserList: `${base}/admin/getUserList`,
   blockUnblockUser: `${base}/admin/blockUnblockUser`,
