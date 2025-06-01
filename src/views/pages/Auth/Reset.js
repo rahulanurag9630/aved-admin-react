@@ -136,11 +136,11 @@ export default function Forgot() {
     try {
       setIsUpdating(true);
       const response = await apiRouterCall({
-        method: "PUT",
+        method: "POST",
         endPoint: "resetPassword",
         token: token,
         bodyData: {
-          password: values.password,
+          newPassword: values.password,
           confirmPassword: values.confirmPassword,
         },
       });

@@ -10,13 +10,16 @@ import {
   FormHelperText,
   MenuItem,
 } from "@material-ui/core";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
-import { FiUpload } from "react-icons/fi";
-import { getBase64 } from "src/utils";
+import { FiUpload, FiTrash2 } from "react-icons/fi";
+import uploadFile, { getBase64 } from "src/utils";
 import JoditEditor from "jodit-react";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { debounce } from "lodash";
+import { apiRouterCall } from "../../../ApiConfig/service/index";
+import toast from "react-hot-toast";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -128,7 +131,7 @@ const validationSchema = yup.object().shape({
   status: yup
     .string()
     .required("Status is required")
-    .oneOf(["Active", "Inactive"], "Status must be either 'Active' or 'Inactive'"),
+    .oneOf(["Active", "Inactive", "Published"], "Status must be either 'Active' or 'Inactive'"),
 
   address: yup
     .string()
@@ -157,16 +160,13 @@ const validationSchema = yup.object().shape({
     .min(1, "At least one image is required")
     .required("Images are required"),
 
-  noOfFloors: yup
-    .number()
-    .required("Number of floors is required")
-    .min(0, "Number of floors cannot be negative"),
+  floorPlans: yup.array().of(
+    yup.object().shape({
+      floorDescription: yup.string().required("Floor description is required"),
+      floorPhoto: yup.string().required("Floor photo is required")
+    })
+  ).min(1, "At least one floor is required"),
 
-  floorPlans: yup
-    .array()
-    .of(yup.mixed().required("Floor plan image is required"))
-    .nullable()
-    .default([]),
 
   metaTitle: yup
     .string()
@@ -179,7 +179,7 @@ const validationSchema = yup.object().shape({
     .min(3, "Meta tags must be at least 3 characters"),
 });
 const propertyTypes = ["Apartment", "Villa", "Studio"];
-const amenitiesOptions = ["Gym", "Swimming Pool", "Parking"];
+// const amenitiesOptions = ["Gym", "Swimming Pool", "Parking"];
 const tagOptions = ["For Sale", "For Rent", "New Launch"];
 
 const AddProperty = () => {
@@ -189,10 +189,40 @@ const AddProperty = () => {
   const [isLoading, setIsLoading] = useState(false);
   const isView = location?.state?.isView;
   const isEdit = location?.state?.isEdit;
+  const [amenitiesOptions, setAmenitiesOptions] = useState([])
+
 
   const editorRefEn = useRef(null);
   const editorRefAr = useRef(null);
+  const handleGetAmenities = async (source, checkFilter) => {
+    try {
+      const response = await apiRouterCall({
+        method: "GET",
+        endPoint: "listAmenities",
+        source: source,
+        paramsData: { page: 1, limit: Number.MAX_SAFE_INTEGER },
+      });
+      console.log(response)
+      if (response.data.responseCode === 200) {
+        setAmenitiesOptions(response.data.result.docs);
 
+      } else {
+        setAmenitiesOptions([]);
+      }
+
+
+    } catch (err) {
+      setAmenitiesOptions([]);
+      setIsLoading(false);
+      console.log(err);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    handleGetAmenities()
+  }, [])
   const initialValues = {
     propertyName: "",
     propertyName_ar: "",
@@ -216,8 +246,11 @@ const AddProperty = () => {
     latitude: "",
     longitude: "",
     images: [],
-    noOfFloors: 0,
-    floorPlans: [],
+    floorPlans: [{
+      floorDescription: "",
+      floorPhoto: ""
+    }],
+
     metaTitle: "",
     metaTags: "",
   };
@@ -225,8 +258,91 @@ const AddProperty = () => {
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
     console.log("Form Submitted:", values);
-    setIsSubmitting(false);
+
+    try {
+      // Construct payload with schema keys
+      const payload = {
+        property_name: values.propertyName,
+        property_name_ar: values.propertyName_ar,
+        overview: values.description,
+        overview_ar: values.description_ar,
+        detailed_description: values.detailDescription,
+        detailed_description_ar: values.detailDescription_ar,
+        price: values.price,
+        apartment_number: values.apartmentNumber,
+        no_of_bedrooms: values.noOfBedrooms,
+        no_of_bathrooms: values.noOfBathrooms,
+        year_of_built: values.yearBuilt,
+        amenities: values.amenities,
+        area_sqft: values.area,
+        parking_space: values.parkingSpace,
+        property_type: values.propertyType,
+        listing_type: values.listingType,
+        availability_status: values.availabilityStatus,
+        status: values.status,
+        address: values.address,
+        latitude: values.latitude,
+        longitude: values.longitude,
+        images: values.images,
+        floor_plan: values.floorPlans.map((floor) => ({
+          photo: floor.floorPhoto,
+          description: floor.floorDescription
+        })),
+        seo_meta_titles: values.metaTitle,
+        seo_meta_tags: values.metaTags,
+        // If you have no_of_floors separately:
+        no_of_floors: values.floorPlans.length,
+        publish_status: values.status // or "published" based on your form logic
+      };
+
+      // Call the API
+      const res = await apiRouterCall({
+        method: "POST",
+        endPoint: "addUpdateProperty",
+        bodyData: payload
+      });
+
+      if (res?.data?.responseCode === 200) {
+        toast.success("Property added/updated successfully!");
+        // Optionally, reset form or redirect here
+      } else {
+        toast.error(res?.data?.responseMessage || "Error while adding/updating property");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+
+  const debounceSetFieldValue = useCallback(
+    debounce((field, value, setFieldValue) => {
+      setFieldValue(field, value);
+    }, 300),
+    []
+  );
+
+  // JoditEditor Configs
+  const editorConfigEn = useMemo(
+    () => ({
+      readonly: isView || isLoading,
+      toolbar: true,
+    }),
+    [isView, isLoading]
+  );
+
+  const editorConfigAr = useMemo(
+    () => ({
+      readonly: isView || isLoading,
+      toolbar: true,
+      direction: "rtl",
+      language: "ar",
+    }),
+    [isView, isLoading]
+  );
+
 
   return (
     <Paper elevation={2} className={classes.formWrapper}>
@@ -263,7 +379,11 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary" dir='rtl'>اسم العقار</Typography>
-                <TextField fullWidth name="propertyName" variant="outlined" value={values.propertyName_ar} onChange={handleChange} onBlur={handleBlur} error={Boolean(touched.propertyName && errors.propertyName)} />
+                <TextField fullWidth name="propertyName_ar" inputProps={{
+                  style: { textAlign: "right" },
+                  dir: "rtl",
+                  lang: "ar",
+                }} variant="outlined" value={values.propertyName_ar} onChange={handleChange} onBlur={handleBlur} error={Boolean(touched.propertyName && errors.propertyName)} />
                 <FormHelperText error>{touched.propertyName_ar && errors.propertyName_ar}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
@@ -288,23 +408,9 @@ const AddProperty = () => {
                   tabIndex={1}
                   name="description"
                   variant="outlined"
-                  config={{
-                    readonly: isView || isLoading,
-                    toolbar: true,
-                    buttons: [
-                      'bold', 'italic', 'underline', '|',
-                      'ul', 'ol', '|',
-                      'link', 'image', '|',
-                      'undo', 'redo', '|',
-                      'source'
-                    ],
-                    paste: {
-                      cleanHTML: true,
-                      cleanOnPaste: true,
-                    }
-                  }}
+                  config={editorConfigEn}
                   error={Boolean(touched.detailDescription && errors.detailDescription)}
-                  onBlur={(newContent) => setFieldValue("detailDescription", newContent)}
+                  onBlur={(newContent) => debounceSetFieldValue("detailDescription", newContent, setFieldValue)}
                 />
 
                 <FormHelperText error>{touched.detailDescription && errors.detailDescription}</FormHelperText>
@@ -320,24 +426,10 @@ const AddProperty = () => {
                   value={values.detailDescription_ar}
                   tabIndex={2}
                   name="detailDescription_ar"
-                  config={{
-                    readonly: isView || isLoading,
-                    toolbar: true,
-                    buttons: [
-                      'bold', 'italic', 'underline', '|',
-                      'ul', 'ol', '|',
-                      'link', 'image', '|',
-                      'undo', 'redo', '|',
-                      'source'
-                    ],
-                    paste: {
-                      cleanHTML: true,
-                      cleanOnPaste: true,
-                    }
-                  }}
+                  config={editorConfigAr}
                   error={Boolean(touched.detailDescription_ar && errors.detailDescription_ar)}
 
-                  onBlur={(newContent) => setFieldValue("detailDescription_ar", newContent)}
+                  onBlur={(newContent) => debounceSetFieldValue("detailDescription_ar", newContent, setFieldValue)}
                 />
 
 
@@ -408,16 +500,19 @@ const AddProperty = () => {
                         vertical: "top",
                         horizontal: "left",
                       },
-                      getContentAnchorEl: null, // Ensures correct positioning
+                      getContentAnchorEl: null,
                     },
                   }}
                 >
-                  {amenitiesOptions.map((item) => (
-                    <MenuItem key={item} value={item}>{item}</MenuItem>
+                  {amenitiesOptions.map((amenity) => (
+                    <MenuItem key={amenity._id} value={amenity._id}>
+                      {amenity.title}
+                    </MenuItem>
                   ))}
                 </TextField>
                 <FormHelperText error>{touched.amenities && errors.amenities}</FormHelperText>
               </Grid>
+
 
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Area (sq ft)</Typography>
@@ -487,7 +582,7 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Availability Status</Typography>
-                <TextField select fullWidth name="availabilityStatus" variant="outlined" value={values.propertyType} onChange={handleChange} SelectProps={{
+                <TextField select fullWidth name="availabilityStatus" variant="outlined" value={values.availabilityStatus} onChange={handleChange} SelectProps={{
                   MenuProps: {
                     anchorOrigin: {
                       vertical: "bottom",
@@ -570,15 +665,23 @@ const AddProperty = () => {
                     accept="image/*"
                     multiple
                     style={{ display: "none" }}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const files = Array.from(e.target.files);
-                      Promise.all(files.map((file) => new Promise((resolve) => getBase64(file, resolve))))
-                        .then((base64Images) => {
-                          setFieldValue("images", [...values.images, ...base64Images]);
-                        });
-                    }}
+                      const uploadedImageUrls = [];
 
+                      setIsSubmitting(true); // Optionally set loading for entire upload process
+                      for (const file of files) {
+                        const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload each file
+                        if (uploadedUrl) {
+                          uploadedImageUrls.push(uploadedUrl); // Collect successful URLs
+                        }
+                      }
+
+                      setFieldValue("images", [...values.images, ...uploadedImageUrls]);
+                      setIsSubmitting(false); // Done with all uploads
+                    }}
                   />
+
                   <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
                     <Avatar><FiUpload /></Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>Click to upload images</Typography>
@@ -592,65 +695,188 @@ const AddProperty = () => {
 
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">No of Floors</Typography>
-                <TextField
-                  fullWidth
-                  name="noOfFloors"
-                  type="number"
-                  variant="outlined"
-                  value={values.noOfFloors}
-                  onChange={(e) => {
-                    const num = parseInt(e.target.value, 10);
-                    handleChange(e);
-                    // Clear extra images if the floor count decreases
-                    if (!isNaN(num) && values.floorPlans.length > num) {
-                      setFieldValue("floorPlans", values.floorPlans.slice(0, num));
-                    }
-                  }}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.noOfFloors && errors.noOfFloors)}
-                />
-                <FormHelperText error>{touched.noOfFloors && errors.noOfFloors}</FormHelperText>
-              </Grid>
-
-              {/* Floor Plan Uploads */}
               <Grid item xs={12}>
-                <Box className={classes.imageUploadBox}>
-                  <input
-                    id="floor-plan-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    disabled={values.floorPlans.length >= values.noOfFloors}
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      const availableSlots = values.noOfFloors - values.floorPlans.length;
+                <Typography variant="h6">Floor Plans</Typography>
+                {values.floorPlans.map((floor, index) => (
+                  <Box
+                    key={index}
+                    mb={2}
+                    p={2}
+                    border={1}
+                    borderColor="grey.300"
+                    borderRadius={4}
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={"20px"}
+                  >
+                    {/* Left Side: Description */}
+                    <Box flex={1} display="flex" flexDirection="column">
+                      <Typography variant="body2" color="secondary">{`Floor ${index + 1} Description`}</Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        minRows={3}
+                        name={`floorPlans[${index}].floorDescription`}
+                        value={floor.floorDescription}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(
+                          touched.floorPlans?.[index]?.floorDescription &&
+                          errors.floorPlans?.[index]?.floorDescription
+                        )}
+                        helperText={
+                          touched.floorPlans?.[index]?.floorDescription &&
+                          errors.floorPlans?.[index]?.floorDescription
+                        }
+                        variant="outlined"
+                        margin="dense"
+                      />
+                      <Box mt="auto" display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          startIcon={<FiTrash2 />}
 
-                      const filesToUpload = files.slice(0, availableSlots);
-                      Promise.all(
-                        filesToUpload.map((file) => new Promise((resolve) => getBase64(file, resolve)))
-                      ).then((base64Images) => {
-                        setFieldValue("floorPlans", [...values.floorPlans, ...base64Images]);
-                      });
-                    }}
-                  />
-                  <label htmlFor="floor-plan-upload" className="displayCenter" style={{ flexDirection: "column", opacity: values.floorPlans.length >= values.noOfFloors ? 0.5 : 1, pointerEvents: values.floorPlans.length >= values.noOfFloors ? "none" : "auto" }}>
-                    <Avatar><FiUpload /></Avatar>
-                    <Typography variant="body2" style={{ marginTop: 8 }}>Click to upload Floor Plans</Typography>
-                    {values.floorPlans.length >= values.noOfFloors && (
-                      <FormHelperText error>You’ve uploaded all {values.noOfFloors} floor plans.</FormHelperText>
-                    )}
-                  </label>
+                          style={{ background: "red", color: "white !important" }}
+                          onClick={() => {
+                            const updatedFloors = values.floorPlans.filter((_, i) => i !== index);
+                            setFieldValue("floorPlans", updatedFloors);
+                          }}
+                          disabled={values.floorPlans.length === 1}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    </Box>
 
-                  <Box display="flex" flexWrap="wrap" mt={2}>
-                    {values.floorPlans.map((img, i) => (
-                      <img key={i} src={img} alt={`floor-${i + 1}`} className={classes.previewImage} />
-                    ))}
+                    {/* Right Side: Image Upload */}
+                    <Box
+                      flex={1}
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      position="relative"
+                      border={1}
+                      borderColor="grey.300"
+                      borderRadius={4}
+                      overflow="hidden"
+                      minHeight={200}
+                    >
+                      {!floor.floorPhoto ? (
+                        <>
+                          <input
+                            id={`floor-photo-${index}`}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                getBase64(file, (base64) => {
+                                  const updatedFloors = [...values.floorPlans];
+                                  updatedFloors[index].floorPhoto = base64;
+                                  setFieldValue("floorPlans", updatedFloors);
+                                });
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`floor-photo-${index}`}
+                            className="displayCenter"
+                            style={{ cursor: "pointer", width: "100%", height: "100%" }}
+                          >
+                            <Box
+                              display="flex"
+                              flexDirection="column"
+                              alignItems="center"
+                              justifyContent="center"
+                              height="100%"
+                              width="100%"
+                              bgcolor="grey.100"
+                              p={2}
+                            >
+                              <Avatar><FiUpload /></Avatar>
+                              <Typography variant="body2" mt={1}>Upload Floor Photo</Typography>
+                            </Box>
+                          </label>
+                        </>
+                      ) : (
+                        <Box
+                          position="relative"
+                          width="100%"
+                          height="100%"
+                        >
+                          <img
+                            src={floor.floorPhoto}
+                            alt={`floor-${index + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: 4
+                            }}
+                          />
+                          <input
+                            id={`floor-photo-${index}`}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload the file
+                                if (uploadedUrl) {
+                                  const updatedFloors = [...values.floorPlans];
+                                  updatedFloors[index].floorPhoto = uploadedUrl; // Save the uploaded URL
+                                  setFieldValue("floorPlans", updatedFloors);
+                                }
+                              }
+                            }}
+                          />
+
+                          <label
+                            htmlFor={`floor-photo-${index}`}
+                            style={{
+                              position: "absolute",
+                              bottom: 8,
+                              right: 8,
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              borderRadius: "50%",
+                              padding: 6,
+                              cursor: "pointer"
+                            }}
+                          >
+                            <FiUpload />
+                          </label>
+                        </Box>
+                      )}
+                      {touched.floorPlans?.[index]?.floorPhoto &&
+                        errors.floorPlans?.[index]?.floorPhoto && (
+                          <FormHelperText error>
+                            {errors.floorPlans[index].floorPhoto}
+                          </FormHelperText>
+                        )}
+                    </Box>
                   </Box>
-                </Box>
+                ))}
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    setFieldValue("floorPlans", [
+                      ...values.floorPlans,
+                      { floorDescription: "", floorPhoto: "" }
+                    ]);
+                  }}
+                >
+                  Add Floor
+                </Button>
               </Grid>
+
+
               <Grid item xs={12} mt={2}>
                 <Typography variant="h6" color="secondary" gutterBottom>
                   Tags

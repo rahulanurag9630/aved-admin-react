@@ -17,10 +17,10 @@ const ApiConfig = {
   addOrUpdateBlog: `${base}/admin/addOrUpdateBlog`,
   toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
   deleteBlog: `${base}/admin/deleteBlog`,
-listBlogs: `${base}/admin/listBlogs`,
+  listBlogs: `${base}/admin/listBlogs`,
 
 
-  
+
   dashboard: `${base}/admin/dashboard`,
   getUserList: `${base}/admin/getUserList`,
   blockUnblockUser: `${base}/admin/blockUnblockUser`,
@@ -75,10 +75,12 @@ listBlogs: `${base}/admin/listBlogs`,
   userExchangeManagement: `${base}/wallet/userExchangeManagement`,
   orderHistoryAdmin: `${base}/wallet/orderHistoryAdmin`,
   closePosition: `${base}/wallet/closePosition`,
+  ///////////////////////////////////////////////////////////////////////////
   addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
   toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
   listAmenities: `${base}/admin/listAmenities`,
   uploadFile: `${base}/user/uploadFile`,
+  addUpdateProperty: `${base}/property/addUpdateProperty`
 };
 
 export default ApiConfig;
