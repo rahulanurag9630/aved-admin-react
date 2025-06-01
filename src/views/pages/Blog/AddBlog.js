@@ -10,7 +10,7 @@ import {
   FormHelperText,
   MenuItem,
 } from "@material-ui/core";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import JoditEditor from "jodit-react";
 import { Form, Formik } from "formik";
@@ -29,6 +29,8 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderRadius: "10px",
     textAlign: "center",
+    
+
   },
   previewImage: {
     height: "120px",
@@ -59,12 +61,23 @@ const validationSchema = yup.object().shape({
 
 });
 
+
 const AddBlog = () => {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formValues, setFormValues] = useState(null);
+
+  const location = useLocation();
+  const isView = location?.state?.isView;
+  const isEdit = location?.state?.isEdit;
+  const blogData = location?.state?.blogData;
+
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
 
 
+  console.log("djfdfdfdfjdjfdjfdjd",isEdit)
   const initialValues = {
     title: "",
     title_ar: "",
@@ -74,21 +87,35 @@ const AddBlog = () => {
     image_ar: "",
   };
 
+  useEffect(() => {
+    if (isEdit || isView) {
+      setFormValues({
+        title: blogData?.title || "",
+        title_ar: blogData?.title_ar || "",
+        description: blogData?.description || "",
+        description_arb: blogData?.description_ar || "",
+        image: blogData?.image || "",
+        image_ar: blogData?.image_ar || "",
+        id: blogData?.id || "",
+      });
+    } else {
+      setFormValues(initialValues);
+    }
+  }, [isEdit, isView, blogData]);
+
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
-    console.log("Blog data submitted:", values);
-
     try {
-      setIsLoading(true);
+      setLoading(true);
 
       const bodyData = {
-        id: values.id || undefined, // for update
+        id: values.id || undefined,
         title: values.title,
         title_ar: values.title_ar,
-        description: values.description, // fixed
-        description_ar: values.description_arb, // fixed
+        description: values.description,
+        description_ar: values.description_arb,
         image: values.image,
-        image_ar: values.image_ar, // fixed: separate field
+        image_ar: values.image_ar,
       };
 
       const res = await apiRouterCall({
@@ -97,53 +124,39 @@ const AddBlog = () => {
         bodyData,
       });
 
-      console.log("Blog API response:", res);
-
       if (res?.data?.responseCode === 200) {
-
-        if (values.id) {
-          toast.success("Blog updated successfully.");
-        } else {
-          toast.success("Blog added successfully.");
-        }
-       
+        toast.success(values.id ? "Blog updated successfully." : "Blog added successfully.");
       } else {
         toast.error(res?.data?.responseMessage || "Something went wrong.");
       }
-
-      setIsLoading(false);
     } catch (err) {
-      setIsLoading(false);
       console.error("Blog add/update error:", err);
       toast.error("Server error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
     }
-
-    setIsSubmitting(false);
   };
 
-  const location = useLocation();
-  const [isLoading, setIsLoading] = useState(false);
-  const isView = location?.state?.isView;
-  const isEdit = location?.state?.isEdit;
+  if (!formValues) return <Typography>Loading form...</Typography>;
 
-  const editorRefEn = useRef(null);
-  const editorRefAr = useRef(null);
   return (
     <Paper elevation={2} className={classes.formWrapper}>
       <Typography variant="h6" color="secondary" gutterBottom>
-        Add New Blog
+        {isEdit ? "Edit Blog" : isView ? "View Blog" : "Add New Blog"}
       </Typography>
 
       <Formik
-        initialValues={initialValues}
+        initialValues={formValues}
+        enableReinitialize
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ values, handleChange, handleBlur, setFieldValue, errors, touched }) => (
           <Form>
             <Grid container spacing={3}>
+              {/* Title fields */}
               <Grid container spacing={2} style={{ marginTop: "10px" }}>
-                {/* Title */}
                 <Grid item xs={6}>
                   <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
                     Title
@@ -157,189 +170,159 @@ const AddBlog = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={Boolean(touched.title && errors.title)}
+                    disabled={isView}
                   />
                   <FormHelperText error>{touched.title && errors.title}</FormHelperText>
                 </Grid>
 
-                {/* Title */}
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="secondary" dir='rtl' style={{ marginBottom: "5px" }}>
+                  <Typography variant="body2" color="secondary" dir="rtl" style={{ marginBottom: "5px" }}>
                     العنوان
                   </Typography>
                   <TextField
                     fullWidth
                     placeholder="أدخل العنوان"
-                    dir='rtl'
+                    dir="rtl"
                     name="title_ar"
                     variant="outlined"
                     value={values.title_ar}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={Boolean(touched.title_ar && errors.title_ar)}
+                    disabled={isView}
                   />
                   <FormHelperText error>{touched.title_ar && errors.title_ar}</FormHelperText>
                 </Grid>
               </Grid>
 
-              {/* Description */}
-
+              {/* Description fields */}
               <Grid container spacing={2} style={{ marginTop: "10px" }}>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
                     Description
                   </Typography>
-
-
                   <JoditEditor
                     ref={editorRefEn}
                     value={values.description}
-                    tabIndex={1}
-                    name="description"
-                    variant="outlined"
                     config={{
-                      readonly: isView || isLoading,
-                      toolbar: true,
-
+                      readonly: isView || loading,
+                      toolbar: !isView,
                     }}
-                    error={Boolean(touched.description && errors.description)}
                     onBlur={(newContent) => setFieldValue("description", newContent)}
                   />
-
                   <FormHelperText error>{touched.description && errors.description}</FormHelperText>
                 </Grid>
-                {/* Description */}
                 <Grid item xs={6}>
-                  <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                  <Typography variant="body2" dir="rtl" color="secondary" style={{ marginBottom: "5px" }}>
                     الوصف
                   </Typography>
-
                   <JoditEditor
                     ref={editorRefAr}
-                    value={values.description_ar}
-                    tabIndex={2}
-                    name="description_arb"
+                    value={values.description_arb}
                     config={{
-                      readonly: isView || isLoading,
-                      toolbar: true,
+                      readonly: isView || loading,
+                      toolbar: !isView,
                       direction: "rtl",
                       language: "ar",
-
                     }}
-                    error={Boolean(touched.description_arb && errors.description_arb)}
-
                     onBlur={(newContent) => setFieldValue("description_arb", newContent)}
                   />
-
-
                   <FormHelperText error>{touched.description_arb && errors.description_arb}</FormHelperText>
                 </Grid>
-
               </Grid>
 
               {/* Image Upload */}
-
-
               <Grid container spacing={2} style={{ marginTop: "10px" }}>
+                {/* English Image */}
                 <Grid item xs={6}>
                   <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
                     Image
                   </Typography>
                   <Box className={classes.imageUploadBox}>
-                    <input
-                      id="image-upload-en"
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          try {
-                            setLoading(true);
-                            const url = await uploadFile(file, setLoading);
-                            if (url) {
-                              setFieldValue("image", url);
+                    {!isView && (
+                      <>
+                        <input
+                          id="image-upload-en"
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" , cursor: "pointer",}}
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              try {
+                                setLoading(true);
+                                const url = await uploadFile(file, setLoading);
+                                if (url) setFieldValue("image", url);
+                              } catch (err) {
+                                toast.error("Image upload failed!");
+                              } finally {
+                                setLoading(false);
+                              }
                             }
-                          } catch (err) {
-                            toast.error("Image upload failed!");
-                          }
-                        }
-                      }}
-                    />
-                    <label htmlFor="image-upload-en" className="displayCenter" style={{ flexDirection: "column" }}>
-                      <Avatar>
-                        <FiUpload color="#FFF" />
-                      </Avatar>
-                      <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
-                        Click to upload image
-                      </Typography>
-                    </label>
-
+                          }}
+                        />
+                        <label htmlFor="image-upload-en" className="displayCenter" style={{ flexDirection: "column" }}>
+                          <Avatar><FiUpload color="#FFF" /></Avatar>
+                          <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
+                            Click to upload image
+                          </Typography>
+                        </label>
+                      </>
+                    )}
                     {values.image && (
                       <img src={values.image} alt="Preview" className={classes.previewImage} />
                     )}
-
                     <FormHelperText error>{touched.image && errors.image}</FormHelperText>
                   </Box>
                 </Grid>
 
-                {/* Image */}
+                {/* Arabic Image */}
                 <Grid item xs={6}>
-                  <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                  <Typography variant="body2" dir="rtl" color="secondary" style={{ marginBottom: "5px" }}>
                     الصورة
                   </Typography>
                   <Box className={classes.imageUploadBox}>
-                    {/* Arabic Image Upload */}
-                    <input
-                      id="image-upload-ar"
-                      type="file"
-                      accept="image/*"
-                      style={{ display: "none" }}
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          try {
-                            setLoading(true);
-                            const url = await uploadFile(file, setLoading);
-                            if (url) {
-                              setFieldValue("image_ar", url);
+                    {!isView && (
+                      <>
+                        <input
+                          id="image-upload-ar"
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" }}
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              try {
+                                setLoading(true);
+                                const url = await uploadFile(file, setLoading);
+                                if (url) setFieldValue("image_ar", url);
+                              } catch (err) {
+                                toast.error("Image upload failed!");
+                              } finally {
+                                setLoading(false);
+                              }
                             }
-                          } catch (err) {
-                            toast.error("Image upload failed!");
-                          }
-                        }
-                      }}
-
-                    />
-                    <label htmlFor="image-upload-ar" className="displayCenter" style={{ flexDirection: "column" }}>
-                      <Avatar>
-                        <FiUpload color="#FFF" />
-                      </Avatar>
-                      <Typography
-                        variant="body2"
-                        style={{ marginTop: 8, textAlign: "center", color: "#fff" }}
-                      >
-                        اضغط لتحميل الصورة
-                      </Typography>
-                    </label>
-
-
+                          }}
+                        />
+                        <label htmlFor="image-upload-ar" className="displayCenter" style={{ flexDirection: "column" }}>
+                          <Avatar><FiUpload color="#FFF" /></Avatar>
+                          <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
+                            اضغط لتحميل الصورة
+                          </Typography>
+                        </label>
+                      </>
+                    )}
                     {values.image_ar && (
                       <img src={values.image_ar} alt="معاينة" className={classes.previewImage} />
                     )}
-
                     <FormHelperText error>{touched.image_ar && errors.image_ar}</FormHelperText>
                   </Box>
                 </Grid>
-
-
               </Grid>
 
-
-              {/* Submit Button */}
-
-              <Grid item xs={7}>
+              {/* Submit/Back Buttons */}
+              <Grid item xs={7} style={{ marginTop: "16px" }}>
                 <div style={{ display: 'flex', gap: '16px' }}>
-                  {/* Back Button */}
                   <Button
                     variant="contained"
                     color="secondary"
@@ -347,20 +330,18 @@ const AddBlog = () => {
                   >
                     Back
                   </Button>
-
-                  {/* Submit Button */}
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Submitting..." : "Submit"}
-                  </Button>
+                  {!isView && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Submitting..." : isEdit ? "Update" : "Submit"}
+                    </Button>
+                  )}
                 </div>
               </Grid>
-
-
             </Grid>
           </Form>
         )}
@@ -370,3 +351,4 @@ const AddBlog = () => {
 };
 
 export default AddBlog;
+

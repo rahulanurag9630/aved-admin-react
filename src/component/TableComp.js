@@ -53,58 +53,6 @@ function TableComp({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Box>
-<<<<<<< HEAD
-      {isMobileAdaptive && isMobile ? (
-        <CustomTable
-          tableHead={tableHead}
-          scoreListData={scoreListData}
-          popupTitle={popupTitle}
-        />
-      ) : (
-        <TableContainer className={tableClass.tableContainer}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {tableHead?.map((head, index) => (
-                  <TableCell key={index}>{head.heading}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {scoreListData?.map((dataOrIndex, i) => (
-                <TableRow key={i}>
-                  {tableHead?.map((head, index) => {
-                    return (
-                      <TableCell key={index}>
-                        <Box className="displayCenter">
-                          {["Action", "Reward Breakdown", "Details"].includes(
-                            head.heading
-                          )
-                            ? dataOrIndex[head.heading]?.map((action, idx) => {
-                                const Icon = action?.icon;
-                                return (
-                                  <Tooltip
-                                    title={action?.title || ""}
-                                    key={idx}
-                                  >
-                                    <IconButton
-                                      size="small"
-                                      key={idx}
-                                      onClick={action?.onClick}
-                                      disabled={!action?.icon}
-                                    >
-                                      <Icon style={action?.style}/>
-                                    </IconButton>
-                                  </Tooltip>
-                                );
-                              })
-                            : dataOrIndex[head.heading] ?? "..."}
-                        </Box>
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-=======
 
       <TableContainer className={tableClass.tableContainer}>
         <Table>
@@ -112,7 +60,6 @@ function TableComp({
             <TableRow>
               {tableHead?.map((head, index) => (
                 <TableCell key={index}>{head.heading}</TableCell>
->>>>>>> b5ff9bd557c4ca20009d57abc5a6e177dd2f2553
               ))}
             </TableRow>
           </TableHead>

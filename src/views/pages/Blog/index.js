@@ -190,8 +190,8 @@ export default function Blogs() {
             icon: VisibilityIcon,
             onClick: () =>
               history.push({
-                pathname: "/add-subscription",
-                state: { ...value, viewSubAdmin: true },
+                pathname: "/add-blog-management",
+                state: { ...value, isView: true },
               }),
           },
           ...(checkEdit
@@ -200,8 +200,8 @@ export default function Blogs() {
                 icon: FaEdit,
                 onClick: () =>
                   history.push({
-                    pathname: "/add-subscription",
-                    state: { ...value, editSubAdmin: true },
+                    pathname: "/add-blog-management",
+                    state: { ...value, isEdit: true },
                   }),
               },
               {
