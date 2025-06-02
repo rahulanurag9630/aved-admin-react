@@ -16,10 +16,11 @@ import * as yup from "yup";
 import { FiUpload, FiTrash2 } from "react-icons/fi";
 import uploadFile, { getBase64 } from "src/utils";
 import JoditEditor from "jodit-react";
-import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { useLocation, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { debounce } from "lodash";
 import { apiRouterCall } from "../../../ApiConfig/service/index";
 import toast from "react-hot-toast";
+import FullScreenLoader from "../../../component/FullScreenLoader";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -190,6 +191,7 @@ const AddProperty = () => {
   const isView = location?.state?.isView;
   const isEdit = location?.state?.isEdit;
   const [amenitiesOptions, setAmenitiesOptions] = useState([])
+  const history = useHistory()
 
 
   const editorRefEn = useRef(null);
@@ -279,7 +281,7 @@ const AddProperty = () => {
         property_type: values.propertyType,
         listing_type: values.listingType,
         availability_status: values.availabilityStatus,
-        status: values.status,
+        // status: values.status,
         address: values.address,
         latitude: values.latitude,
         longitude: values.longitude,
@@ -305,6 +307,7 @@ const AddProperty = () => {
       if (res?.data?.responseCode === 200) {
         toast.success("Property added/updated successfully!");
         // Optionally, reset form or redirect here
+        history.push("/property-management")
       } else {
         toast.error(res?.data?.responseMessage || "Error while adding/updating property");
       }
@@ -346,6 +349,7 @@ const AddProperty = () => {
 
   return (
     <Paper elevation={2} className={classes.formWrapper}>
+      <FullScreenLoader isLoading={isSubmitting} />
       <Typography variant="h4" color="secondary" gutterBottom>
         Add New Property
       </Typography>
@@ -707,8 +711,9 @@ const AddProperty = () => {
                     borderRadius={4}
                     display="flex"
                     flexDirection={{ xs: "column", sm: "row" }}
-                    gap={"20px"}
+                    sx={{ gap: 20 }} // Use the MUI sx prop for gap
                   >
+
                     {/* Left Side: Description */}
                     <Box flex={1} display="flex" flexDirection="column">
                       <Typography variant="body2" color="secondary">{`Floor ${index + 1} Description`}</Typography>
@@ -770,14 +775,15 @@ const AddProperty = () => {
                             type="file"
                             accept="image/*"
                             style={{ display: "none" }}
-                            onChange={(e) => {
+                            onChange={async (e) => {
                               const file = e.target.files[0];
                               if (file) {
-                                getBase64(file, (base64) => {
+                                const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload the file
+                                if (uploadedUrl) {
                                   const updatedFloors = [...values.floorPlans];
-                                  updatedFloors[index].floorPhoto = base64;
+                                  updatedFloors[index].floorPhoto = uploadedUrl; // Save the uploaded URL
                                   setFieldValue("floorPlans", updatedFloors);
-                                });
+                                }
                               }
                             }}
                           />

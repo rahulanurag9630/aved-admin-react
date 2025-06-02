@@ -59,7 +59,7 @@ const tableHead = [
   },
 ];
 
-  
+
 
 export default function Property() {
   const history = useHistory();
@@ -119,116 +119,116 @@ export default function Property() {
       // }
       // setIsClear(false);
       // setIsLoading(false);
-     setTransactionList([
-  {
-    id: 1,
-    propertyName: "Sunny Apartments",
-    propertyType: "Apartment",
-    overview: "Spacious 2BHK apartment with garden view.",
-    noOfFloar: 5,
-    noOfBedRooms: 2,
-    image: "https://via.placeholder.com/100x100?text=Sunny",
-    createdAt: "2025-05-01 10:15 AM",
-  },
-  {
-    id: 2,
-    propertyName: "Oceanview Villa",
-    propertyType: "Villa",
-    overview: "Luxury villa with private pool and sea view.",
-    noOfFloar: 2,
-    noOfBedRooms: 4,
-    image: "https://via.placeholder.com/100x100?text=Oceanview",
-    createdAt: "2025-05-01 10:30 AM",
-  },
-  {
-    id: 3,
-    propertyName: "Skyline Towers",
-    propertyType: "Penthouse",
-    overview: "Top-floor penthouse with skyline view.",
-    noOfFloar: 15,
-    noOfBedRooms: 3,
-    image: "https://via.placeholder.com/100x100?text=Skyline",
-    createdAt: "2025-05-01 11:00 AM",
-  },
-  {
-    id: 4,
-    propertyName: "Greenwood Homes",
-    propertyType: "Independent House",
-    overview: "3BHK house in a gated community.",
-    noOfFloar: 2,
-    noOfBedRooms: 3,
-    image: "https://via.placeholder.com/100x100?text=Greenwood",
-    createdAt: "2025-05-01 11:15 AM",
-  },
-  {
-    id: 5,
-    propertyName: "Metro Residency",
-    propertyType: "Studio",
-    overview: "Compact studio apartment near metro station.",
-    noOfFloar: 10,
-    noOfBedRooms: 1,
-    image: "https://via.placeholder.com/100x100?text=Metro",
-    createdAt: "2025-05-01 12:00 PM",
-  },
-  {
-    id: 6,
-    propertyName: "Hilltop Mansion",
-    propertyType: "Bungalow",
-    overview: "Massive bungalow on hilltop with garden.",
-    noOfFloar: 3,
-    noOfBedRooms: 5,
-    image: "https://via.placeholder.com/100x100?text=Hilltop",
-    createdAt: "2025-05-01 12:30 PM",
-  },
-  {
-    id: 7,
-    propertyName: "Budget Flats",
-    propertyType: "Apartment",
-    overview: "Affordable housing for small families.",
-    noOfFloar: 4,
-    noOfBedRooms: 2,
-    image: "https://via.placeholder.com/100x100?text=Budget",
-    createdAt: "2025-05-01 01:00 PM",
-  },
-  {
-    id: 8,
-    propertyName: "Elite Estate",
-    propertyType: "Villa",
-    overview: "Gated community villa with 24x7 security.",
-    noOfFloar: 2,
-    noOfBedRooms: 4,
-    image: "https://via.placeholder.com/100x100?text=Elite",
-    createdAt: "2025-05-01 01:30 PM",
-  },
-  {
-    id: 9,
-    propertyName: "Student Suites",
-    propertyType: "Hostel",
-    overview: "Furnished shared accommodations for students.",
-    noOfFloar: 3,
-    noOfBedRooms: 1,
-    image: "https://via.placeholder.com/100x100?text=Student",
-    createdAt: "2025-05-01 02:00 PM",
-  },
-  {
-    id: 10,
-    propertyName: "Family Residency",
-    propertyType: "Apartment",
-    overview: "3BHK flats designed for modern families.",
-    noOfFloar: 7,
-    noOfBedRooms: 3,
-    image: "https://via.placeholder.com/100x100?text=Family",
-    createdAt: "2025-05-01 02:30 PM",
-  },
-]);
+      setTransactionList([
+        {
+          id: 1,
+          propertyName: "Sunny Apartments",
+          propertyType: "Apartment",
+          overview: "Spacious 2BHK apartment with garden view.",
+          noOfFloar: 5,
+          noOfBedRooms: 2,
+          image: "https://via.placeholder.com/100x100?text=Sunny",
+          createdAt: "2025-05-01 10:15 AM",
+        },
+        {
+          id: 2,
+          propertyName: "Oceanview Villa",
+          propertyType: "Villa",
+          overview: "Luxury villa with private pool and sea view.",
+          noOfFloar: 2,
+          noOfBedRooms: 4,
+          image: "https://via.placeholder.com/100x100?text=Oceanview",
+          createdAt: "2025-05-01 10:30 AM",
+        },
+        {
+          id: 3,
+          propertyName: "Skyline Towers",
+          propertyType: "Penthouse",
+          overview: "Top-floor penthouse with skyline view.",
+          noOfFloar: 15,
+          noOfBedRooms: 3,
+          image: "https://via.placeholder.com/100x100?text=Skyline",
+          createdAt: "2025-05-01 11:00 AM",
+        },
+        {
+          id: 4,
+          propertyName: "Greenwood Homes",
+          propertyType: "Independent House",
+          overview: "3BHK house in a gated community.",
+          noOfFloar: 2,
+          noOfBedRooms: 3,
+          image: "https://via.placeholder.com/100x100?text=Greenwood",
+          createdAt: "2025-05-01 11:15 AM",
+        },
+        {
+          id: 5,
+          propertyName: "Metro Residency",
+          propertyType: "Studio",
+          overview: "Compact studio apartment near metro station.",
+          noOfFloar: 10,
+          noOfBedRooms: 1,
+          image: "https://via.placeholder.com/100x100?text=Metro",
+          createdAt: "2025-05-01 12:00 PM",
+        },
+        {
+          id: 6,
+          propertyName: "Hilltop Mansion",
+          propertyType: "Bungalow",
+          overview: "Massive bungalow on hilltop with garden.",
+          noOfFloar: 3,
+          noOfBedRooms: 5,
+          image: "https://via.placeholder.com/100x100?text=Hilltop",
+          createdAt: "2025-05-01 12:30 PM",
+        },
+        {
+          id: 7,
+          propertyName: "Budget Flats",
+          propertyType: "Apartment",
+          overview: "Affordable housing for small families.",
+          noOfFloar: 4,
+          noOfBedRooms: 2,
+          image: "https://via.placeholder.com/100x100?text=Budget",
+          createdAt: "2025-05-01 01:00 PM",
+        },
+        {
+          id: 8,
+          propertyName: "Elite Estate",
+          propertyType: "Villa",
+          overview: "Gated community villa with 24x7 security.",
+          noOfFloar: 2,
+          noOfBedRooms: 4,
+          image: "https://via.placeholder.com/100x100?text=Elite",
+          createdAt: "2025-05-01 01:30 PM",
+        },
+        {
+          id: 9,
+          propertyName: "Student Suites",
+          propertyType: "Hostel",
+          overview: "Furnished shared accommodations for students.",
+          noOfFloar: 3,
+          noOfBedRooms: 1,
+          image: "https://via.placeholder.com/100x100?text=Student",
+          createdAt: "2025-05-01 02:00 PM",
+        },
+        {
+          id: 10,
+          propertyName: "Family Residency",
+          propertyType: "Apartment",
+          overview: "3BHK flats designed for modern families.",
+          noOfFloar: 7,
+          noOfBedRooms: 3,
+          image: "https://via.placeholder.com/100x100?text=Family",
+          createdAt: "2025-05-01 02:30 PM",
+        },
+      ]);
 
     } catch (err) {
       setTransactionList([]);
       setIsLoading(false);
       console.log(err);
     }
-    finally{
-       setIsClear(false);
+    finally {
+      setIsClear(false);
       setIsLoading(false);
     }
   };
@@ -262,33 +262,33 @@ export default function Property() {
     }
   };
 
-function tableDataFunction(arrayData, condition) {
-  return (
-    arrayData &&
-    arrayData.map((value, i) => ({
-      "Sr No.": (page - 1) * 10 + i + 1,
-      "Property Name": value?.propertyName,
-      "Property Type": value?.propertyType,
-      Overview: value?.overview,
-      "No Of Floar": value?.noOfFloar,
-      "No Of BedRooms": value?.noOfBedRooms,
-      "Created Date & Time": value?.createdAt,
-      Action: [
-        {
-          icon: VisibilityIcon,
-          onClick: () =>
-            history.push({
-              pathname: "/add-subscription",
-              state: { ...value, viewSubAdmin: true },
-            }),
-        },
-        ...(checkEdit
-          ? [
+  function tableDataFunction(arrayData, condition) {
+    return (
+      arrayData &&
+      arrayData.map((value, i) => ({
+        "Sr No.": (page - 1) * 10 + i + 1,
+        "Property Name": value?.propertyName,
+        "Property Type": value?.propertyType,
+        Overview: value?.overview,
+        "No Of Floar": value?.noOfFloar,
+        "No Of BedRooms": value?.noOfBedRooms,
+        "Created Date & Time": value?.createdAt,
+        Action: [
+          {
+            icon: VisibilityIcon,
+            onClick: () =>
+              history.push({
+                pathname: "/add-subscription",
+                state: { ...value, viewSubAdmin: true },
+              }),
+          },
+          ...(true
+            ? [
               {
                 icon: FaEdit,
                 onClick: () =>
                   history.push({
-                    pathname: "/add-subscription",
+                    pathname: "/add-property-management",
                     state: { ...value, editSubAdmin: true },
                   }),
               },
@@ -307,14 +307,14 @@ function tableDataFunction(arrayData, condition) {
                 },
               },
             ]
-          : []),
-      ],
-    }))
-  );
-}
+            : []),
+        ],
+      }))
+    );
+  }
 
 
-  
+
 
   const handleClearFilter = () => {
     if (!isClear) {
@@ -356,7 +356,7 @@ function tableDataFunction(arrayData, condition) {
       <Box className="tophead">
         <Topheading
           heading="Property Management"
-          pathname={checkEdit ? "/add-property-management" : undefined}
+          pathname={true ? "/add-property-management" : undefined}
           addButton={"Add Property"}
         />
       </Box>
@@ -391,20 +391,18 @@ function tableDataFunction(arrayData, condition) {
         <ConfirmationDialogBox
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
-          heading={`${
-            modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
+          heading={`${modalOpen === "delete"
+            ? "Delete"
+            : deleteBlockId.status !== "BLOCK"
               ? "Block"
               : "Unblock"
-          } Plan`}
-          description={`Are you sure, you want to ${
-            modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
+            } Plan`}
+          description={`Are you sure, you want to ${modalOpen === "delete"
+            ? "Delete"
+            : deleteBlockId.status !== "BLOCK"
               ? "Block"
               : "Unblock"
-          } this plan?`}
+            } this plan?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
           blockDescription={"Are you sure, you want to block this plan?"}

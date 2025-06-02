@@ -53,65 +53,65 @@ function TableComp({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Box>
-      {isMobileAdaptive && isMobile ? (
+      {/* {isMobileAdaptive && isMobile ? (
         <CustomTable
           tableHead={tableHead}
           scoreListData={scoreListData}
           popupTitle={popupTitle}
         />
-      ) : (
-        <TableContainer className={tableClass.tableContainer}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                {tableHead?.map((head, index) => (
-                  <TableCell key={index}>{head.heading}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {scoreListData?.map((dataOrIndex, i) => (
-                <TableRow key={i}>
-                  {tableHead?.map((head, index) => {
-                    return (
-                      <TableCell key={index}>
-                        <Box className="displayCenter">
-                          {["Action", "Reward Breakdown", "Details"].includes(
-                            head.heading
-                          )
-                            ? dataOrIndex[head.heading]?.map((action, idx) => {
-                              const Icon = action?.icon;
-                              return (
-                                <Tooltip
-                                  title={action?.title || ""}
-                                  key={idx}
-                                >
-                                  <IconButton
-                                    size="small"
-                                    key={idx}
-                                    onClick={action?.onClick}
-                                    disabled={!action?.icon}
-                                  >
-                                    <Icon />
-                                  </IconButton>
-                                </Tooltip>
-                              );
-                            })
-                            : dataOrIndex[head.heading] ?? "..."}
-                        </Box>
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
+      ) : ( */}
+      <TableContainer className={tableClass.tableContainer}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {tableHead?.map((head, index) => (
+                <TableCell key={index}>{head.heading}</TableCell>
               ))}
-              {isLoading &&
-                Array.from({ length: 10 }).map((itm) => (
-                  <TopTradingSkeleton skeleton={tableHead} />
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {scoreListData?.map((dataOrIndex, i) => (
+              <TableRow key={i}>
+                {tableHead?.map((head, index) => {
+                  return (
+                    <TableCell key={index}>
+                      <Box className="displayCenter">
+                        {["Action", "Reward Breakdown", "Details"].includes(
+                          head.heading
+                        )
+                          ? dataOrIndex[head.heading]?.map((action, idx) => {
+                            const Icon = action?.icon;
+                            return (
+                              <Tooltip
+                                title={action?.title || ""}
+                                key={idx}
+                              >
+                                <IconButton
+                                  size="small"
+                                  key={idx}
+                                  onClick={action?.onClick}
+                                  disabled={!action?.icon}
+                                >
+                                  <Icon />
+                                </IconButton>
+                              </Tooltip>
+                            );
+                          })
+                          : dataOrIndex[head.heading] ?? "..."}
+                      </Box>
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+            {isLoading &&
+              Array.from({ length: 10 }).map((itm) => (
+                <TopTradingSkeleton skeleton={tableHead} />
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {/* )} */}
       {!isLoading && scoreListData && scoreListData?.length === 0 && (
         <NoDataFound text={noDataFoundResponses[NoDataFoundText]} />
       )}
