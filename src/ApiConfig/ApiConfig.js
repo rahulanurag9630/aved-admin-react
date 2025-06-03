@@ -18,6 +18,14 @@ const ApiConfig = {
   toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
   deleteBlog: `${base}/admin/deleteBlog`,
 listBlogs: `${base}/admin/listBlogs`,
+  addOrUpdateTeam: `${base}/admin/addOrUpdateTeam`,
+listTeam: `${base}/admin/listTeam`,
+  toggleBlockTeamStatus: `${base}/admin/toggleBlockTeamStatus`,
+  deleteTeam: `${base}/admin/deleteTeam`,
+
+
+
+
 
 
   

@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const validationSchema = yup.object().shape({
   title: yup.string().required("Please enter title.").min(3, "Enter at least 3 characters"),
   description: yup.string().required("Please enter description.").min(10, "Enter at least 10 characters"),
-  description_arb: yup
+  description_ar: yup
     .string()
     .required("يرجى إدخال الوصف.")
     .min(10, "أدخل 10 أحرف على الأقل."),
@@ -68,41 +68,25 @@ const AddBlog = () => {
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState(null);
 
-  const location = useLocation();
-  const isView = location?.state?.isView;
-  const isEdit = location?.state?.isEdit;
-  const blogData = location?.state?.blogData;
+   const location = useLocation();
+const editorRefEn = useRef(null);
+const editorRefAr = useRef(null);
 
-  const editorRefEn = useRef(null);
-  const editorRefAr = useRef(null);
+ const isEdit = location?.state?.isEdit || false;
+    const isView = location?.state?.isView || false;
 
-
-  console.log("djfdfdfdfjdjfdjfdjd",isEdit)
-  const initialValues = {
-    title: "",
-    title_ar: "",
-    description: "",
-    description_arb: "",
-    image: "",
-    image_ar: "",
-  };
-
-  useEffect(() => {
-    if (isEdit || isView) {
-      setFormValues({
-        title: blogData?.title || "",
-        title_ar: blogData?.title_ar || "",
-        description: blogData?.description || "",
-        description_arb: blogData?.description_ar || "",
-        image: blogData?.image || "",
-        image_ar: blogData?.image_ar || "",
-        id: blogData?.id || "",
-      });
-    } else {
-      setFormValues(initialValues);
-    }
-  }, [isEdit, isView, blogData]);
-
+    const editData = location?.state || {};
+    console.log("dsfdfdfdfsdfsdfsdfdsfd",location.state)
+ 
+    const initialValues = {
+        id: editData?._id || "",
+        title: editData?.title || "",
+        title_ar: editData?.title_ar || "",
+        description: editData?.description || "",
+        description_ar: editData?.description_ar || "",
+        image: editData?.image || "",
+        image_ar: editData?.image_ar || "",
+    };
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
     try {
@@ -113,7 +97,7 @@ const AddBlog = () => {
         title: values.title,
         title_ar: values.title_ar,
         description: values.description,
-        description_ar: values.description_arb,
+        description_ar: values.description_ar,
         image: values.image,
         image_ar: values.image_ar,
       };
@@ -126,6 +110,7 @@ const AddBlog = () => {
 
       if (res?.data?.responseCode === 200) {
         toast.success(values.id ? "Blog updated successfully." : "Blog added successfully.");
+        window.history.back();
       } else {
         toast.error(res?.data?.responseMessage || "Something went wrong.");
       }
@@ -138,7 +123,7 @@ const AddBlog = () => {
     }
   };
 
-  if (!formValues) return <Typography>Loading form...</Typography>;
+  if (!initialValues) return <Typography>Loading form...</Typography>;
 
   return (
     <Paper elevation={2} className={classes.formWrapper}>
@@ -147,7 +132,7 @@ const AddBlog = () => {
       </Typography>
 
       <Formik
-        initialValues={formValues}
+        initialValues={initialValues}
         enableReinitialize
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -218,14 +203,14 @@ const AddBlog = () => {
                   </Typography>
                   <JoditEditor
                     ref={editorRefAr}
-                    value={values.description_arb}
+                   value={values.description_ar} 
                     config={{
                       readonly: isView || loading,
                       toolbar: !isView,
                       direction: "rtl",
                       language: "ar",
                     }}
-                    onBlur={(newContent) => setFieldValue("description_arb", newContent)}
+                    onBlur={(newContent) => setFieldValue("description_ar", newContent)}
                   />
                   <FormHelperText error>{touched.description_arb && errors.description_arb}</FormHelperText>
                 </Grid>
@@ -261,7 +246,7 @@ const AddBlog = () => {
                             }
                           }}
                         />
-                        <label htmlFor="image-upload-en" className="displayCenter" style={{ flexDirection: "column" }}>
+                        <label htmlFor="image-upload-en" className="displayCenter"  style={{ flexDirection: "column", cursor: isView ? "default" : "pointer" }}>
                           <Avatar><FiUpload color="#FFF" /></Avatar>
                           <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
                             Click to upload image
@@ -304,7 +289,7 @@ const AddBlog = () => {
                             }
                           }}
                         />
-                        <label htmlFor="image-upload-ar" className="displayCenter" style={{ flexDirection: "column" }}>
+                        <label htmlFor="image-upload-ar" className="displayCenter"  style={{ flexDirection: "column", cursor: isView ? "default" : "pointer" }}>
                           <Avatar><FiUpload color="#FFF" /></Avatar>
                           <Typography variant="body2" style={{ marginTop: 8, textAlign: "center", color: "#fff" }}>
                             اضغط لتحميل الصورة
@@ -340,6 +325,7 @@ const AddBlog = () => {
                       {isSubmitting ? "Submitting..." : isEdit ? "Update" : "Submit"}
                     </Button>
                   )}
+                  
                 </div>
               </Grid>
             </Grid>
@@ -351,4 +337,3 @@ const AddBlog = () => {
 };
 
 export default AddBlog;
-
