@@ -204,6 +204,25 @@ export const routes = [
       import("src/views/pages/Blog/AddBlog")
     ),
   },
+
+   {
+    exact: true,
+    guard: true,
+    path: "/team-management",
+    layout: DashboardLayout,
+    component: lazy(() =>
+      import("src/views/pages/Team/index")
+    ),
+  },
+    {
+    exact: true,
+    guard: true,
+    path: "/add-team-management",
+    layout: DashboardLayout,
+   component: lazy(() =>
+      import("src/views/pages/Team/AddTeam")
+    ),
+  },
   {
     exact: true,
     guard: true,
