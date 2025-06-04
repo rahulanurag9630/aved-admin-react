@@ -80,7 +80,8 @@ const ApiConfig = {
   toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
   listAmenities: `${base}/admin/listAmenities`,
   uploadFile: `${base}/user/uploadFile`,
-  addUpdateProperty: `${base}/property/addUpdateProperty`
+  addUpdateProperty: `${base}/property/addUpdateProperty`,
+  listProperties: `${base}/property/listProperties`,
 };
 
 export default ApiConfig;

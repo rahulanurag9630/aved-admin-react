@@ -192,7 +192,7 @@ const AddProperty = () => {
   const isEdit = location?.state?.isEdit;
   const [amenitiesOptions, setAmenitiesOptions] = useState([])
   const history = useHistory()
-
+  console.log(location.state)
 
   const editorRefEn = useRef(null);
   const editorRefAr = useRef(null);
@@ -225,37 +225,40 @@ const AddProperty = () => {
   useEffect(() => {
     handleGetAmenities()
   }, [])
-  const initialValues = {
-    propertyName: "",
-    propertyName_ar: "",
-    description: "",
-    description_ar: "",
-    detailDescription: "",
-    detailDescription_ar: "",
-    price: "",
-    apartmentNumber: "",
-    noOfBedrooms: 0,
-    noOfBathrooms: 0,
-    yearBuilt: "",
-    amenities: [],
-    area: "",
-    parkingSpace: "Yes",
-    propertyType: "",
-    listingType: "",
-    availabilityStatus: "",
-    status: "",
-    address: "",
-    latitude: "",
-    longitude: "",
-    images: [],
-    floorPlans: [{
-      floorDescription: "",
-      floorPhoto: ""
-    }],
+  const state = location?.state || {};
 
-    metaTitle: "",
-    metaTags: "",
+  const initialValues = {
+    ...(location?.state?._id && { id: location.state._id }),
+    propertyName: state?.property_name || "",
+    propertyName_ar: state?.property_name_ar || "",
+    description: state?.overview || "",
+    description_ar: state?.overview_ar || "",
+    detailDescription: state?.detailed_description || "",
+    detailDescription_ar: state?.detailed_description_ar || "",
+    price: state?.price?.toString() || "",
+    apartmentNumber: state?.apartment_number || "",
+    noOfBedrooms: state?.no_of_bedrooms || 0,
+    noOfBathrooms: state?.no_of_bathrooms || 0,
+    yearBuilt: state?.year_of_built?.toString() || "",
+    amenities: (state?.amenities || []).map(a => a._id),
+    area: state?.area_sqft?.toString() || "",
+    parkingSpace: state?.parking_space || "Yes",
+    propertyType: state?.property_type || "",
+    listingType: state?.listing_type || "",
+    availabilityStatus: state?.availability_status || "",
+    status: state?.status || "",
+    address: state?.address || "",
+    latitude: state?.latitude?.toString() || "",
+    longitude: state?.longitude?.toString() || "",
+    images: state?.images || [],
+    floorPlans: (state?.floor_plan || []).map(fp => ({
+      floorDescription: fp.description || "",
+      floorPhoto: fp.photo || ""
+    })),
+    metaTitle: state?.seo_meta_titles || "",
+    metaTags: state?.seo_meta_tags || ""
   };
+
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
@@ -264,6 +267,8 @@ const AddProperty = () => {
     try {
       // Construct payload with schema keys
       const payload = {
+        ...(location?.state?._id && { id: location.state._id }),
+
         property_name: values.propertyName,
         property_name_ar: values.propertyName_ar,
         overview: values.description,
@@ -351,7 +356,7 @@ const AddProperty = () => {
     <Paper elevation={2} className={classes.formWrapper}>
       <FullScreenLoader isLoading={isSubmitting} />
       <Typography variant="h4" color="secondary" gutterBottom>
-        Add New Property
+        {state?.edit ? "Edit" : state?.view ? "View" : "Add"} New Property
       </Typography>
 
       <Formik
@@ -868,7 +873,7 @@ const AddProperty = () => {
                   </Box>
                 ))}
 
-                <Button
+                {state?.view ? null : <Button
                   variant="contained"
                   color="primary"
                   onClick={() => {
@@ -878,8 +883,8 @@ const AddProperty = () => {
                     ]);
                   }}
                 >
-                  Add Floor
-                </Button>
+                  {state?.edit ? "Update" : "Add Floor"}
+                </Button>}
               </Grid>
 
 
