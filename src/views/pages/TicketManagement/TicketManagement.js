@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
       margin: "10px 0",
     },
     "& .MuiIconButton-root.Mui-disabled": {
-      color: "#fff9f966", // Apply styles to IconButton when disabled
+      color: "#fff9f966",
     },
     "& .MuiTabPanel-root": {
       padding: "10px 0",
@@ -85,105 +85,35 @@ const TicketManagement = () => {
 
   const getTicketManagementList = async (source) => {
     try {
-      // const response = await apiRouterCall({
-      //   method: "GET",
-      //   paramsData: filterData,
-      //   endPoint: "listAllContactUsRequest",
-      // });
-      // if (response.data.responseCode === 200) {
-      //   setticketManagementData(response.data.result.docs);
-      //   setNoOfPages({
-      //     pages: response.data.result.pages,
-      //     totalPages: response.data.result.total,
-      //   });
-      // } else {
-      //   setticketManagementData([]);
-      // }
-      setticketManagementData([
-        {
-          srNo: 1,
-          name: "Anjali Sharma",
-          email: "anjali.sharma@example.com",
-          mobile: "+91-9876543210",
-          dateTime: "2025-05-01 10:30 AM",
-          status: "Active",
-        },
-        {
-          srNo: 2,
-          name: "Ravi Mehta",
-          email: "ravi.mehta@example.com",
-          mobile: "+91-9123456780",
-          dateTime: "2025-05-01 11:00 AM",
-          status: "Inactive",
-        },
-        {
-          srNo: 3,
-          name: "Priya Desai",
-          email: "priya.desai@example.com",
-          mobile: "+91-9988776655",
-          dateTime: "2025-05-02 09:15 AM",
-          status: "Active",
-        },
-        {
-          srNo: 4,
-          name: "Aman Verma",
-          email: "aman.verma@example.com",
-          mobile: "+91-9090909090",
-          dateTime: "2025-05-02 02:45 PM",
-          status: "Blocked",
-        },
-        {
-          srNo: 5,
-          name: "Sneha Kulkarni",
-          email: "sneha.kulkarni@example.com",
-          mobile: "+91-9123412345",
-          dateTime: "2025-05-03 08:00 AM",
-          status: "Active",
-        },
-        {
-          srNo: 6,
-          name: "Karan Malhotra",
-          email: "karan.malhotra@example.com",
-          mobile: "+91-9000011111",
-          dateTime: "2025-05-03 09:30 AM",
-          status: "Inactive",
-        },
-        {
-          srNo: 7,
-          name: "Neha Singh",
-          email: "neha.singh@example.com",
-          mobile: "+91-7777888899",
-          dateTime: "2025-05-03 11:45 AM",
-          status: "Active",
-        },
-        {
-          srNo: 8,
-          name: "Rahul Bansal",
-          email: "rahul.bansal@example.com",
-          mobile: "+91-8888999900",
-          dateTime: "2025-05-03 01:20 PM",
-          status: "Blocked",
-        },
-        {
-          srNo: 9,
-          name: "Divya Nair",
-          email: "divya.nair@example.com",
-          mobile: "+91-6666777788",
-          dateTime: "2025-05-03 03:10 PM",
-          status: "Active",
-        },
-        {
-          srNo: 10,
-          name: "Manish Kapoor",
-          email: "manish.kapoor@example.com",
-          mobile: "+91-9999000011",
-          dateTime: "2025-05-03 04:50 PM",
-          status: "Inactive",
-        },
-      ])
+      const response = await apiRouterCall({
+        method: "GET",
+        paramsData: filterData,
+        endPoint: "listContactUs",
+        signal: source?.signal,
+      });
+
+      if (response?.data?.responseCode === 200) {
+        const data = response.data.result.docs || [];
+
+        const mappedData = data.map((item, index) => ({
+          ...item,
+          srNo: (page - 1) * 10 + index + 1,
+        }));
+
+        setticketManagementData(mappedData);
+        setNoOfPages({
+          pages: response.data.result.pages,
+          totalPages: response.data.result.total,
+        });
+      } else {
+        setticketManagementData([]);
+      }
+
       setIsClear(false);
       setIsLoading(false);
     } catch (err) {
+      console.error("❌ Error fetching ticket list: ", err);
+      setticketManagementData([]);
       setIsLoading(false);
     }
   };
@@ -191,7 +121,6 @@ const TicketManagement = () => {
   const sendTicketReply = async () => {
     try {
       setIsContractUpdating(true);
-      console.log("_id", blockUnblockId);
       const response = await apiRouterCall({
         method: "PUT",
         endPoint: "replyContactUs",
@@ -213,7 +142,6 @@ const TicketManagement = () => {
       setIsContractUpdating(false);
     } catch (error) {
       setIsContractUpdating(false);
-      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -307,19 +235,19 @@ const TicketManagement = () => {
               {ticketManagementData &&
                 ticketManagementData.map((value, i) => (
                   <TableRow>
-                    <TableCell>{(page - 1) * 10 + i + 1}</TableCell>
+                    <TableCell>{value?.srNo}</TableCell>
                     <TableCell>{value?.name ? value?.name : "--"}</TableCell>
                     <TableCell>{value?.email ? value?.email : "--"}</TableCell>
                     <TableCell>
-                      {value?.mobileNumber ? value?.mobileNumber : "--"}
+                      {value?.phoneNumber ? value?.phoneNumber : "--"}
                     </TableCell>
                     <TableCell>
-                      {value.createdAt ? (
+                      {value?.createdAt ? (
                         <> {moment(value.createdAt).format("lll")}</>
                       ) : (
                         "--"
                       )}
-                    </TableCell>{" "}
+                    </TableCell>
                     <TableCell>{value?.isReply ? "Closed" : "Open"}</TableCell>
                     <TableCell>
                       <Box key={value._id} className="displayCenter">

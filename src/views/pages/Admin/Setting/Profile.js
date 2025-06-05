@@ -143,6 +143,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
+// ... [Imports remain unchanged] ...
 
 export default function Profile(userData) {
   const auth = useContext(AuthContext);
@@ -161,7 +162,7 @@ export default function Profile(userData) {
       .string()
       .min(3, "Please enter atleast 3 characters.")
       .max(32, "You can enter only 32 characters.")
-      .required("Name is required.")
+      .required("Please enter name.")
       .matches(
         /^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9])?[a-zA-Z0-9]*)*$/g,
         "Please enter name."
@@ -170,7 +171,7 @@ export default function Profile(userData) {
       .string()
       .trim()
       .email("Please enter valid email.")
-      .required("Email is required.")
+      .required("Please enter email.")
       .max(100, "Should not exceeds 100 characters.")
       .matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"),
   });
@@ -180,22 +181,24 @@ export default function Profile(userData) {
       setIsLoading(true);
       const response = await apiRouterCall({
         method: "PUT",
-        endPoint: "editProfile",
+        endPoint: "admin/update", // assuming your Express route is /admin/update
         bodyData: {
+          adminId: auth?.userData?._id,
           name: values.name,
           email: values.email.toLowerCase(),
           profilePic: values.profilePic,
         },
       });
-      if (response.data.responseCode == 200) {
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
-        auth.getProfileDataHandler();
+        auth.getProfileDataHandler(); // refresh profile
       } else {
         toast.error(response.data.responseMessage);
       }
       setIsLoading(false);
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong!");
       setIsLoading(false);
     }
   };
@@ -220,13 +223,13 @@ export default function Profile(userData) {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12} className="order1">
                 <Paper elevation={2}>
-                  <Typography variant="h3" color="primary">
+                  <Typography variant="h3" color="secondary">
                     Edit Profile
                   </Typography>
                   <Box className="formBox">
                     <Grid container spacing={1}>
                       <Grid item xs={12}>
-                        <Typography variant="body1" color="primary">
+                        <Typography variant="body1" color="secondary">
                           Add Profile Image
                           <span style={{ color: "#EB5A2C" }}>*</span>
                         </Typography>
@@ -273,7 +276,7 @@ export default function Profile(userData) {
                                       <Avatar className="editicon">
                                         <FiUpload
                                           style={{
-                                            color: "#071c35",
+                                            color: "#fff",
                                             fontSize: "27px",
                                           }}
                                         />
@@ -284,11 +287,11 @@ export default function Profile(userData) {
                                       >
                                         <Typography
                                           variant="body2"
-                                          color="secondary"
+                                          color="primary"
                                           mt={3}
                                           style={{
                                             textAlign: "center",
-                                            color: "#071c35",
+                                            color: "#fff",
                                           }}
                                         >
                                           Browse Files
@@ -304,7 +307,7 @@ export default function Profile(userData) {
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <Box mt={2} mb={1}>
-                          <Typography variant="body2" color="primary">
+                          <Typography variant="body2" color="secondary">
                             Full Name{" "}
                             <span style={{ color: "#EB5A2C" }}>*</span>
                           </Typography>
@@ -331,7 +334,7 @@ export default function Profile(userData) {
                       <Grid item xs={12} sm={6}>
                         <Box>
                           <Box mt={2} mb={1}>
-                            <Typography variant="body2" color="primary">
+                            <Typography variant="body2" color="secondary">
                               Email Address{" "}
                               <span style={{ color: "#EB5A2C" }}>*</span>
                             </Typography>
@@ -361,7 +364,7 @@ export default function Profile(userData) {
                   <Box className="displayCenter" mt={3}>
                     <Button
                       variant="contained"
-                      color="primary"
+                      color="secondary"
                       type="submit"
                       style={{ minWidth: "168px" }}
                       disabled={isLoading}
