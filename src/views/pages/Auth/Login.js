@@ -95,6 +95,7 @@ export default function Login() {
       if (res?.data?.responseCode === 200) {
 
         auth.userLogIn(true, res?.data?.result?.token);
+        auth.setUserData(res?.data?.result || {})
         console.log(auth)
         history.push(
           `/dashboard`

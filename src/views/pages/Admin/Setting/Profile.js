@@ -155,7 +155,9 @@ export default function Profile() {
     profilePic: "",
   });
 
+
   // ✅ Fetch profile data on mount
+  console.log(auth)
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -166,17 +168,19 @@ export default function Profile() {
         const response = await apiRouterCall({
           method: "GET",
           endPoint: "getAdminDetails",
-          queryParams,
+          paramsData: queryParams,
         });
-
+        console.log("Raw response", response);
+        console.log("Jgjhghjghjghj", response.data.data.email)
         if (response.data.responseCode === 200) {
-          const { name, email, profilePic } = response.data.responseData;
+          const { name = "", email = "", profilePic = "" } = response.data.data || {};
           setProfileData({
             name,
             email,
             profilePic,
           });
-        } else {
+        }
+        else {
           toast.error(response.data.responseMessage);
         }
       } catch (error) {

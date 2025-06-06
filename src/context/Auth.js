@@ -83,6 +83,7 @@ export default function AuthProvider(props) {
   let data = {
     userLoggedIn: isLogin,
     userData,
+    setUserData,
     userTokenBalance,
     userLogIn: (type, data) => {
       setSession(data);
