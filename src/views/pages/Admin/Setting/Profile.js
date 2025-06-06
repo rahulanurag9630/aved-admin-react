@@ -16,7 +16,7 @@ import {
   IconButton,
 } from "@material-ui/core";
 import { BiLock } from "react-icons/bi";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { FiEdit, FiPaperclip } from "react-icons/fi";
 import { KeyboardDatePicker } from "@material-ui/pickers";
@@ -144,24 +144,57 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 // ... [Imports remain unchanged] ...
-
-export default function Profile(userData) {
+export default function Profile() {
   const auth = useContext(AuthContext);
   const classes = useStyles();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    profilePic: "",
+  });
 
-  const initialFormValues = {
-    name: auth?.userData?.name || "",
-    email: auth?.userData?.email || "",
-    profilePic: auth?.userData?.profilePic || "",
-  };
+  // ✅ Fetch profile data on mount
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setIsLoading(true);
+        const queryParams = {
+          adminId: auth?.userData?._id,
+        };
+        const response = await apiRouterCall({
+          method: "GET",
+          endPoint: "getAdminDetails",
+          queryParams,
+        });
+
+        if (response.data.responseCode === 200) {
+          const { name, email, profilePic } = response.data.responseData;
+          setProfileData({
+            name,
+            email,
+            profilePic,
+          });
+        } else {
+          toast.error(response.data.responseMessage);
+        }
+      } catch (error) {
+        console.log("Error fetching profile", error);
+        toast.error("Something went wrong while loading profile.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [auth?.userData?._id]);
 
   const validationFormSchema = yup.object().shape({
     name: yup
       .string()
-      .min(3, "Please enter atleast 3 characters.")
-      .max(32, "You can enter only 32 characters.")
+      .min(3)
+      .max(32)
       .required("Please enter name.")
       .matches(
         /^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9])?[a-zA-Z0-9]*)*$/g,
@@ -172,33 +205,36 @@ export default function Profile(userData) {
       .trim()
       .email("Please enter valid email.")
       .required("Please enter email.")
-      .max(100, "Should not exceeds 100 characters.")
+      .max(100)
       .matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"),
   });
 
-  const handleAddGarageApi = async (values) => {
+  const handleUpdateProfileApi = async (values) => {
     try {
       setIsLoading(true);
+      const queryParams = {
+        adminId: auth?.userData?._id,
+        name: values.name,
+        email: values.email.toLowerCase(),
+        profilePic: values.profilePic,
+      };
+
       const response = await apiRouterCall({
-        method: "PUT",
-        endPoint: "admin/update", // assuming your Express route is /admin/update
-        bodyData: {
-          adminId: auth?.userData?._id,
-          name: values.name,
-          email: values.email.toLowerCase(),
-          profilePic: values.profilePic,
-        },
+        method: "GET",
+        endPoint: "getAdminDetails/{id}",
+        queryParams,
       });
+
       if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
-        auth.getProfileDataHandler(); // refresh profile
+        auth.getProfileDataHandler();
       } else {
         toast.error(response.data.responseMessage);
       }
-      setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log("API Error in handleUpdateProfileApi", error);
       toast.error("Something went wrong!");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -207,9 +243,9 @@ export default function Profile(userData) {
     <Box className={classes.profileBox}>
       <Formik
         enableReinitialize
-        initialValues={initialFormValues}
+        initialValues={profileData}
         validationSchema={validationFormSchema}
-        onSubmit={(values) => handleAddGarageApi(values)}
+        onSubmit={handleUpdateProfileApi}
       >
         {({
           values,

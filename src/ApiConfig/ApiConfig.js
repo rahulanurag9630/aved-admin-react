@@ -9,7 +9,7 @@ export const currency = process.env.REACT_APP_CURRENCY;
 let base = `${baseurl}/api/v1`;
 const ApiConfig = {
   login: `${base}/admin/login`,
-  updateAdminDetails: `${base}/admin/updateAdminDetails`,
+  getAdminDetails: `${base}/admin/getAdminDetails`,
 
   getProfile: `${base}/admin/getProfile`,
   resendOTP: `${base}/admin/resendOTP`,
