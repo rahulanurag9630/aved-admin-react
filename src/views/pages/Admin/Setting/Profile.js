@@ -20,7 +20,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { FiEdit, FiPaperclip } from "react-icons/fi";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-import { MenuProps, getBase64 } from "src/utils";
+import uploadFile, { MenuProps, getBase64 } from "src/utils";
 import * as yup from "yup";
 import { Form, Formik } from "formik";
 import { apiRouterCall } from "src/ApiConfig/service";
@@ -145,6 +145,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 // ... [Imports remain unchanged] ...
 export default function Profile() {
+    const [loading, setLoading] = useState(false);
+  
   const auth = useContext(AuthContext);
   const classes = useStyles();
   const history = useHistory();
@@ -162,25 +164,30 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         setIsLoading(true);
+        const storedId = localStorage.getItem("id");
+        const adminId = auth?.userData?._id || storedId;
+
         const queryParams = {
-          adminId: auth?.userData?._id,
+          adminId: adminId,
         };
+
         const response = await apiRouterCall({
           method: "GET",
           endPoint: "getAdminDetails",
           paramsData: queryParams,
         });
+
         console.log("Raw response", response);
-        console.log("Jgjhghjghjghj", response.data.data.email)
+        console.log("Jgjhghjghjghj", response.data.result.email);
+
         if (response.data.responseCode === 200) {
-          const { name = "", email = "", profilePic = "" } = response.data.data || {};
+          const { name = "", email = "", profilePic = "" } = response.data.result || {};
           setProfileData({
             name,
             email,
             profilePic,
           });
-        }
-        else {
+        } else {
           toast.error(response.data.responseMessage);
         }
       } catch (error) {
@@ -216,32 +223,39 @@ export default function Profile() {
   const handleUpdateProfileApi = async (values) => {
     try {
       setIsLoading(true);
-      const queryParams = {
-        adminId: auth?.userData?._id,
+
+      const adminId = localStorage.getItem("id"); // Get adminId from localStorage
+
+      const payload = {
+        adminId: adminId, // Add adminId to payload
         name: values.name,
         email: values.email.toLowerCase(),
         profilePic: values.profilePic,
       };
 
       const response = await apiRouterCall({
-        method: "GET",
-        endPoint: "getAdminDetails/{id}",
-        queryParams,
+        method: "POST",
+        endPoint: "updateAdminDetails",
+        bodyData: payload, // <-- Corrected this line
+        headers: {
+          authToken: localStorage.getItem("token") || "",
+        },
       });
 
       if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
-        auth.getProfileDataHandler();
+        auth.getProfileDataHandler(); // Refresh profile data
       } else {
         toast.error(response.data.responseMessage);
       }
     } catch (error) {
       console.log("API Error in handleUpdateProfileApi", error);
-      toast.error("Something went wrong!");
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <Box className={classes.profileBox}>
@@ -303,11 +317,21 @@ export default function Profile() {
                                 type="file"
                                 accept=".png, .jpg, .jpeg"
                                 disabled={isLoading}
-                                onChange={(e) => {
-                                  getBase64(e.target.files[0], (result) => {
-                                    setFieldValue("profilePic", result);
-                                  });
+                                onChange={async (e) => {
+                                  const file = e.target.files[0];
+                                  if (file) {
+                                    try {
+                                      setLoading(true);
+                                      const url = await uploadFile(file, setLoading);
+                                      if (url) setFieldValue("profilePic", url);
+                                    } catch (err) {
+                                      toast.error("Image upload failed!");
+                                    } finally {
+                                      setLoading(false);
+                                    }
+                                  }
                                 }}
+
                               />
                               <Box display="flex" justifyContent="center">
                                 <Box className={classes.upload}>

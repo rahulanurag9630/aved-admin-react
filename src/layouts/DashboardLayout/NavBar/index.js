@@ -164,12 +164,7 @@ export const sections = [
         href: "/team-management",
         isEdit: false,
       },
-       {
-        title: "Tag Management",
-        icon:   MdLabel,
-        href: "/tag-management",
-        isEdit: false,
-      },
+    
 
       // {
       //   title: "Sub Admin Management",

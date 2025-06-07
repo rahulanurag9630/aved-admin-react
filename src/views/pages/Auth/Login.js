@@ -95,6 +95,8 @@ export default function Login() {
       if (res?.data?.responseCode === 200) {
 
         auth.userLogIn(true, res?.data?.result?.token);
+        localStorage.setItem("id", res?.data?.result?._id);
+        console.log("fmdmfg,mgfgfgfgf",res?.data?.result?._id)
         auth.setUserData(res?.data?.result || {})
         console.log(auth)
         history.push(
