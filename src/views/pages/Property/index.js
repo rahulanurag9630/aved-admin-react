@@ -239,13 +239,12 @@ export default function Property() {
       setIsUpdating(true);
       const response = await apiRouterCall({
         method: modalOpen === "delete" ? "DELETE" : "PUT",
-        endPoint: modalOpen === "delete" ? "deleteUser" : "blockUnblockUser",
+        endPoint: modalOpen === "delete" ? "deleteProperty" : "toggleBlockProperty",
         bodyData: {
-          _id: deleteBlockId ? deleteBlockId?._id : undefined,
-          reason: reason || undefined,
+          propertyId: deleteBlockId ? deleteBlockId?._id : undefined,
         },
       });
-      if (response.data.responseCode == 200) {
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
         modalOpen !== "delete" && handleGetTransaction();
         setModalOpen("");
@@ -397,16 +396,16 @@ export default function Property() {
             : deleteBlockId.status !== "BLOCK"
               ? "Block"
               : "Unblock"
-            } Plan`}
+            } Property`}
           description={`Are you sure, you want to ${modalOpen === "delete"
             ? "Delete"
             : deleteBlockId.status !== "BLOCK"
               ? "Block"
               : "Unblock"
-            } this plan?`}
+            } this property?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
-          blockDescription={"Are you sure, you want to block this plan?"}
+          blockDescription={"Are you sure, you want to block this property?"}
           showBlock={true}
         />
       )}

@@ -122,17 +122,17 @@ const validationSchema = yup.object().shape({
   listingType: yup
     .string()
     .required("Listing type is required")
-    .oneOf(["Sale", "Rent"], "Listing type must be either 'Sale' or 'Rent'"),
+    .oneOf(["For Sale", "Rent", "Featured"], "Listing type must be either 'Sale' or 'Rent'"),
 
   availabilityStatus: yup
     .string()
     .required("Availability status is required")
-    .oneOf(["Available", "Sold", "Pending"], "Invalid availability status"),
+    .oneOf(["Available", "Sold", "Rented"], "Invalid availability status"),
 
   status: yup
     .string()
     .required("Status is required")
-    .oneOf(["Active", "Inactive", "Published"], "Status must be either 'Active' or 'Inactive'"),
+    .oneOf(["Active", "Inactive", "Published", "Draft"], "Status must be either 'Active' or 'Inactive'"),
 
   address: yup
     .string()
@@ -192,7 +192,7 @@ const AddProperty = () => {
   const isEdit = location?.state?.isEdit;
   const [amenitiesOptions, setAmenitiesOptions] = useState([])
   const history = useHistory()
-  console.log(location.state)
+  console.log(location.state.view)
 
   const editorRefEn = useRef(null);
   const editorRefAr = useRef(null);

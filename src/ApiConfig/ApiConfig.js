@@ -89,6 +89,8 @@ const ApiConfig = {
   uploadFile: `${base}/user/uploadFile`,
   addUpdateProperty: `${base}/property/addUpdateProperty`,
   listProperties: `${base}/property/listProperties`,
+  toggleBlockProperty: `${base}/property/toggleBlockProperty`,
+  deleteProperty: `${base}/property/deleteProperty`,
 };
 
 export default ApiConfig;
