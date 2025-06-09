@@ -16,11 +16,11 @@ import {
   IconButton,
 } from "@material-ui/core";
 import { BiLock } from "react-icons/bi";
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { FiEdit, FiPaperclip } from "react-icons/fi";
 import { KeyboardDatePicker } from "@material-ui/pickers";
-import { MenuProps, getBase64 } from "src/utils";
+import uploadFile, { MenuProps, getBase64 } from "src/utils";
 import * as yup from "yup";
 import { Form, Formik } from "formik";
 import { apiRouterCall } from "src/ApiConfig/service";
@@ -143,25 +143,70 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-
-export default function Profile(userData) {
+// ... [Imports remain unchanged] ...
+export default function Profile() {
+    const [loading, setLoading] = useState(false);
+  
   const auth = useContext(AuthContext);
   const classes = useStyles();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    profilePic: "",
+  });
 
-  const initialFormValues = {
-    name: auth?.userData?.name || "",
-    email: auth?.userData?.email || "",
-    profilePic: auth?.userData?.profilePic || "",
-  };
+
+  // ✅ Fetch profile data on mount
+  console.log(auth)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setIsLoading(true);
+        const storedId = localStorage.getItem("id");
+        const adminId = auth?.userData?._id || storedId;
+
+        const queryParams = {
+          adminId: adminId,
+        };
+
+        const response = await apiRouterCall({
+          method: "GET",
+          endPoint: "getAdminDetails",
+          paramsData: queryParams,
+        });
+
+        console.log("Raw response", response);
+        console.log("Jgjhghjghjghj", response.data.result.email);
+
+        if (response.data.responseCode === 200) {
+          const { name = "", email = "", profilePic = "" } = response.data.result || {};
+          setProfileData({
+            name,
+            email,
+            profilePic,
+          });
+        } else {
+          toast.error(response.data.responseMessage);
+        }
+      } catch (error) {
+        console.log("Error fetching profile", error);
+        toast.error("Something went wrong while loading profile.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [auth?.userData?._id]);
 
   const validationFormSchema = yup.object().shape({
     name: yup
       .string()
-      .min(3, "Please enter atleast 3 characters.")
-      .max(32, "You can enter only 32 characters.")
-      .required("Name is required.")
+      .min(3)
+      .max(32)
+      .required("Please enter name.")
       .matches(
         /^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9])?[a-zA-Z0-9]*)*$/g,
         "Please enter name."
@@ -170,43 +215,55 @@ export default function Profile(userData) {
       .string()
       .trim()
       .email("Please enter valid email.")
-      .required("Email is required.")
-      .max(100, "Should not exceeds 100 characters.")
+      .required("Please enter email.")
+      .max(100)
       .matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"),
   });
 
-  const handleAddGarageApi = async (values) => {
+  const handleUpdateProfileApi = async (values) => {
     try {
       setIsLoading(true);
+
+      const adminId = localStorage.getItem("id"); // Get adminId from localStorage
+
+      const payload = {
+        adminId: adminId, // Add adminId to payload
+        name: values.name,
+        email: values.email.toLowerCase(),
+        profilePic: values.profilePic,
+      };
+
       const response = await apiRouterCall({
-        method: "PUT",
-        endPoint: "editProfile",
-        bodyData: {
-          name: values.name,
-          email: values.email.toLowerCase(),
-          profilePic: values.profilePic,
+        method: "POST",
+        endPoint: "updateAdminDetails",
+        bodyData: payload, // <-- Corrected this line
+        headers: {
+          authToken: localStorage.getItem("token") || "",
         },
       });
-      if (response.data.responseCode == 200) {
+
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
-        auth.getProfileDataHandler();
+        auth.getProfileDataHandler(); // Refresh profile data
       } else {
         toast.error(response.data.responseMessage);
       }
-      setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log("API Error in handleUpdateProfileApi", error);
+
+    } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <Box className={classes.profileBox}>
       <Formik
         enableReinitialize
-        initialValues={initialFormValues}
+        initialValues={profileData}
         validationSchema={validationFormSchema}
-        onSubmit={(values) => handleAddGarageApi(values)}
+        onSubmit={handleUpdateProfileApi}
       >
         {({
           values,
@@ -220,13 +277,13 @@ export default function Profile(userData) {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={12} className="order1">
                 <Paper elevation={2}>
-                  <Typography variant="h3" color="primary">
+                  <Typography variant="h3" color="secondary">
                     Edit Profile
                   </Typography>
                   <Box className="formBox">
                     <Grid container spacing={1}>
                       <Grid item xs={12}>
-                        <Typography variant="body1" color="primary">
+                        <Typography variant="body1" color="secondary">
                           Add Profile Image
                           <span style={{ color: "#EB5A2C" }}>*</span>
                         </Typography>
@@ -260,11 +317,21 @@ export default function Profile(userData) {
                                 type="file"
                                 accept=".png, .jpg, .jpeg"
                                 disabled={isLoading}
-                                onChange={(e) => {
-                                  getBase64(e.target.files[0], (result) => {
-                                    setFieldValue("profilePic", result);
-                                  });
+                                onChange={async (e) => {
+                                  const file = e.target.files[0];
+                                  if (file) {
+                                    try {
+                                      setLoading(true);
+                                      const url = await uploadFile(file, setLoading);
+                                      if (url) setFieldValue("profilePic", url);
+                                    } catch (err) {
+                                      toast.error("Image upload failed!");
+                                    } finally {
+                                      setLoading(false);
+                                    }
+                                  }
                                 }}
+
                               />
                               <Box display="flex" justifyContent="center">
                                 <Box className={classes.upload}>
@@ -273,7 +340,7 @@ export default function Profile(userData) {
                                       <Avatar className="editicon">
                                         <FiUpload
                                           style={{
-                                            color: "#071c35",
+                                            color: "#fff",
                                             fontSize: "27px",
                                           }}
                                         />
@@ -284,11 +351,11 @@ export default function Profile(userData) {
                                       >
                                         <Typography
                                           variant="body2"
-                                          color="secondary"
+                                          color="primary"
                                           mt={3}
                                           style={{
                                             textAlign: "center",
-                                            color: "#071c35",
+                                            color: "#fff",
                                           }}
                                         >
                                           Browse Files
@@ -304,7 +371,7 @@ export default function Profile(userData) {
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <Box mt={2} mb={1}>
-                          <Typography variant="body2" color="primary">
+                          <Typography variant="body2" color="secondary">
                             Full Name{" "}
                             <span style={{ color: "#EB5A2C" }}>*</span>
                           </Typography>
@@ -331,7 +398,7 @@ export default function Profile(userData) {
                       <Grid item xs={12} sm={6}>
                         <Box>
                           <Box mt={2} mb={1}>
-                            <Typography variant="body2" color="primary">
+                            <Typography variant="body2" color="secondary">
                               Email Address{" "}
                               <span style={{ color: "#EB5A2C" }}>*</span>
                             </Typography>
@@ -361,7 +428,7 @@ export default function Profile(userData) {
                   <Box className="displayCenter" mt={3}>
                     <Button
                       variant="contained"
-                      color="primary"
+                      color="secondary"
                       type="submit"
                       style={{ minWidth: "168px" }}
                       disabled={isLoading}

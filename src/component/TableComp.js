@@ -91,6 +91,7 @@ function TableComp({
                                   key={idx}
                                   onClick={action?.onClick}
                                   disabled={!action?.icon}
+                                  style={action?.style}
                                 >
                                   <Icon />
                                 </IconButton>

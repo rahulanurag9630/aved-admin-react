@@ -10,6 +10,7 @@ export const apiRouterCall = async ({
   id,
   source,
 }) => {
+  console.log(paramsData)
   try {
     return await axios({
       method: method,
