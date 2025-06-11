@@ -267,9 +267,13 @@ export default function Property() {
       arrayData &&
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
-        "Property Name": value?.property_name,
+        "Property Name": value?.property_name ? value.property_name.length > 60 ? value.property_name.slice(0, 60) + "..." : value.property_name : "",
         "Property Type": value?.property_type,
-        Overview: value?.overview,
+        Overview: value?.overview
+          ? value.overview.length > 60
+            ? value.overview.slice(0, 60) + "..."
+            : value.overview
+          : "",
         "No Of Floar": value?.no_of_floors,
         "No Of BedRooms": value?.no_of_bedrooms,
         "Created Date & Time": formatDate(value?.createdAt),

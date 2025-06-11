@@ -192,7 +192,7 @@ const AddProperty = () => {
   const isEdit = location?.state?.isEdit;
   const [amenitiesOptions, setAmenitiesOptions] = useState([])
   const history = useHistory()
-  console.log(location.state.view)
+  // console.log(location.state.view)
 
   const editorRefEn = useRef(null);
   const editorRefAr = useRef(null);
