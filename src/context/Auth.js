@@ -64,7 +64,7 @@ export default function AuthProvider(props) {
     }
   };
 
- 
+
 
   const handleLogout = (condition) => {
     localStorage.removeItem("token");
@@ -73,16 +73,17 @@ export default function AuthProvider(props) {
   };
 
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      getProfileDataHandler(localStorage.getItem("token"));
-      getConnectedExchangeList();
-    }
-  }, [localStorage.getItem("token")]);
+  // useEffect(() => {
+  //   if (localStorage.getItem("token")) {
+  //     getProfileDataHandler(localStorage.getItem("token"));
+  //     getConnectedExchangeList();
+  //   }
+  // }, [localStorage.getItem("token")]);
 
   let data = {
     userLoggedIn: isLogin,
     userData,
+    setUserData,
     userTokenBalance,
     userLogIn: (type, data) => {
       setSession(data);
@@ -92,8 +93,8 @@ export default function AuthProvider(props) {
     handleLogout: handleLogout,
     getConnectedExchangeList: () =>
       getConnectedExchangeList(sessionStorage.getItem("token")),
-    getProfileDataHandler: () =>
-      getProfileDataHandler(localStorage.getItem("token")),
+    // getProfileDataHandler: () =>
+    //   getProfileDataHandler(localStorage.getItem("token")),
   };
 
   return (

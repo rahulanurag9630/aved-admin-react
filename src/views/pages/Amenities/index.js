@@ -14,6 +14,8 @@ import moment from "moment";
 import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
+import { formatDate } from "src/utils";
+
 
 const tableHead = [
   {
@@ -57,8 +59,9 @@ export default function Blogs() {
   const [transactionList, setTransactionList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
-  const checkEdit = location?.state?.isEdit;
-  console.log("checkEdit", checkEdit);
+  const [status, setStatus] = useState("ACTIVE")
+  // const checkEdit = location?.state?.isEdit;
+  // console.log("checkEdit", checkEdit);
 
   const [selectFilter, setSelectFilter] = useState({
     fromDate: null,
@@ -82,100 +85,29 @@ export default function Blogs() {
     toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
     search: selectFilter.search !== "" ? selectFilter.search : undefined,
     status: selectFilter.status !== "All" ? selectFilter.status : undefined,
-    userType1: "SUBADMIN",
   };
 
-  const handleGetTransaction = async (source, checkFilter) => {
+  const handleGetAmenities = async (source, checkFilter) => {
     try {
-      // const response = await apiRouterCall({
-      //   method: "GET",
-      //   endPoint: "getUserList",
-      //   source: source,
-      //   paramsData: filterData,
-      // });
-      // if (response.data.responseCode === 200) {
-      //   setTransactionList(response.data.result.docs);
-      //   setNoOfPages({
-      //     pages: response.data.result.pages,
-      //     totalPages: response.data.result.total,
-      //   });
-      // } else {
-      //   setTransactionList([]);
-      // }
-      // setIsClear(false);
-      // setIsLoading(false);
-      setTransactionList([
-        {
-          id: 1,
-          title: "Swimming Pool",
-          image: "https://via.placeholder.com/100x100?text=Pool",
-          description: "Olympic-sized pool open from 6 AM to 10 PM.",
-          createdAt: "2025-05-01 10:15 AM",
-        },
-        {
-          id: 2,
-          title: "Gym",
-          image: "https://via.placeholder.com/100x100?text=Gym",
-          description: "24/7 fully equipped gym with trainers.",
-          createdAt: "2025-05-01 10:30 AM",
-        },
-        {
-          id: 3,
-          title: "Community Hall",
-          image: "https://via.placeholder.com/100x100?text=Hall",
-          description: "Available for resident events and parties.",
-          createdAt: "2025-05-01 11:00 AM",
-        },
-        {
-          id: 4,
-          title: "Children's Play Area",
-          image: "https://via.placeholder.com/100x100?text=Play+Area",
-          description: "Safe play area with modern equipment.",
-          createdAt: "2025-05-01 11:15 AM",
-        },
-        {
-          id: 5,
-          title: "Library",
-          image: "https://via.placeholder.com/100x100?text=Library",
-          description: "Quiet reading space with a wide range of books.",
-          createdAt: "2025-05-01 12:00 PM",
-        },
-        {
-          id: 6,
-          title: "Jogging Track",
-          image: "https://via.placeholder.com/100x100?text=Jogging",
-          description: "1.5 km paved track around the garden.",
-          createdAt: "2025-05-01 12:30 PM",
-        },
-        {
-          id: 7,
-          title: "Guest Parking",
-          image: "https://via.placeholder.com/100x100?text=Parking",
-          description: "Dedicated parking slots for visitors.",
-          createdAt: "2025-05-01 01:00 PM",
-        },
-        {
-          id: 8,
-          title: "Clubhouse",
-          image: "https://via.placeholder.com/100x100?text=Clubhouse",
-          description: "Multipurpose indoor recreational space.",
-          createdAt: "2025-05-01 01:30 PM",
-        },
-        {
-          id: 9,
-          title: "Security Room",
-          image: "https://via.placeholder.com/100x100?text=Security",
-          description: "Round-the-clock monitoring and control room.",
-          createdAt: "2025-05-01 02:00 PM",
-        },
-        {
-          id: 10,
-          title: "CCTV Surveillance",
-          image: "https://via.placeholder.com/100x100?text=CCTV",
-          description: "24/7 camera monitoring across premises.",
-          createdAt: "2025-05-01 02:30 PM",
-        },
-      ]);
+      const response = await apiRouterCall({
+        method: "GET",
+        endPoint: "listAmenities",
+        source: source,
+        paramsData: filterData,
+      });
+      console.log(response)
+      if (response.data.responseCode === 200) {
+        setTransactionList(response.data.result.docs);
+        setNoOfPages({
+          pages: response.data.result.pages,
+          totalPages: response.data.result.total,
+        });
+      } else {
+        setTransactionList([]);
+      }
+      setIsClear(false);
+      setIsLoading(false);
+      setTransactionList(response?.data?.result?.docs || []);
 
     } catch (err) {
       setTransactionList([]);
@@ -187,25 +119,40 @@ export default function Blogs() {
       setIsLoading(false);
     }
   };
-
-  const handleBlockDeleteApi = async (reason) => {
+  useEffect(() => {
+    handleGetAmenities()
+  }, [])
+  const handleBlockDeleteApi = async () => {
     try {
       setIsUpdating(true);
+
+      let bodyData = {};
+      console.log("blocking")
+      if (modalOpen === "delete") {
+        bodyData = {
+          id: deleteBlockId?._id,
+        };
+      } else {
+        bodyData = {
+          id: deleteBlockId?._id,
+          status: status, // status should be either "ACTIVE" or "BLOCK"
+        };
+      }
+
       const response = await apiRouterCall({
-        method: modalOpen === "delete" ? "DELETE" : "PUT",
-        endPoint: modalOpen === "delete" ? "deleteUser" : "blockUnblockUser",
-        bodyData: {
-          _id: deleteBlockId ? deleteBlockId?._id : undefined,
-          reason: reason || undefined,
-        },
+        method: "PATCH",
+        endPoint: modalOpen === "delete" ? "deleteUser" : "toggleAmenityStatus",
+        bodyData,
+        token: localStorage.getItem("token"),
       });
-      if (response.data.responseCode == 200) {
+
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
-        modalOpen !== "delete" && handleGetTransaction();
+        modalOpen !== "delete" && handleGetAmenities();
         setModalOpen("");
         modalOpen === "delete" && page > 1
           ? setPage((prePage) => prePage - 1)
-          : handleGetTransaction();
+          : handleGetAmenities();
       } else {
         toast.error(response.data.responseMessage);
       }
@@ -217,53 +164,42 @@ export default function Blogs() {
     }
   };
 
+
   function tableDataFunction(arrayData, condition) {
     return (
       arrayData &&
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
         Title: value?.title,
-        Desctiption: value?.description,
-        Price: `$${value?.price}`,
-        Duration: value?.durationLabel,
-        Badge: value?.badge,
+        Image: (<img src={`${value?.image}`} alt="img" height={"50px"} style={{ borderRadius: "10px" }} />),
 
-        "Created Date & Time": value?.createdAt,
+
+        "Created Date & Time": formatDate(value?.createdAt),
         Action: [
+
+
           {
-            icon: VisibilityIcon,
+            icon: FaEdit,
             onClick: () =>
               history.push({
-                pathname: "/add-subscription",
-                state: { ...value, viewSubAdmin: true },
+                pathname: "/add-amenities-management",
+                state: { ...value, editAmenities: true },
               }),
           },
-          ...(checkEdit
-            ? [
-              {
-                icon: FaEdit,
-                onClick: () =>
-                  history.push({
-                    pathname: "/add-subscription",
-                    state: { ...value, editSubAdmin: true },
-                  }),
-              },
-              {
-                icon: BlockIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("block");
-                },
-              },
-              {
-                icon: DeleteIcon,
-                onClick: () => {
-                  setDeleteBlockId(value);
-                  setModalOpen("delete");
-                },
-              },
-            ]
-            : []),
+          {
+            icon: BlockIcon,
+            onClick: () => {
+              setStatus(value?.status === "ACTIVE" ? "BLOCK" : "ACTIVE");
+              setDeleteBlockId(value);
+              setModalOpen("block");
+            },
+            // ADD color property here based on status
+            style: {
+              color: value?.status === "BLOCK" ? "red" : "green",
+            },
+          },
+
+
         ],
       }))
     );
@@ -286,14 +222,14 @@ export default function Blogs() {
   useEffect(() => {
     const source = axios.CancelToken.source();
     if (isClear) {
-      handleGetTransaction(source);
+      handleGetAmenities(source);
     }
     return () => source.cancel();
   }, [isClear]);
 
   useEffect(() => {
     const source = axios.CancelToken.source();
-    handleGetTransaction(source);
+    handleGetAmenities(source);
     return () => {
       source.cancel();
     };
@@ -310,7 +246,8 @@ export default function Blogs() {
       <Box className="tophead">
         <Topheading
           heading="Amenities Management"
-          pathname={checkEdit ? "/add-amenities-management" : undefined}
+          // pathname={checkEdit ? "/add-amenities-management" : undefined}
+          pathname={true ? "/add-amenities-management" : undefined}
           addButton={"Add Amenities"}
         />
       </Box>
@@ -320,7 +257,7 @@ export default function Blogs() {
           selectFilter={selectFilter}
           handleCallApi={() => {
             page > 1 && setPage(1);
-            page === 1 && handleGetTransaction();
+            page === 1 && handleGetAmenities();
           }}
           filterData={{ ...filterData, limit: noOfPages.totalPages }}
           transactionList={transactionList}
@@ -346,20 +283,20 @@ export default function Blogs() {
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
           heading={`${modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
-                ? "Block"
-                : "Unblock"
+            ? "Delete"
+            : deleteBlockId.status !== "BLOCK"
+              ? "Block"
+              : "Unblock"
             } Plan`}
           description={`Are you sure, you want to ${modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId.status !== "BLOCK"
-                ? "Block"
-                : "Unblock"
+            ? "Delete"
+            : deleteBlockId.status !== "BLOCK"
+              ? "Block"
+              : "Unblock"
             } this plan?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
-          blockDescription={"Are you sure, you want to block this plan?"}
+          blockDescription={"Are you sure, you want to block this amenity?"}
           showBlock={true}
         />
       )}

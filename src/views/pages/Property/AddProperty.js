@@ -10,11 +10,17 @@ import {
   FormHelperText,
   MenuItem,
 } from "@material-ui/core";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Form, Formik } from "formik";
 import * as yup from "yup";
-import { FiUpload } from "react-icons/fi";
-import { getBase64 } from "src/utils";
+import { FiUpload, FiTrash2 } from "react-icons/fi";
+import uploadFile, { getBase64 } from "src/utils";
+import JoditEditor from "jodit-react";
+import { useLocation, useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { debounce } from "lodash";
+import { apiRouterCall } from "../../../ApiConfig/service/index";
+import toast from "react-hot-toast";
+import FullScreenLoader from "../../../component/FullScreenLoader";
 
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
@@ -36,67 +42,321 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Title is required"),
-  description: yup.string().required("Description is required"),
-  propertyName: yup.string().required("Property Name is required"),
-  apartmentNumber: yup.string().required("Apartment Number is required"),
-  propertyType: yup.string().required("Property Type is required"),
-  address: yup.string().required("Address is required"),
-  latitude: yup.string().required("Latitude is required"),
-  longitude: yup.string().required("Longitude is required"),
-  area: yup.number().required("Area is required"),
-  overview: yup.string().required("Overview is required"),
-  noOfFloors: yup.number().required("Number of floors is required"),
-  noOfBedrooms: yup.number().required("Number of bedrooms is required"),
-  noOfBathrooms: yup.number().required("Number of bathrooms is required"),
-  yearBuilt: yup.number().required("Year of built is required"),
-  price: yup.number().required("Price is required"),
-});
+  propertyName: yup
+    .string()
+    .required("Property name is required")
+    .min(3, "Property name must be at least 3 characters"),
 
+  propertyName_ar: yup
+    .string()
+    .required("Property name (Arabic) is required")
+    .min(3, "Property name (Arabic) must be at least 3 characters"),
+
+  description: yup
+    .string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+
+  description_ar: yup
+    .string()
+    .required("Description (Arabic) is required")
+    .min(10, "Description (Arabic) must be at least 10 characters"),
+
+  detailDescription: yup
+    .string()
+    .required("Detailed description is required")
+    .min(20, "Detailed description must be at least 20 characters"),
+
+  detailDescription_ar: yup
+    .string()
+    .required("Detailed description (Arabic) is required")
+    .min(20, "Detailed description (Arabic) must be at least 20 characters"),
+
+  price: yup
+    .number()
+    .required("Price is required")
+    .min(0, "Price must be a positive number"),
+
+  apartmentNumber: yup
+    .string()
+    .required("Apartment number is required")
+    .matches(/^[a-zA-Z0-9\- ]+$/, "Apartment number can only contain letters, numbers, hyphens, and spaces"),
+
+  noOfBedrooms: yup
+    .number()
+    .required("Number of bedrooms is required")
+    .min(0, "Number of bedrooms cannot be negative"),
+
+  noOfBathrooms: yup
+    .number()
+    .required("Number of bathrooms is required")
+    .min(0, "Number of bathrooms cannot be negative"),
+
+  yearBuilt: yup
+    .number()
+    .required("Year built is required")
+    .min(1800, "Year built must be after 1800")
+    .max(new Date().getFullYear(), `Year built cannot be in the future`),
+
+  amenities: yup
+    .array()
+    .of(yup.string())
+    .nullable()
+    .default([]),
+
+  area: yup
+    .number()
+    .required("Area is required")
+    .min(0, "Area must be a positive number"),
+
+  parkingSpace: yup
+    .string()
+    .oneOf(["Yes", "No"], "Parking space must be either 'Yes' or 'No'")
+    .required("Parking space selection is required"),
+
+  propertyType: yup
+    .string()
+    .required("Property type is required")
+    .min(3, "Property type must be at least 3 characters"),
+
+  listingType: yup
+    .string()
+    .required("Listing type is required")
+    .oneOf(["For Sale", "Rent", "Featured"], "Listing type must be either 'Sale' or 'Rent'"),
+
+  availabilityStatus: yup
+    .string()
+    .required("Availability status is required")
+    .oneOf(["Available", "Sold", "Rented"], "Invalid availability status"),
+
+  status: yup
+    .string()
+    .required("Status is required")
+    .oneOf(["Active", "Inactive", "Published", "Draft"], "Status must be either 'Active' or 'Inactive'"),
+
+  address: yup
+    .string()
+    .required("Address is required")
+    .min(5, "Address must be at least 5 characters"),
+
+  latitude: yup
+    .string()
+    .required("Latitude is required")
+    .matches(
+      /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)/,
+      "Invalid latitude format"
+    ),
+
+  longitude: yup
+    .string()
+    .required("Longitude is required")
+    .matches(
+      /^-?((1[0-7]\d)|(\d{1,2}))(\.\d+)?|180(\.0+)?/,
+      "Invalid longitude format"
+    ),
+
+  images: yup
+    .array()
+    .of(yup.mixed().required("Image is required"))
+    .min(1, "At least one image is required")
+    .required("Images are required"),
+
+  floorPlans: yup.array().of(
+    yup.object().shape({
+      floorDescription: yup.string().required("Floor description is required"),
+      floorPhoto: yup.string().required("Floor photo is required")
+    })
+  ).min(1, "At least one floor is required"),
+
+
+  metaTitle: yup
+    .string()
+    .required("Meta title is required")
+    .min(3, "Meta title must be at least 3 characters"),
+
+  metaTags: yup
+    .string()
+    .required("Meta tags are required")
+    .min(3, "Meta tags must be at least 3 characters"),
+});
 const propertyTypes = ["Apartment", "Villa", "Studio"];
-const amenitiesOptions = ["Gym", "Swimming Pool", "Parking"];
+// const amenitiesOptions = ["Gym", "Swimming Pool", "Parking"];
 const tagOptions = ["For Sale", "For Rent", "New Launch"];
 
 const AddProperty = () => {
   const classes = useStyles();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const isView = location?.state?.isView;
+  const isEdit = location?.state?.isEdit;
+  const [amenitiesOptions, setAmenitiesOptions] = useState([])
+  const history = useHistory()
+  // console.log(location.state.view)
+
+  const editorRefEn = useRef(null);
+  const editorRefAr = useRef(null);
+  const handleGetAmenities = async (source, checkFilter) => {
+    try {
+      const response = await apiRouterCall({
+        method: "GET",
+        endPoint: "listAmenities",
+        source: source,
+        paramsData: { page: 1, limit: Number.MAX_SAFE_INTEGER },
+      });
+      console.log(response)
+      if (response.data.responseCode === 200) {
+        setAmenitiesOptions(response.data.result.docs);
+
+      } else {
+        setAmenitiesOptions([]);
+      }
+
+
+    } catch (err) {
+      setAmenitiesOptions([]);
+      setIsLoading(false);
+      console.log(err);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    handleGetAmenities()
+  }, [])
+  const state = location?.state || {};
 
   const initialValues = {
-    title: "",
-    description: "",
-    description_ar: "",
-    detailDescription: "",
-    detailDescription_ar: "",
-    propertyName: "",
-    propertyName_ar: "",
-    apartmentNumber: "",
-    propertyType: "",
-    address: "",
-    latitude: "",
-    longitude: "",
-    area: "",
-    overview: "",
-    images: [],
-    noOfFloors: 0,
-    floorPlans: [],
-    noOfBedrooms: 0,
-    noOfBathrooms: 0,
-    yearBuilt: "",
-    price: "",
-    amenities: [],
-    tags: [],
+    ...(location?.state?._id && { id: location.state._id }),
+    propertyName: state?.property_name || "",
+    propertyName_ar: state?.property_name_ar || "",
+    description: state?.overview || "",
+    description_ar: state?.overview_ar || "",
+    detailDescription: state?.detailed_description || "",
+    detailDescription_ar: state?.detailed_description_ar || "",
+    price: state?.price?.toString() || "",
+    apartmentNumber: state?.apartment_number || "",
+    noOfBedrooms: state?.no_of_bedrooms || 0,
+    noOfBathrooms: state?.no_of_bathrooms || 0,
+    yearBuilt: state?.year_of_built?.toString() || "",
+    amenities: (state?.amenities || []).map(a => a._id),
+    area: state?.area_sqft?.toString() || "",
+    parkingSpace: state?.parking_space || "Yes",
+    propertyType: state?.property_type || "",
+    listingType: state?.listing_type || "",
+    availabilityStatus: state?.availability_status || "",
+    status: state?.status || "",
+    address: state?.address || "",
+    latitude: state?.latitude?.toString() || "",
+    longitude: state?.longitude?.toString() || "",
+    images: state?.images || [],
+    floorPlans: (state?.floor_plan || []).map(fp => ({
+      floorDescription: fp.description || "",
+      floorPhoto: fp.photo || ""
+    })),
+    metaTitle: state?.seo_meta_titles || "",
+    metaTags: state?.seo_meta_tags || ""
   };
+
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
     console.log("Form Submitted:", values);
-    setIsSubmitting(false);
+
+    try {
+      // Construct payload with schema keys
+      const payload = {
+        ...(location?.state?._id && { id: location.state._id }),
+
+        property_name: values.propertyName,
+        property_name_ar: values.propertyName_ar,
+        overview: values.description,
+        overview_ar: values.description_ar,
+        detailed_description: values.detailDescription,
+        detailed_description_ar: values.detailDescription_ar,
+        price: values.price,
+        apartment_number: values.apartmentNumber,
+        no_of_bedrooms: values.noOfBedrooms,
+        no_of_bathrooms: values.noOfBathrooms,
+        year_of_built: values.yearBuilt,
+        amenities: values.amenities,
+        area_sqft: values.area,
+        parking_space: values.parkingSpace,
+        property_type: values.propertyType,
+        listing_type: values.listingType,
+        availability_status: values.availabilityStatus,
+        // status: values.status,
+        address: values.address,
+        latitude: values.latitude,
+        longitude: values.longitude,
+        images: values.images,
+        floor_plan: values.floorPlans.map((floor) => ({
+          photo: floor.floorPhoto,
+          description: floor.floorDescription
+        })),
+        seo_meta_titles: values.metaTitle,
+        seo_meta_tags: values.metaTags,
+        // If you have no_of_floors separately:
+        no_of_floors: values.floorPlans.length,
+        publish_status: values.status // or "published" based on your form logic
+      };
+
+      // Call the API
+      const res = await apiRouterCall({
+        method: "POST",
+        endPoint: "addUpdateProperty",
+        bodyData: payload
+      });
+
+      if (res?.data?.responseCode === 200) {
+        toast.success("Property added/updated successfully!");
+        // Optionally, reset form or redirect here
+        history.push("/property-management")
+      } else {
+        toast.error(res?.data?.responseMessage || "Error while adding/updating property");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+
+  const debounceSetFieldValue = useCallback(
+    debounce((field, value, setFieldValue) => {
+      setFieldValue(field, value);
+    }, 300),
+    []
+  );
+
+  // JoditEditor Configs
+  const editorConfigEn = useMemo(
+    () => ({
+      readonly: isView || isLoading,
+      toolbar: true,
+    }),
+    [isView, isLoading]
+  );
+
+  const editorConfigAr = useMemo(
+    () => ({
+      readonly: isView || isLoading,
+      toolbar: true,
+      direction: "rtl",
+      language: "ar",
+    }),
+    [isView, isLoading]
+  );
+
 
   return (
     <Paper elevation={2} className={classes.formWrapper}>
+      <FullScreenLoader isLoading={isSubmitting} />
       <Typography variant="h4" color="secondary" gutterBottom>
-        Add New Property
+        {state?.edit ? "Edit" : state?.view ? "View" : "Add"} New Property
       </Typography>
 
       <Formik
@@ -128,27 +388,60 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary" dir='rtl'>اسم العقار</Typography>
-                <TextField fullWidth name="propertyName" variant="outlined" value={values.propertyName_ar} onChange={handleChange} onBlur={handleBlur} error={Boolean(touched.propertyName && errors.propertyName)} />
+                <TextField fullWidth name="propertyName_ar" inputProps={{
+                  style: { textAlign: "right" },
+                  dir: "rtl",
+                  lang: "ar",
+                }} variant="outlined" value={values.propertyName_ar} onChange={handleChange} onBlur={handleBlur} error={Boolean(touched.propertyName && errors.propertyName)} />
                 <FormHelperText error>{touched.propertyName_ar && errors.propertyName_ar}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Overview</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.overview} onChange={handleChange} />
-                <FormHelperText error>{touched.overview && errors.overview}</FormHelperText>
+                <TextField fullWidth multiline minRows={3} name="description" variant="outlined" value={values.description} onChange={handleChange} />
+                <FormHelperText error>{touched.description && errors.description}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary" dir="rtl">نظرة عامة</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.overview_ar} onChange={handleChange} />
-                <FormHelperText error>{touched.overview_ar && errors.overview_ar}</FormHelperText>
+                <TextField fullWidth multiline minRows={3} name="description_ar" variant="outlined" value={values.description_ar} onChange={handleChange} />
+                <FormHelperText error>{touched.description_ar && errors.description_ar}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Detailed Description</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.detailDescription} onChange={handleChange} />
+                <Typography variant="body2" color="secondary" style={{ marginBottom: "5px" }}>
+                  Detailed Description
+                </Typography>
+
+
+                <JoditEditor
+                  ref={editorRefEn}
+                  value={values.detailDescription}
+                  tabIndex={1}
+                  name="description"
+                  variant="outlined"
+                  config={editorConfigEn}
+                  error={Boolean(touched.detailDescription && errors.detailDescription)}
+                  onBlur={(newContent) => debounceSetFieldValue("detailDescription", newContent, setFieldValue)}
+                />
+
                 <FormHelperText error>{touched.detailDescription && errors.detailDescription}</FormHelperText>
               </Grid>
+              {/* Description */}
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary" dir="rtl">نظرة عامة</Typography>
-                <TextField fullWidth multiline minRows={3} name="overview" variant="outlined" value={values.detailDescription_ar} onChange={handleChange} />
+                <Typography variant="body2" dir='rtl' color="secondary" style={{ marginBottom: "5px" }}>
+                  الوصف
+                </Typography>
+
+                <JoditEditor
+                  ref={editorRefAr}
+                  value={values.detailDescription_ar}
+                  tabIndex={2}
+                  name="detailDescription_ar"
+                  config={editorConfigAr}
+                  error={Boolean(touched.detailDescription_ar && errors.detailDescription_ar)}
+
+                  onBlur={(newContent) => debounceSetFieldValue("detailDescription_ar", newContent, setFieldValue)}
+                />
+
+
                 <FormHelperText error>{touched.detailDescription_ar && errors.detailDescription_ar}</FormHelperText>
               </Grid>
               {/* Apartment Number */}
@@ -161,6 +454,8 @@ const AddProperty = () => {
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Price</Typography>
                 <TextField fullWidth name="price" variant="outlined" type="number" value={values.price} onChange={handleChange} />
+                <FormHelperText error>{touched.price && errors.price}</FormHelperText>
+
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Apartment Number</Typography>
@@ -175,27 +470,59 @@ const AddProperty = () => {
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">No of Bedrooms</Typography>
                 <TextField fullWidth type="number" name="noOfBedrooms" variant="outlined" value={values.noOfBedrooms} onChange={handleChange} />
+                <FormHelperText error>{touched.noOfBedrooms && errors.noOfBedrooms}</FormHelperText>
+
               </Grid>
 
               {/* Bathrooms */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">No of Bathrooms</Typography>
                 <TextField fullWidth type="number" name="noOfBathrooms" variant="outlined" value={values.noOfBathrooms} onChange={handleChange} />
+                <FormHelperText error>{touched.noOfBathrooms && errors.noOfBathrooms}</FormHelperText>
+
               </Grid>
 
               {/* Year Built */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Year of Built</Typography>
                 <TextField fullWidth type="number" name="yearBuilt" variant="outlined" value={values.yearBuilt} onChange={handleChange} />
+                <FormHelperText error>{touched.yearBuilt && errors.yearBuilt}</FormHelperText>
+
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Amenities</Typography>
-                <TextField select fullWidth name="amenities" variant="outlined" multiple value={values.amenities} onChange={handleChange}>
-                  {amenitiesOptions.map((item) => (
-                    <MenuItem key={item} value={item}>{item}</MenuItem>
+                <TextField
+                  select
+                  fullWidth
+                  name="amenities"
+                  variant="outlined"
+                  value={values.amenities}
+                  onChange={handleChange}
+                  SelectProps={{
+                    multiple: true,
+                    MenuProps: {
+                      anchorOrigin: {
+                        vertical: "bottom",
+                        horizontal: "left",
+                      },
+                      transformOrigin: {
+                        vertical: "top",
+                        horizontal: "left",
+                      },
+                      getContentAnchorEl: null,
+                    },
+                  }}
+                >
+                  {amenitiesOptions.map((amenity) => (
+                    <MenuItem key={amenity._id} value={amenity._id}>
+                      {amenity.title}
+                    </MenuItem>
                   ))}
                 </TextField>
+                <FormHelperText error>{touched.amenities && errors.amenities}</FormHelperText>
               </Grid>
+
+
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Area (sq ft)</Typography>
                 <TextField fullWidth name="area" variant="outlined" value={values.area} onChange={handleChange} />
@@ -203,11 +530,13 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Parking Space</Typography>
-                <TextField select fullWidth name="amenities" variant="outlined" multiple value={values.amenities} onChange={handleChange}>
+                <TextField select fullWidth name="parkingSpace" variant="outlined" multiple value={values.parkingSpace} onChange={handleChange}>
                   {["Yes", "No"].map((item) => (
                     <MenuItem key={item} value={item}>{item}</MenuItem>
                   ))}
                 </TextField>
+                <FormHelperText error>{touched.parkingSpace && errors.parkingSpace}</FormHelperText>
+
               </Grid>
 
               <Grid item xs={12}>
@@ -220,7 +549,19 @@ const AddProperty = () => {
               {/* Property Type */}
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Property Type</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {propertyTypes.map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
@@ -229,30 +570,54 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Listing Type</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="listingType" variant="outlined" value={values.listingType} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {["For Sale", "Rent", "Fetured"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.listingType && errors.listingType}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">Availability Status</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <TextField select fullWidth name="availabilityStatus" variant="outlined" value={values.availabilityStatus} onChange={handleChange} SelectProps={{
+                  MenuProps: {
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                    getContentAnchorEl: null, // Ensures correct positioning
+                  },
+                }}>
                   {["Available", "Sold", "Rented"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.availabilityStatus && errors.availabilityStatus}</FormHelperText>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Availability Status</Typography>
-                <TextField select fullWidth name="propertyType" variant="outlined" value={values.propertyType} onChange={handleChange}>
+                <Typography variant="body2" color="secondary">Status</Typography>
+                <TextField select fullWidth name="status" variant="outlined" value={values.status} onChange={handleChange}>
                   {["Published", "Draft"].map((type) => (
                     <MenuItem key={type} value={type}>{type}</MenuItem>
                   ))}
                 </TextField>
-                <FormHelperText error>{touched.propertyType && errors.propertyType}</FormHelperText>
+                <FormHelperText error>{touched.status && errors.status}</FormHelperText>
               </Grid>
 
               {/* Address */}
@@ -265,6 +630,16 @@ const AddProperty = () => {
                 <Typography variant="body2" color="secondary">Address</Typography>
                 <TextField fullWidth name="address" variant="outlined" value={values.address} onChange={handleChange} />
                 <FormHelperText error>{touched.address && errors.address}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">Latitude</Typography>
+                <TextField fullWidth name="latitude" variant="outlined" value={values.latitude} onChange={handleChange} />
+                <FormHelperText error>{touched.latitude && errors.latitude}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">Longitude</Typography>
+                <TextField fullWidth name="longitude" variant="outlined" value={values.longitude} onChange={handleChange} />
+                <FormHelperText error>{touched.longitude && errors.longitude}</FormHelperText>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" color="secondary">Google Maps Preview</Typography>
@@ -299,15 +674,23 @@ const AddProperty = () => {
                     accept="image/*"
                     multiple
                     style={{ display: "none" }}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const files = Array.from(e.target.files);
-                      Promise.all(files.map((file) => new Promise((resolve) => getBase64(file, resolve))))
-                        .then((base64Images) => {
-                          setFieldValue("images", [...values.images, ...base64Images]);
-                        });
-                    }}
+                      const uploadedImageUrls = [];
 
+                      setIsSubmitting(true); // Optionally set loading for entire upload process
+                      for (const file of files) {
+                        const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload each file
+                        if (uploadedUrl) {
+                          uploadedImageUrls.push(uploadedUrl); // Collect successful URLs
+                        }
+                      }
+
+                      setFieldValue("images", [...values.images, ...uploadedImageUrls]);
+                      setIsSubmitting(false); // Done with all uploads
+                    }}
                   />
+
                   <label htmlFor="image-upload" className="displayCenter" style={{ flexDirection: "column" }}>
                     <Avatar><FiUpload /></Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>Click to upload images</Typography>
@@ -317,79 +700,208 @@ const AddProperty = () => {
                       <img key={i} src={img} alt="preview" className={classes.previewImage} />
                     ))}
                   </Box>
+                  <FormHelperText error>{touched.images && errors.images}</FormHelperText>
+
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">No of Floors</Typography>
-                <TextField
-                  fullWidth
-                  name="noOfFloors"
-                  type="number"
-                  variant="outlined"
-                  value={values.noOfFloors}
-                  onChange={(e) => {
-                    const num = parseInt(e.target.value, 10);
-                    handleChange(e);
-                    // Clear extra images if the floor count decreases
-                    if (!isNaN(num) && values.floorPlans.length > num) {
-                      setFieldValue("floorPlans", values.floorPlans.slice(0, num));
-                    }
-                  }}
-                  onBlur={handleBlur}
-                  error={Boolean(touched.noOfFloors && errors.noOfFloors)}
-                />
-                <FormHelperText error>{touched.noOfFloors && errors.noOfFloors}</FormHelperText>
-              </Grid>
-
-              {/* Floor Plan Uploads */}
               <Grid item xs={12}>
-                <Box className={classes.imageUploadBox}>
-                  <input
-                    id="floor-plan-upload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    disabled={values.floorPlans.length >= values.noOfFloors}
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      const availableSlots = values.noOfFloors - values.floorPlans.length;
+                <Typography variant="h6">Floor Plans</Typography>
+                {values.floorPlans.map((floor, index) => (
+                  <Box
+                    key={index}
+                    mb={2}
+                    p={2}
+                    border={1}
+                    borderColor="grey.300"
+                    borderRadius={4}
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    sx={{ gap: 20 }} // Use the MUI sx prop for gap
+                  >
 
-                      const filesToUpload = files.slice(0, availableSlots);
-                      Promise.all(
-                        filesToUpload.map((file) => new Promise((resolve) => getBase64(file, resolve)))
-                      ).then((base64Images) => {
-                        setFieldValue("floorPlans", [...values.floorPlans, ...base64Images]);
-                      });
-                    }}
-                  />
-                  <label htmlFor="floor-plan-upload" className="displayCenter" style={{ flexDirection: "column", opacity: values.floorPlans.length >= values.noOfFloors ? 0.5 : 1, pointerEvents: values.floorPlans.length >= values.noOfFloors ? "none" : "auto" }}>
-                    <Avatar><FiUpload /></Avatar>
-                    <Typography variant="body2" style={{ marginTop: 8 }}>Click to upload Floor Plans</Typography>
-                    {values.floorPlans.length >= values.noOfFloors && (
-                      <FormHelperText error>You’ve uploaded all {values.noOfFloors} floor plans.</FormHelperText>
-                    )}
-                  </label>
+                    {/* Left Side: Description */}
+                    <Box flex={1} display="flex" flexDirection="column">
+                      <Typography variant="body2" color="secondary">{`Floor ${index + 1} Description`}</Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        minRows={3}
+                        name={`floorPlans[${index}].floorDescription`}
+                        value={floor.floorDescription}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={Boolean(
+                          touched.floorPlans?.[index]?.floorDescription &&
+                          errors.floorPlans?.[index]?.floorDescription
+                        )}
+                        helperText={
+                          touched.floorPlans?.[index]?.floorDescription &&
+                          errors.floorPlans?.[index]?.floorDescription
+                        }
+                        variant="outlined"
+                        margin="dense"
+                      />
+                      <Box mt="auto" display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          startIcon={<FiTrash2 />}
 
-                  <Box display="flex" flexWrap="wrap" mt={2}>
-                    {values.floorPlans.map((img, i) => (
-                      <img key={i} src={img} alt={`floor-${i + 1}`} className={classes.previewImage} />
-                    ))}
+                          style={{ background: "red", color: "white !important" }}
+                          onClick={() => {
+                            const updatedFloors = values.floorPlans.filter((_, i) => i !== index);
+                            setFieldValue("floorPlans", updatedFloors);
+                          }}
+                          disabled={values.floorPlans.length === 1}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    </Box>
+
+                    {/* Right Side: Image Upload */}
+                    <Box
+                      flex={1}
+                      display="flex"
+                      flexDirection="column"
+                      alignItems="center"
+                      justifyContent="center"
+                      position="relative"
+                      border={1}
+                      borderColor="grey.300"
+                      borderRadius={4}
+                      overflow="hidden"
+                      minHeight={200}
+                    >
+                      {!floor.floorPhoto ? (
+                        <>
+                          <input
+                            id={`floor-photo-${index}`}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload the file
+                                if (uploadedUrl) {
+                                  const updatedFloors = [...values.floorPlans];
+                                  updatedFloors[index].floorPhoto = uploadedUrl; // Save the uploaded URL
+                                  setFieldValue("floorPlans", updatedFloors);
+                                }
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor={`floor-photo-${index}`}
+                            className="displayCenter"
+                            style={{ cursor: "pointer", width: "100%", height: "100%" }}
+                          >
+                            <Box
+                              display="flex"
+                              flexDirection="column"
+                              alignItems="center"
+                              justifyContent="center"
+                              height="100%"
+                              width="100%"
+                              bgcolor="grey.100"
+                              p={2}
+                            >
+                              <Avatar><FiUpload /></Avatar>
+                              <Typography variant="body2" mt={1}>Upload Floor Photo</Typography>
+                            </Box>
+                          </label>
+                        </>
+                      ) : (
+                        <Box
+                          position="relative"
+                          width="100%"
+                          height="100%"
+                        >
+                          <img
+                            src={floor.floorPhoto}
+                            alt={`floor-${index + 1}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                              borderRadius: 4
+                            }}
+                          />
+                          <input
+                            id={`floor-photo-${index}`}
+                            type="file"
+                            accept="image/*"
+                            style={{ display: "none" }}
+                            onChange={async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                const uploadedUrl = await uploadFile(file, setIsSubmitting); // Upload the file
+                                if (uploadedUrl) {
+                                  const updatedFloors = [...values.floorPlans];
+                                  updatedFloors[index].floorPhoto = uploadedUrl; // Save the uploaded URL
+                                  setFieldValue("floorPlans", updatedFloors);
+                                }
+                              }
+                            }}
+                          />
+
+                          <label
+                            htmlFor={`floor-photo-${index}`}
+                            style={{
+                              position: "absolute",
+                              bottom: 8,
+                              right: 8,
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              borderRadius: "50%",
+                              padding: 6,
+                              cursor: "pointer"
+                            }}
+                          >
+                            <FiUpload />
+                          </label>
+                        </Box>
+                      )}
+                      {touched.floorPlans?.[index]?.floorPhoto &&
+                        errors.floorPlans?.[index]?.floorPhoto && (
+                          <FormHelperText error>
+                            {errors.floorPlans[index].floorPhoto}
+                          </FormHelperText>
+                        )}
+                    </Box>
                   </Box>
-                </Box>
+                ))}
+
+                {state?.view ? null : <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    setFieldValue("floorPlans", [
+                      ...values.floorPlans,
+                      { floorDescription: "", floorPhoto: "" }
+                    ]);
+                  }}
+                >
+                  {state?.edit ? "Update" : "Add Floor"}
+                </Button>}
               </Grid>
+
+
               <Grid item xs={12} mt={2}>
                 <Typography variant="h6" color="secondary" gutterBottom>
-                  Media
+                  Tags
                 </Typography>
               </Grid>
               <Grid item xs={6}>
-                <Typography variant="body2" color="secondary">Tags</Typography>
-                <TextField select fullWidth name="tags" variant="outlined" multiple value={values.tags} onChange={handleChange}>
-                  {tagOptions.map((tag) => (
-                    <MenuItem key={tag} value={tag}>{tag}</MenuItem>
-                  ))}
-                </TextField>
+                <Typography variant="body2" color="secondary">SEO Meta Titles</Typography>
+                <TextField fullWidth name="metaTitle" variant="outlined" value={values.metaTitle} onChange={handleChange} />
+                <FormHelperText error>{touched.metaTitle && errors.metaTitle}</FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary">SEO Meta Tags</Typography>
+                <TextField fullWidth name="metaTags" variant="outlined" value={values.metaTags} onChange={handleChange} />
+                <FormHelperText error>{touched.metaTags && errors.metaTags}</FormHelperText>
               </Grid>
 
               <Grid item xs={12} className="displayCenter">

@@ -1,4 +1,7 @@
-export const baseurl = process.env.REACT_APP_BASE_URL;
+// export const baseurl = process.env.REACT_APP_BASE_URL;
+// export const baseurl = "http://192.168.123.33:2211"
+// export const baseurl = "http://localhost:2211"
+export const baseurl = "https://aved-node.onrender.com"
 
 ///////////////////local///////////////
 // export const baseurl = "http://172.16.1.254:2154";
@@ -8,11 +11,33 @@ export const currency = process.env.REACT_APP_CURRENCY;
 let base = `${baseurl}/api/v1`;
 const ApiConfig = {
   login: `${base}/admin/login`,
+  getAdminDetails: `${base}/admin/getAdminDetails`,
+  updateAdminDetails: `${base}/admin/updateAdminDetails`,
+
+
   getProfile: `${base}/admin/getProfile`,
   resendOTP: `${base}/admin/resendOTP`,
   verifyOTP: `${base}/admin/verifyOTP`,
-  forgotPassword: `${base}/admin/forgotPassword`,
+  forgotPassword: `${base}/admin/forgetPassword`,
   resetPassword: `${base}/admin/resetPassword`,
+  addOrUpdateBlog: `${base}/admin/addOrUpdateBlog`,
+  toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
+  deleteBlog: `${base}/admin/deleteBlog`,
+  listBlogs: `${base}/admin/listBlogs`,
+  addOrUpdateTeam: `${base}/admin/addOrUpdateTeam`,
+  listTeam: `${base}/admin/listTeam`,
+  toggleBlockTeamStatus: `${base}/admin/toggleBlockTeamStatus`,
+  deleteTeam: `${base}/admin/deleteTeam`,
+
+
+  listContactUs: `${base}/contact/listContactUs`,
+
+
+
+
+
+
+
   dashboard: `${base}/admin/dashboard`,
   getUserList: `${base}/admin/getUserList`,
   blockUnblockUser: `${base}/admin/blockUnblockUser`,
@@ -37,12 +62,13 @@ const ApiConfig = {
   checkEmail: `${base}/user/checkEmail`,
 
   ///////////static//////
-  listStaticContent: `${base}/static/listStaticContent`,
+  listStaticContent: `${base}/staticContent/getAllStaticContent`,
+  addStaticContent: `${base}/staticContent/addStaticContent`,
   editStaticContent: `${base}/static/editStaticContent`,
   addFAQ: `${base}/static/addFAQ`,
-  faqList: `${base}/static/faqList`,
-  editFAQ: `${base}/static/editFAQ`,
-  deleteFAQ: `${base}/static/deleteFAQ`,
+  faqList: `${base}/staticContent/getAllStaticContentByType`,
+  updateStaticContent: `${base}/staticContent/updateStaticContent`,
+  deleteStaticContent: `${base}/staticContent/deleteStaticContent`,
   listAllContactUsRequest: `${base}/static/listAllContactUsRequest`,
   replyContactUs: `${base}/static/replyContactUs`,
 
@@ -66,5 +92,15 @@ const ApiConfig = {
   userExchangeManagement: `${base}/wallet/userExchangeManagement`,
   orderHistoryAdmin: `${base}/wallet/orderHistoryAdmin`,
   closePosition: `${base}/wallet/closePosition`,
+  ///////////////////////////////////////////////////////////////////////////
+  addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
+  toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
+  listAmenities: `${base}/admin/listAmenities`,
+  uploadFile: `${base}/user/uploadFile`,
+  addUpdateProperty: `${base}/property/addUpdateProperty`,
+  listProperties: `${base}/property/listProperties`,
+  toggleBlockProperty: `${base}/property/toggleBlockProperty`,
+  deleteProperty: `${base}/property/deleteProperty`,
 };
+
 export default ApiConfig;

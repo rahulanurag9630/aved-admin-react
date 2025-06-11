@@ -24,12 +24,10 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     gap: "16px",
     overflow: "auto",
-
     padding: "15px",
-    // background: "rgba(14, 14, 17, 1)",
     borderRadius: "10px",
-    background: "#242030",
-    border: "1px solid #80808047",
+    // background: "#242030",
+    // border: "1px solid #80808047",
     "& .MuiTypography-body2": {
       "@media(max-width:499px)": {
         wordBreak: "break-all",
@@ -62,8 +60,8 @@ const useStyles = makeStyles((theme) => ({
 
 const ticketData = [
   {
-    key: "_id",
-    label: "Ticket ID",
+    key: "name",
+    label: "Name",
   },
   // {
   //   key: "subject",
@@ -147,7 +145,7 @@ const PendingDetails = () => {
                   ) : (
                     <Typography
                       variant="body2"
-                      color="primary"
+                      color="secondary"
                       dangerouslySetInnerHTML={{
                         __html:
                           ticketDetail && ticketDetail[item.key]

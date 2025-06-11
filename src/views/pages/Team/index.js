@@ -22,12 +22,12 @@ const tableHead = [
     isMobile: true,
   },
   {
-    heading: "Title",
+    heading: "Name",
     column: 0,
     isMobile: true,
   },
   {
-    heading: "Description",
+    heading: "Position",
     column: 0,
     isMobile: true,
     isCopy: true,
@@ -103,7 +103,7 @@ export default function Blogs() {
     try {
       const response = await apiRouterCall({
         method: "GET",
-        endPoint: "listBlogs",
+        endPoint: "listTeam",
         source: source,
         paramsData: filterData,
       });
@@ -132,7 +132,7 @@ export default function Blogs() {
       setIsUpdating(true);
 
       const isDelete = modalOpen === "delete";
-      const endPoint = isDelete ? "deleteBlog" : "toggleBlockStatus";
+      const endPoint = isDelete ? "deleteTeam" : "toggleBlockTeamStatus";
       const method = "POST";
 
       const response = await apiRouterCall({
@@ -178,8 +178,8 @@ export default function Blogs() {
       arrayData &&
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
-        Title: value?.title,
-        Description: value?.description,
+        Name: value?.name,
+        Position: value?.position,
         Price: `$${value?.price}`,
         Duration: value?.durationLabel,
         Badge: value?.badge,
@@ -190,7 +190,7 @@ export default function Blogs() {
             icon: VisibilityIcon,
             onClick: () =>
               history.push({
-                pathname: "/add-blog-management",
+                pathname: "/add-team-management",
                 state: { ...value, isView: true },
               }),
           },
@@ -200,7 +200,7 @@ export default function Blogs() {
                 icon: FaEdit,
                 onClick: () =>
                   history.push({
-                    pathname: "/add-blog-management",
+                    pathname: "/add-team-management",
                     state: { ...value, isEdit: true },
                   }),
               },
@@ -266,9 +266,9 @@ export default function Blogs() {
     <Box>
       <Box className="tophead">
         <Topheading
-          heading="Blog Management"
-          pathname={checkEdit ? "/add-blog-management" : undefined}
-          addButton={"Add Blog"}
+          heading="Team Management"
+          pathname={checkEdit ? "/add-team-management" : undefined}
+          addButton={"Add Team"}
         />
       </Box>
       <Box my={3}>
@@ -283,7 +283,7 @@ export default function Blogs() {
           transactionList={transactionList}
           excelTableName="SubAdminManagement"
           apiEndPoint="getUserList"
-          placeholder="Search by title"
+          placeholder="Search by name"
           tableDataFunction={tableDataFunction}
           handleClearApi={handleClearFilter}
         />
