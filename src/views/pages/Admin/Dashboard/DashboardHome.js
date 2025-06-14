@@ -115,35 +115,7 @@ export default function DashdoardHome() {
   const [isLoading, setIsLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState();
   const [tradingDashboardData, setTradingDashboardData] = useState();
-
-  const arrayData = [
-    {
-      title: "Total Properties",
-      count: 160,
-      background: "#846cf94d",
-      color: "#3e2d91",
-      background1: "rgb(132 108 249 / 44%)",
-      active: 120,
-      draft: 30,
-      inactive: 50,
-    },
-    {
-      title: "Total Leads & Inquiries",
-      count: 245,
-      background: "rgb(255 199 129 / 15%)",
-      color: "#ffb153",
-      background1: "rgb(255 177 83 / 39%)",
-
-    },
-    {
-      title: "Published Blogs",
-      count: 42,
-      background: "rgb(255 199 129 / 15%)",
-      color: "#ffb153",
-      background1: "rgb(255 177 83 / 39%)",
-
-    },
-  ];
+  const [arrayData, setArrayData] = useState([])
 
 
   const getDashboardData = async (source) => {
@@ -151,32 +123,41 @@ export default function DashdoardHome() {
       setIsLoading(true);
       const response = await apiRouterCall({
         method: "GET",
-        endPoint: "dashboard",
+        endPoint: "getDashboardData",
         source: source,
       });
+      console.log(response?.data?.responseCode)
       if (response?.data?.responseCode === 200) {
         setDashboardData(response.data.result);
+        const dashboardData = response?.data?.result;
+        setArrayData([
+          {
+            title: "Total Properties",
+            count: dashboardData?.totalPublishedProperty + dashboardData?.totalDraftProperty,
+            background: "#846cf94d",
+            color: "#3e2d91",
+            background1: "rgb(132 108 249 / 44%)",
+            active: dashboardData?.totalPublishedProperty,
+            draft: dashboardData?.totalDraftProperty,
+          },
+          {
+            title: "Total Leads & Inquiries",
+            count: dashboardData?.totalContactUs,
+            background: "rgb(255 199 129 / 15%)",
+            color: "#ffb153",
+            background1: "rgb(255 177 83 / 39%)",
+
+          },
+          {
+            title: "Published Blogs",
+            count: dashboardData?.totalBlogs,
+            background: "rgb(255 199 129 / 15%)",
+            color: "#ffb153",
+            background1: "rgb(255 177 83 / 39%)",
+
+          }])
       } else {
         setDashboardData();
-      }
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-  const getTradingDashboardData = async (source) => {
-    try {
-      setIsLoading(true);
-      const response = await apiRouterCall({
-        method: "GET",
-        endPoint: "copyTradingDashBoard",
-        source: source,
-      });
-      if (response?.data?.responseCode === 200) {
-        setTradingDashboardData(response.data.result);
-      } else {
-        setTradingDashboardData();
       }
       setIsLoading(false);
     } catch (error) {
@@ -188,33 +169,12 @@ export default function DashdoardHome() {
   useEffect(() => {
     const source = axios.CancelToken.source();
     getDashboardData(source);
-    getTradingDashboardData(source);
+    getDashboardData(source);
     return () => {
       source.cancel();
     };
   }, []);
-  const [selectFilter, setSelectFilter] = useState({
-    status: "today_paid_liquidity",
-  });
 
-  const handleChange = (e) => {
-    setSelectFilter({
-      ...selectFilter,
-      status: e.target.value,
-    });
-  };
-
-  const menuProps = {
-    anchorOrigin: {
-      vertical: "bottom", // Position the menu to open from the bottom
-      horizontal: "left",
-    },
-    transformOrigin: {
-      vertical: "top", // Align the menu with the top of the dropdown
-      horizontal: "left",
-    },
-    getContentAnchorEl: null, // Ensures menu positioning is consistent
-  };
 
   return (
     <Box className={classes.dashboardBox}>
@@ -265,11 +225,11 @@ export default function DashdoardHome() {
                     </Typography>
                   </Box>
                   {value?.active && <Box className={classes.subTitleBox}>
-                    <Typography variant="body2">Active:</Typography>
+                    <Typography variant="body2">Published:</Typography>
                     <Typography variant="subtitle1">{value?.active}</Typography>
                   </Box>
                   }
-                  {value?.draft && <Box className={classes.subTitleBox}>
+                  {(value?.draft || value?.draft === 0) && <Box className={classes.subTitleBox}>
                     <Typography variant="body2">Draft:</Typography>
                     <Typography variant="subtitle1">{value?.draft}</Typography>
                   </Box>}
@@ -303,14 +263,14 @@ export default function DashdoardHome() {
               }}
             >
               <Typography variant="h5">Most Viewed Properties</Typography>
-              <MostViewedProperty />
+              <MostViewedProperty data={dashboardData?.topViewedProperties} />
             </Box>
 
           </Grid>
           <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
             <Box style={{ padding: "30px", background: "#FFF", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}><Typography variant="h5">Recentaly Added Properties
             </Typography>
-              <RecentalyAddedProperty /></Box>
+              <RecentalyAddedProperty data={dashboardData?.latestProperties} /></Box>
 
           </Grid>
         </Grid>
@@ -326,105 +286,20 @@ export default function DashdoardHome() {
               }}
             >
               <Typography variant="h5">Daily Property Views</Typography>
-              <DailyPropertyViewChart />
+              <DailyPropertyViewChart data={dashboardData?.dailyChartData} />
             </Box>
 
           </Grid>
           <Grid item xs={12} sm={6} md={6} style={{ padding: "10px", background: "#F3F4F6" }}>
             <Box style={{ padding: "30px", background: "#FFF", borderRadius: "15px", boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)" }}><Typography variant="h5">Monthly Property Views
             </Typography>
-              <MonthlyPropertyViewChart />
+              <MonthlyPropertyViewChart data={dashboardData?.monthlyChartData} />
             </Box>
 
           </Grid>
         </Grid>
       </Box>
-      {/* 
-      <Box mt={3}>
-        <Typography
-          variant="h3"  
-          color="primary"
-          style={{ marginBottom: "16px" }}
-        >
-          Liquidity Analytics
-        </Typography>
-        <Paper elevation={1} className="graphmainBox">
-          <Box align="right">
-            <FormControl variant="outlined">
-              <Select
-                name="status"
-                value={selectFilter.status}
-                onChange={handleChange}
-                MenuProps={menuProps}
-              >
-                <MenuItem value="today_paid_liquidity">1 Days</MenuItem>
 
-                <MenuItem value="pending">7 Days</MenuItem>
-                <MenuItem value="completed">30 Days</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <BarChart />
-        </Paper>
-      </Box>
-
-      <Box mt={3}>
-        <Typography
-          variant="h3"
-          color="primary"
-          style={{ marginBottom: "16px" }}
-        >
-          Users Analytics
-        </Typography>
-
-        <Paper elevation={1} className="graphmainBox">
-          <Box align="right">
-            <FormControl variant="outlined">
-              <Select
-                name="status"
-                value={selectFilter.status}
-                onChange={handleChange}
-                MenuProps={menuProps}
-              >
-                <MenuItem value="today_paid_liquidity">1 Days</MenuItem>
-
-                <MenuItem value="pending">7 Days</MenuItem>
-                <MenuItem value="completed">30 Days</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          <AreaChart />
-        </Paper>
-      </Box>
-
-      <Box mt={3} mb={3}>
-        <Typography
-          variant="h3"
-          color="primary"
-          style={{ marginBottom: "16px" }}
-        >
-          Buy CWN Analytics
-        </Typography>
-        <Paper elevation={1} className="graphmainBox">
-          <Box align="right">
-            <FormControl variant="outlined">
-              <Select
-                name="status"
-                value={selectFilter.status}
-                onChange={handleChange}
-                MenuProps={menuProps}
-              >
-                <MenuItem value="today_paid_liquidity">1 Days</MenuItem>
-
-                <MenuItem value="pending">7 Days</MenuItem>
-                <MenuItem value="completed">30 Days</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <BarChart />
-        </Paper>
-      </Box> */}
     </Box >
   );
 }

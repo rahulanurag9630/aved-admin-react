@@ -4,14 +4,18 @@ import Chart from "react-apexcharts";
 /**
  * 📊 Monthly Property View Chart
  * This chart displays monthly user activity for properties, such as views and inquiries.
+ * @param {Object} props
+ * @param {Object} props.data - Contains monthlyChartData (categories, views, inquiries)
  */
-const MonthlyPropertyViews = () => {
+const MonthlyPropertyViews = ({ data }) => {
+    if (!data) return null; // Optional: loading state
+
     const options = {
         chart: {
             height: 350,
             type: "area",
             toolbar: {
-                show: false, // Hide the toolbar entirely
+                show: false,
             },
         },
         dataLabels: {
@@ -23,15 +27,7 @@ const MonthlyPropertyViews = () => {
         },
         xaxis: {
             type: "datetime",
-            categories: [
-                "2025-01-01T00:00:00.000Z",
-                "2025-02-01T00:00:00.000Z",
-                "2025-03-01T00:00:00.000Z",
-                "2025-04-01T00:00:00.000Z",
-                "2025-05-01T00:00:00.000Z",
-                "2025-06-01T00:00:00.000Z",
-                "2025-07-01T00:00:00.000Z",
-            ],
+            categories: data.categories || [],
         },
         tooltip: {
             x: {
@@ -43,11 +39,11 @@ const MonthlyPropertyViews = () => {
     const series = [
         {
             name: "Property Views",
-            data: [1200, 1800, 1600, 1900, 2100, 2300, 2500],
+            data: data.views || [],
         },
         {
             name: "Inquiries",
-            data: [120, 140, 135, 160, 170, 190, 200],
+            data: data.inquiries || [],
         },
     ];
 

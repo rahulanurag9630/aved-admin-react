@@ -122,15 +122,15 @@ const TicketManagement = () => {
     try {
       setIsContractUpdating(true);
       const response = await apiRouterCall({
-        method: "PUT",
+        method: "POST",
         endPoint: "replyContactUs",
-        bodyData: {
-          contactUsId: blockUnblockId,
-          replyMessage: reasonData?.reason,
+        paramsData: {
+          _id: blockUnblockId,
+          message: reasonData?.reason,
         },
       });
 
-      if (response.status == 200) {
+      if (response.status === 200) {
         toast.success("Ticket resolved successfully.");
         setIsContractUpdating(false);
         getTicketManagementList();
@@ -185,10 +185,10 @@ const TicketManagement = () => {
       value.trim() == ""
         ? "Reason is required."
         : value.length < 3
-        ? "Reason must be at least 3 characters long."
-        : value.length > 600
-        ? "Exceeded maximum character limit (600)."
-        : "";
+          ? "Reason must be at least 3 characters long."
+          : value.length > 600
+            ? "Exceeded maximum character limit (600)."
+            : "";
     setError(errorMsg);
   };
 

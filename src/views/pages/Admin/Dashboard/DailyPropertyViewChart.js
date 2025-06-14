@@ -4,14 +4,18 @@ import Chart from "react-apexcharts";
 /**
  * 📊 Daily Property View Chart
  * This chart displays daily user activity for properties, such as views and inquiries.
+ * @param {Object} props
+ * @param {Object} props.data - Contains dailyChartData (categories, views, inquiries)
  */
-const DailyPropertyViewChart = () => {
+const DailyPropertyViewChart = ({ data }) => {
+    if (!data) return null; // Optional: show a loader or fallback
+
     const options = {
         chart: {
             height: 350,
             type: "area",
             toolbar: {
-                show: false, // Hide the toolbar entirely
+                show: false,
             },
         },
         dataLabels: {
@@ -23,15 +27,7 @@ const DailyPropertyViewChart = () => {
         },
         xaxis: {
             type: "datetime",
-            categories: [
-                "2025-05-14T00:00:00.000Z",
-                "2025-05-15T00:00:00.000Z",
-                "2025-05-16T00:00:00.000Z",
-                "2025-05-17T00:00:00.000Z",
-                "2025-05-18T00:00:00.000Z",
-                "2025-05-19T00:00:00.000Z",
-                "2025-05-20T00:00:00.000Z",
-            ],
+            categories: data.categories || [],
         },
         tooltip: {
             x: {
@@ -43,11 +39,11 @@ const DailyPropertyViewChart = () => {
     const series = [
         {
             name: "Property Views",
-            data: [120, 200, 150, 300, 250, 320, 280],
+            data: data.views || [],
         },
         {
             name: "Inquiries",
-            data: [10, 30, 20, 40, 25, 35, 30],
+            data: data.inquiries || [],
         },
     ];
 
