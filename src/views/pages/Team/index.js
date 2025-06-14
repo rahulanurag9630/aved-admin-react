@@ -14,6 +14,7 @@ import moment from "moment";
 import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
+import { formatDate } from "../../../utils/index";
 
 const tableHead = [
   {
@@ -184,7 +185,7 @@ export default function Blogs() {
         Duration: value?.durationLabel,
         Badge: value?.badge,
 
-        "Created Date & Time": value?.createdAt,
+        "Created Date & Time": formatDate(value?.createdAt),
         Action: [
           {
             icon: VisibilityIcon,
@@ -210,7 +211,7 @@ export default function Blogs() {
                   setDeleteBlockId(value);
                   setModalOpen("block");
                 },
-                style:{ color: value.status === "ACTIVE" ? "green" : "red" }
+                style: { color: value.status === "ACTIVE" ? "green" : "red" }
               },
               {
                 icon: DeleteIcon,
@@ -303,16 +304,16 @@ export default function Blogs() {
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
           heading={`${modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId?.status === "BLOCK"
-                ? "Unblock"
-                : "Block"
+            ? "Delete"
+            : deleteBlockId?.status === "BLOCK"
+              ? "Unblock"
+              : "Block"
             } Blog`}
           description={`Are you sure you want to ${modalOpen === "delete"
-              ? "delete"
-              : deleteBlockId?.status === "BLOCK"
-                ? "unblock"
-                : "block"
+            ? "delete"
+            : deleteBlockId?.status === "BLOCK"
+              ? "unblock"
+              : "block"
             } this blog?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}

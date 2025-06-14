@@ -14,6 +14,7 @@ import moment from "moment";
 import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
+import { formatDate } from "../../../utils/index";
 
 const tableHead = [
   {
@@ -98,6 +99,20 @@ export default function Blogs() {
   };
 
 
+  function getTextSnippetFromHTML(html, limit = 65) {
+    if (!html) return "";
+
+    // Create a temporary DOM element to extract plain text
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    const plainText = tempDiv.textContent || tempDiv.innerText || "";
+
+    // Trim and limit to `limit` characters
+    return plainText.length > limit
+      ? plainText.substring(0, limit).trim() + "..."
+      : plainText.trim();
+  }
 
   const handleGetTransaction = async (source, checkFilter) => {
     try {
@@ -179,12 +194,12 @@ export default function Blogs() {
       arrayData.map((value, i) => ({
         "Sr No.": (page - 1) * 10 + i + 1,
         Title: value?.title,
-        Description: value?.description,
+        Description: getTextSnippetFromHTML(value?.description),
         Price: `$${value?.price}`,
         Duration: value?.durationLabel,
         Badge: value?.badge,
 
-        "Created Date & Time": value?.createdAt,
+        "Created Date & Time": formatDate(value?.createdAt),
         Action: [
           {
             icon: VisibilityIcon,
@@ -210,7 +225,7 @@ export default function Blogs() {
                   setDeleteBlockId(value);
                   setModalOpen("block");
                 },
-                style:{ color: value.status === "ACTIVE" ? "green" : "red" }
+                style: { color: value.status === "ACTIVE" ? "green" : "red" }
               },
               {
                 icon: DeleteIcon,
@@ -303,16 +318,16 @@ export default function Blogs() {
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
           heading={`${modalOpen === "delete"
-              ? "Delete"
-              : deleteBlockId?.status === "BLOCK"
-                ? "Unblock"
-                : "Block"
+            ? "Delete"
+            : deleteBlockId?.status === "BLOCK"
+              ? "Unblock"
+              : "Block"
             } Blog`}
           description={`Are you sure you want to ${modalOpen === "delete"
-              ? "delete"
-              : deleteBlockId?.status === "BLOCK"
-                ? "unblock"
-                : "block"
+            ? "delete"
+            : deleteBlockId?.status === "BLOCK"
+              ? "unblock"
+              : "block"
             } this blog?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}

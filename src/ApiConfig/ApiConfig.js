@@ -1,7 +1,7 @@
 // export const baseurl = process.env.REACT_APP_BASE_URL;
 // export const baseurl = "http://192.168.123.33:2211"
-// export const baseurl = "http://localhost:2211"
-export const baseurl = "https://aved-node.onrender.com"
+export const baseurl = "http://localhost:2211"
+// export const baseurl = "https://aved-node.onrender.com"
 
 ///////////////////local///////////////
 // export const baseurl = "http://172.16.1.254:2154";
@@ -31,6 +31,7 @@ const ApiConfig = {
 
 
   listContactUs: `${base}/contact/listContactUs`,
+  replyContactUs: `${base}/contact/replyContactUs`,
 
 
 
@@ -70,7 +71,6 @@ const ApiConfig = {
   updateStaticContent: `${base}/staticContent/updateStaticContent`,
   deleteStaticContent: `${base}/staticContent/deleteStaticContent`,
   listAllContactUsRequest: `${base}/static/listAllContactUsRequest`,
-  replyContactUs: `${base}/static/replyContactUs`,
 
   //////////Exchange////////
   closeOpenOrdersAll: `${base}/wallet/closeOpenOrdersAll`,
@@ -101,6 +101,9 @@ const ApiConfig = {
   listProperties: `${base}/property/listProperties`,
   toggleBlockProperty: `${base}/property/toggleBlockProperty`,
   deleteProperty: `${base}/property/deleteProperty`,
+  getDashboardData: `${base}/admin/getDashboardData`,
+
+
 };
 
 export default ApiConfig;
