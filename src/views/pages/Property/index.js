@@ -302,6 +302,7 @@ export default function Property() {
                   setDeleteBlockId(value);
                   setModalOpen("block");
                 },
+                style: { color: value.status === "ACTIVE" ? "green" : "red" }
               },
               {
                 icon: DeleteIcon,
@@ -376,7 +377,7 @@ export default function Property() {
           transactionList={transactionList}
           excelTableName="SubAdminManagement"
           apiEndPoint="getUserList"
-          placeholder="Search by title"
+          placeholder="Search by property name"
           tableDataFunction={tableDataFunction}
           handleClearApi={handleClearFilter}
         />

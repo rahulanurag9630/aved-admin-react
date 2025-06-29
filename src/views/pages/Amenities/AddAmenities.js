@@ -53,7 +53,7 @@ const AddAmenities = () => {
     const editData = location?.state || {};
 
     const initialValues = {
-        id: editData?._id || "",
+        ...(editData?._id ? { id: editData._id } : {}), // Conditional spread
         title: editData?.title || "",
         title_ar: editData?.title_ar || "",
         image: editData?.image || "",

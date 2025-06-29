@@ -1,7 +1,7 @@
 // export const baseurl = process.env.REACT_APP_BASE_URL;
 // export const baseurl = "http://192.168.123.33:2211"
-//export const baseurl = "http://localhost:2211"
- export const baseurl = "https://aved-node.onrender.com"
+// export const baseurl = "http://localhost:2211"
+export const baseurl = "https://aved-node.onrender.com"
 
 ///////////////////local///////////////
 // export const baseurl = "http://172.16.1.254:2154";
