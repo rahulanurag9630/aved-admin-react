@@ -229,6 +229,7 @@ const AddProperty = () => {
     description_ar: state?.overview_ar || "",
     detailDescription: state?.detailed_description || "",
     detailDescription_ar: state?.detailed_description_ar || "",
+    videoUrl: state.videoUrl || "",
     priceMin: state?.price_min?.toString() || state?.price || "",
     priceMax: state?.price_max?.toString() || "",
     apartmentNumber: state?.apartment_number || "",
@@ -241,7 +242,7 @@ const AddProperty = () => {
     propertyType: state?.property_type || "",
     listingType: state?.listing_type || "",
     availabilityStatus: state?.availability_status || "",
-    status: state?.status || "",
+    status: state?.publish_status || "",
     address: state?.address || "",
     latitude: state?.latitude?.toString() || "",
     longitude: state?.longitude?.toString() || "",
@@ -260,6 +261,7 @@ const AddProperty = () => {
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
+    console.log("clicking")
     try {
       const payload = {
         ...(location?.state?._id && { id: location.state._id }),
@@ -954,7 +956,7 @@ const AddProperty = () => {
                   onChange={handleChange}
                 />
                 <FormHelperText error>
-                  {touched.address && errors.address}
+                  {touched.videoUrl && errors.videoUrl}
                 </FormHelperText>
               </Grid>
               <Grid item xs={12}>
@@ -1185,6 +1187,7 @@ const AddProperty = () => {
                               (_, i) => i !== index
                             );
                             setFieldValue("landmarks", updatedLandmarks);
+                            console.log(errors)
                           }}
                           disabled={values.landmarks.length === 1}
                         >
@@ -1373,6 +1376,7 @@ const AddProperty = () => {
                   color="primary"
                   type="submit"
                   disabled={isSubmitting}
+                  onClick={() => console.log(errors)}
                 >
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
