@@ -177,7 +177,7 @@ const validationSchema = yup.object().shape({
     .min(3, "Meta tags must be at least 3 characters"),
 });
 
-const propertyTypes = ["Apartment", "Villa", "Studio"];
+const propertyTypes = ["Apartment", "Studio", "Plot", "Hotel", "Townhouse", "Office"];
 const tagOptions = ["For Sale", "For Rent", "New Launch"];
 
 const AddProperty = () => {
