@@ -154,7 +154,12 @@ const validationSchema = yup.object().shape({
     .of(
       yup.object().shape({
         floorDescription: yup.string().required("Floor description is required"),
-        floorPhoto: yup.string().required("Floor photo is required"),
+        floorPhoto: yup.string().optional(),
+        images: yup
+          .array()
+          .of(yup.string())
+          .optional()
+          .default([]),
       })
     )
     .min(1, "At least one floor is required"),
@@ -250,6 +255,7 @@ const AddProperty = () => {
     floorPlans: (state?.floor_plan || []).map((fp) => ({
       floorDescription: fp.description || "",
       floorPhoto: fp.photo || "",
+      images: fp.images || [],
     })),
     landmarks: (state?.landmarks || []).map((lm) => ({
       landmarkDescription: lm.description || "",
@@ -291,6 +297,7 @@ const AddProperty = () => {
         floor_plan: values.floorPlans.map((floor) => ({
           photo: floor.floorPhoto,
           description: floor.floorDescription,
+          images: floor.images || [],
         })),
         landmarks: values.landmarks.map((landmark) => ({
           photo: landmark.landmarkPhoto,
@@ -960,51 +967,141 @@ const AddProperty = () => {
                 </FormHelperText>
               </Grid>
               <Grid item xs={12}>
-                <Typography variant="h6">Floor Plans</Typography>
+                <Typography variant="h6" gutterBottom>
+                  Floor Plans
+                </Typography>
                 {values.floorPlans.map((floor, index) => (
                   <Box
                     key={index}
-                    mb={2}
+                    mb={3}
                     p={2}
                     border={1}
                     borderColor="grey.300"
                     borderRadius={4}
                     display="flex"
                     flexDirection={{ xs: "column", sm: "row" }}
-                    sx={{ gap: 20 }}
+                    gap={4}
                   >
-                    <Box flex={1} display="flex" flexDirection="column">
-                      <Typography variant="body2" color="secondary">{`Floor ${index + 1
-                        } Description`}</Typography>
-                      <TextField
-                        fullWidth
-                        multiline
-                        minRows={3}
-                        name={`floorPlans[${index}].floorDescription`}
-                        value={floor.floorDescription}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        error={Boolean(
-                          touched.floorPlans?.[index]?.floorDescription &&
-                          errors.floorPlans?.[index]?.floorDescription
+                    {/* LEFT: Floor Photo */}
+                    <Box flex={0.4}>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        position="relative"
+                        border={1}
+                        borderColor="grey.300"
+                        borderRadius={4}
+                        minHeight={220}
+                        overflow="hidden"
+                      >
+                        {!floor.floorPhoto ? (
+                          <>
+                            <input
+                              id={`floor-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updatedFloors = [...values.floorPlans];
+                                    updatedFloors[index].floorPhoto = uploadedUrl;
+                                    setFieldValue("floorPlans", updatedFloors);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`floor-photo-${index}`}
+                              style={{ cursor: "pointer", width: "100%", height: "100%" }}
+                            >
+                              <Box
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                justifyContent="center"
+                                width="100%"
+                                height="100%"
+                                bgcolor="grey.100"
+                                p={2}
+                              >
+                                <Avatar>
+                                  <FiUpload />
+                                </Avatar>
+                                <Typography variant="body2" mt={1}>
+                                  Upload Floor Photo
+                                </Typography>
+                              </Box>
+                            </label>
+                          </>
+                        ) : (
+                          <Box position="relative" width="100%" height="100%">
+                            <img
+                              src={floor.floorPhoto}
+                              alt={`floor-${index + 1}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: 4,
+                              }}
+                            />
+                            <input
+                              id={`floor-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updatedFloors = [...values.floorPlans];
+                                    updatedFloors[index].floorPhoto = uploadedUrl;
+                                    setFieldValue("floorPlans", updatedFloors);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`floor-photo-${index}`}
+                              style={{
+                                position: "absolute",
+                                bottom: 8,
+                                right: 8,
+                                background: "rgba(0,0,0,0.6)",
+                                color: "#fff",
+                                borderRadius: "50%",
+                                padding: 6,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <FiUpload />
+                            </label>
+                          </Box>
                         )}
-                        helperText={
-                          touched.floorPlans?.[index]?.floorDescription &&
-                          errors.floorPlans?.[index]?.floorDescription
-                        }
-                        variant="outlined"
-                        margin="dense"
-                      />
-                      <Box mt="auto" display="flex" justifyContent="flex-end">
+                      </Box>
+
+                      {touched.floorPlans?.[index]?.floorPhoto &&
+                        errors.floorPlans?.[index]?.floorPhoto && (
+                          <FormHelperText error>
+                            {errors.floorPlans[index].floorPhoto}
+                          </FormHelperText>
+                        )}
+
+                      <Box mt={2} display="flex" justifyContent="flex-end">
                         <Button
                           variant="outlined"
                           color="secondary"
                           startIcon={<FiTrash2 />}
-                          style={{ background: "red", color: "white !important" }}
+                          style={{ background: "red", color: "white" }}
                           onClick={() => {
-                            const updatedFloors = values.floorPlans.filter(
-                              (_, i) => i !== index
-                            );
+                            const updatedFloors = values.floorPlans.filter((_, i) => i !== index);
                             setFieldValue("floorPlans", updatedFloors);
                           }}
                           disabled={values.floorPlans.length === 1}
@@ -1013,112 +1110,106 @@ const AddProperty = () => {
                         </Button>
                       </Box>
                     </Box>
-                    <Box
-                      flex={1}
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      justifyContent="center"
-                      position="relative"
-                      border={1}
-                      borderColor="grey.300"
-                      borderRadius={4}
-                      overflow="hidden"
-                      minHeight={200}
-                    >
-                      {!floor.floorPhoto ? (
-                        <>
-                          <input
-                            id={`floor-photo-${index}`}
-                            type="file"
-                            accept="image/*"
-                            style={{ display: "none" }}
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const uploadedUrl = await uploadFile(file, setIsSubmitting);
-                                if (uploadedUrl) {
-                                  const updatedFloors = [...values.floorPlans];
-                                  updatedFloors[index].floorPhoto = uploadedUrl;
-                                  setFieldValue("floorPlans", updatedFloors);
-                                }
-                              }
-                            }}
-                          />
-                          <label
-                            htmlFor={`floor-photo-${index}`}
-                            className="displayCenter"
-                            style={{ cursor: "pointer", width: "100%", height: "100%" }}
+
+                    {/* RIGHT: Additional Images */}
+                    <Box flex={0.6}>
+                      <input
+                        id={`floor-images-${index}`}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files);
+                          const uploadedImageUrls = [];
+                          setIsSubmitting(true);
+                          for (const file of files) {
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) {
+                              uploadedImageUrls.push(uploadedUrl);
+                            }
+                          }
+                          const updatedFloors = [...values.floorPlans];
+                          updatedFloors[index].images = [
+                            ...(updatedFloors[index].images || []),
+                            ...uploadedImageUrls,
+                          ];
+                          setFieldValue("floorPlans", updatedFloors);
+                          setIsSubmitting(false);
+                        }}
+                      />
+                      <label
+                        htmlFor={`floor-images-${index}`}
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Avatar>
+                          <FiUpload />
+                        </Avatar>
+                        <Typography variant="body2" mt={1}>
+                          Upload Additional Images
+                        </Typography>
+                      </label>
+
+                      <Box
+                        display="flex"
+                        flexWrap="wrap"
+                        gap={2}
+                        mt={2}
+                        justifyContent="flex-start"
+                      >
+                        {(floor.images || []).map((img, i) => (
+                          <Box
+                            key={i}
+                            position="relative"
+                            width={150}
+                            height={150}
+                            borderRadius={2}
+                            marginRight={"3px"}
+                            overflow="hidden"
                           >
-                            <Box
-                              display="flex"
-                              flexDirection="column"
-                              alignItems="center"
-                              justifyContent="center"
-                              height="100%"
-                              width="100%"
-                              bgcolor="grey.100"
-                              p={2}
+                            <IconButton
+                              size="small"
+                              style={{
+                                position: "absolute",
+                                top: 4,
+                                right: 4,
+                                background: "rgba(0,0,0,0.5)",
+                                color: "white",
+                                zIndex: 1,
+                              }}
+                              onClick={() => {
+                                const updatedFloors = [...values.floorPlans];
+                                updatedFloors[index].images = updatedFloors[index].images.filter(
+                                  (_, imgIndex) => imgIndex !== i
+                                );
+                                setFieldValue("floorPlans", updatedFloors);
+                              }}
                             >
-                              <Avatar>
-                                <FiUpload />
-                              </Avatar>
-                              <Typography variant="body2" mt={1}>
-                                Upload Floor Photo
-                              </Typography>
-                            </Box>
-                          </label>
-                        </>
-                      ) : (
-                        <Box position="relative" width="100%" height="100%">
-                          <img
-                            src={floor.floorPhoto}
-                            alt={`floor-${index + 1}`}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              objectFit: "cover",
-                              borderRadius: 4,
-                            }}
-                          />
-                          <input
-                            id={`floor-photo-${index}`}
-                            type="file"
-                            accept="image/*"
-                            style={{ display: "none" }}
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const uploadedUrl = await uploadFile(file, setIsSubmitting);
-                                if (uploadedUrl) {
-                                  const updatedFloors = [...values.floorPlans];
-                                  updatedFloors[index].floorPhoto = uploadedUrl;
-                                  setFieldValue("floorPlans", updatedFloors);
-                                }
-                              }
-                            }}
-                          />
-                          <label
-                            htmlFor={`floor-photo-${index}`}
-                            style={{
-                              position: "absolute",
-                              bottom: 8,
-                              right: 8,
-                              background: "rgba(0,0,0,0.6)",
-                              color: "#fff",
-                              borderRadius: "50%",
-                              padding: 6,
-                              cursor: "pointer",
-                            }}
-                          >
-                            <FiUpload />
-                          </label>
-                        </Box>
-                      )}
-                      {touched.floorPlans?.[index]?.floorPhoto &&
-                        errors.floorPlans?.[index]?.floorPhoto && (
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                            <img
+                              src={img}
+                              alt={`floor-image-${index}-${i}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: 8,
+                              }}
+                            />
+                          </Box>
+                        ))}
+                      </Box>
+
+                      {touched.floorPlans?.[index]?.images &&
+                        errors.floorPlans?.[index]?.images && (
                           <FormHelperText error>
-                            {errors.floorPlans[index].floorPhoto}
+                            {errors.floorPlans[index].images}
                           </FormHelperText>
                         )}
                     </Box>
@@ -1131,7 +1222,7 @@ const AddProperty = () => {
                     onClick={() => {
                       setFieldValue("floorPlans", [
                         ...values.floorPlans,
-                        { floorDescription: "", floorPhoto: "" },
+                        { floorDescription: "", floorPhoto: "", images: [] },
                       ]);
                     }}
                   >

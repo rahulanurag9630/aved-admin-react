@@ -192,6 +192,9 @@ const AddBlog = () => {
                     config={{
                       readonly: isView || loading,
                       toolbar: !isView,
+                      askBeforePasteHTML: false,
+                      askBeforePasteFromWord: false,
+                      allowTabNavigation: true, // explicitly define this
                     }}
                     onBlur={(newContent) => setFieldValue("description", newContent)}
                   />
@@ -209,6 +212,9 @@ const AddBlog = () => {
                       toolbar: !isView,
                       direction: "rtl",
                       language: "ar",
+                      askBeforePasteHTML: false,
+                      askBeforePasteFromWord: false,
+                      allowTabNavigation: true, // explicitly define this
                     }}
                     onBlur={(newContent) => setFieldValue("description_ar", newContent)}
                   />
