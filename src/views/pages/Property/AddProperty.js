@@ -49,6 +49,8 @@ const validationSchema = yup.object().shape({
     .string()
     .required("Property name is required")
     .min(3, "Property name must be at least 3 characters"),
+  brochure: yup
+    .string(),
   propertyName_ar: yup
     .string()
     .required("Property name (Arabic) is required")
@@ -133,6 +135,10 @@ const validationSchema = yup.object().shape({
     .string()
     .required("Address is required")
     .min(5, "Address must be at least 5 characters"),
+  address_ar: yup
+    .string()
+    .required("Address is required")
+    .min(5, "Address must be at least 5 characters"),
   latitude: yup
     .string()
     .required("Latitude is required")
@@ -149,6 +155,10 @@ const validationSchema = yup.object().shape({
     .of(yup.mixed().required("Image is required"))
     .min(1, "At least one image is required")
     .required("Images are required"),
+  partners: yup
+    .array()
+    .of(yup.mixed())
+  ,
   floorPlans: yup
     .array()
     .of(
@@ -229,6 +239,7 @@ const AddProperty = () => {
   const initialValues = {
     ...(location?.state?._id && { id: location.state._id }),
     propertyName: state?.property_name || "",
+    brochure: state?.brochure || "",
     propertyName_ar: state?.property_name_ar || "",
     description: state?.overview || "",
     description_ar: state?.overview_ar || "",
@@ -249,9 +260,11 @@ const AddProperty = () => {
     availabilityStatus: state?.availability_status || "",
     status: state?.publish_status || "",
     address: state?.address || "",
+    address_ar: state?.address_ar || "",
     latitude: state?.latitude?.toString() || "",
     longitude: state?.longitude?.toString() || "",
     images: state?.images || [],
+    partners: state?.partners || [],
     floorPlans: (state?.floor_plan || []).map((fp) => ({
       floorDescription: fp.description || "",
       floorPhoto: fp.photo || "",
@@ -272,6 +285,7 @@ const AddProperty = () => {
       const payload = {
         ...(location?.state?._id && { id: location.state._id }),
         property_name: values.propertyName,
+        brochure: values.brochure,
         property_name_ar: values.propertyName_ar,
         overview: values.description,
         overview_ar: values.description_ar,
@@ -291,9 +305,11 @@ const AddProperty = () => {
         listing_type: values.listingType,
         availability_status: values.availabilityStatus,
         address: values.address,
+        address_ar: values.address_ar,
         latitude: values.latitude,
         longitude: values.longitude,
         images: values.images,
+        partners: values.partners,
         floor_plan: values.floorPlans.map((floor) => ({
           photo: floor.floorPhoto,
           description: floor.floorDescription,
@@ -446,6 +462,11 @@ const AddProperty = () => {
                   fullWidth
                   multiline
                   minRows={3}
+                  inputProps={{
+                    style: { textAlign: "right" },
+                    dir: "rtl",
+                    lang: "ar",
+                  }}
                   name="description_ar"
                   variant="outlined"
                   value={values.description_ar}
@@ -681,6 +702,129 @@ const AddProperty = () => {
                   {touched.parkingSpace && errors.parkingSpace}
                 </FormHelperText>
               </Grid>
+              <Grid item xs={12} mt={2}>
+                <Typography variant="body2" color="secondary">
+                  Brochure
+                </Typography>
+                <Box className={classes.imageUploadBox}>
+                  <input
+                    id="brochure-upload"
+                    type="file"
+                    accept="application/pdf"
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      setIsSubmitting(true);
+                      const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                      if (uploadedUrl) {
+                        setFieldValue("brochure", uploadedUrl); // storing single brochure link
+                      }
+                      setIsSubmitting(false);
+                    }}
+                  />
+                  <label
+                    htmlFor="brochure-upload"
+                    className="displayCenter"
+                    style={{ flexDirection: "column" }}
+                  >
+                    <Avatar>
+                      <FiUpload />
+                    </Avatar>
+                    <Typography variant="body2" style={{ marginTop: 8 }}>
+                      Click to upload brochure (PDF)
+                    </Typography>
+                  </label>
+
+                  {values.brochure && (
+                    <Box mt={2} className={classes.previewImageWrapper}>
+                      <IconButton
+                        className={classes.removeIcon}
+                        onClick={() => setFieldValue("brochure", "")}
+                        size="small"
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                      <iframe
+                        src={values.brochure}
+                        width="100%"
+                        height="400px"
+                        title="Brochure Preview"
+                        style={{ border: "1px solid #ccc", borderRadius: 4 }}
+                      />
+                    </Box>
+                  )}
+
+                  <FormHelperText error>
+                    {touched.brochure && errors.brochure}
+                  </FormHelperText>
+                </Box>
+              </Grid>
+              <Grid item xs={12} mt={2}>
+                <Typography variant="body2" color="secondary">
+                  Partner Images
+                </Typography>
+                <Box className={classes.imageUploadBox}>
+                  <input
+                    id="partner-upload"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files);
+                      const uploadedPartnerUrls = [];
+                      setIsSubmitting(true);
+                      for (const file of files) {
+                        const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                        if (uploadedUrl) {
+                          uploadedPartnerUrls.push(uploadedUrl);
+                        }
+                      }
+                      setFieldValue("partners", [...(values.partners || []), ...uploadedPartnerUrls]);
+                      setIsSubmitting(false);
+                    }}
+                  />
+                  <label
+                    htmlFor="partner-upload"
+                    className="displayCenter"
+                    style={{ flexDirection: "column" }}
+                  >
+                    <Avatar>
+                      <FiUpload />
+                    </Avatar>
+                    <Typography variant="body2" style={{ marginTop: 8 }}>
+                      Click to upload partner images
+                    </Typography>
+                  </label>
+
+                  <Box display="flex" flexWrap="wrap" mt={2}>
+                    {(values.partners || []).map((img, i) => (
+                      <Box key={i} className={classes.previewImageWrapper}>
+                        <IconButton
+                          className={classes.removeIcon}
+                          onClick={() => {
+                            const updatedPartners = values.partners.filter((_, index) => index !== i);
+                            setFieldValue("partners", updatedPartners);
+                          }}
+                          size="small"
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                        <img
+                          src={img}
+                          alt={`partner-${i}`}
+                          className={classes.previewImage}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+
+                  <FormHelperText error>
+                    {touched.partners && errors.partners}
+                  </FormHelperText>
+                </Box>
+              </Grid>
 
               <Grid item xs={12}>
                 <Typography variant="h6" color="secondary" gutterBottom>
@@ -833,6 +977,26 @@ const AddProperty = () => {
                 />
                 <FormHelperText error>
                   {touched.address && errors.address}
+                </FormHelperText>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="secondary" dir="rtl">
+                  العنوان
+                </Typography>
+                <TextField
+                  fullWidth
+                  name="address_ar"
+                  variant="outlined"
+                  inputProps={{
+                    style: { textAlign: "right" },
+                    dir: "rtl",
+                    lang: "ar",
+                  }}
+                  value={values.address_ar}
+                  onChange={handleChange}
+                />
+                <FormHelperText error>
+                  {touched.address_ar && errors.address_ar}
                 </FormHelperText>
               </Grid>
               <Grid item xs={6}>
