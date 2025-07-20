@@ -13,6 +13,7 @@ const ApiConfig = {
   login: `${base}/admin/login`,
   getAdminDetails: `${base}/admin/getAdminDetails`,
   updateAdminDetails: `${base}/admin/updateAdminDetails`,
+  updateTeamOrder: `${base}/admin/updateTeamOrder`,
 
 
   getProfile: `${base}/admin/getProfile`,
