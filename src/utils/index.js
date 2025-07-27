@@ -580,6 +580,34 @@ const uploadFile = async (file, setLoading) => {
     setLoading(false)
   }
 }
+export const uploadFiles = async (files, setLoading) => {
+  try {
+    setLoading(true);
+
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append("files", file); // ✅ Append each file under the same key
+    }
+
+    const res = await apiRouterCall({
+      method: "POST",
+      endPoint: "uploadMultipleFiles",
+      bodyData: formData,
+    });
+
+    if (res?.data?.responseCode === 200) {
+      return res.data.result;
+    } else {
+      toast.error(res?.data?.responseMessage || "Error while uploading file");
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong while uploading.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 export function formatDate(isoDate) {
   const date = new Date(isoDate);

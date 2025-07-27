@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload, FiTrash2 } from "react-icons/fi";
-import uploadFile, { getBase64 } from "src/utils";
+import uploadFile, { getBase64, uploadFiles } from "src/utils";
 import JoditEditor from "jodit-react";
 import { useLocation, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { debounce } from "lodash";
@@ -1063,16 +1063,18 @@ const AddProperty = () => {
                     multiple
                     style={{ display: "none" }}
                     onChange={async (e) => {
-                      const files = Array.from(e.target.files);
-                      const uploadedImageUrls = [];
+                      const files = Array.from(e.target.files); // multiple files
+
+                      console.log(files)
+                      if (!files.length) return;
+
                       setIsSubmitting(true);
-                      for (const file of files) {
-                        const uploadedUrl = await uploadFile(file, setIsSubmitting);
-                        if (uploadedUrl) {
-                          uploadedImageUrls.push(uploadedUrl);
-                        }
+
+                      const uploadedUrls = await uploadFiles(files, setIsSubmitting); // ✅ use multi-upload
+                      if (uploadedUrls && uploadedUrls.length) {
+                        setFieldValue("images", [...values.images, ...uploadedUrls]);
                       }
-                      setFieldValue("images", [...values.images, ...uploadedImageUrls]);
+
                       setIsSubmitting(false);
                     }}
                   />
@@ -1088,6 +1090,7 @@ const AddProperty = () => {
                       Click to upload images (First image will be Thumbnail image)
                     </Typography>
                   </label>
+
                   <Box display="flex" flexWrap="wrap" mt={2}>
                     {values.images.map((img, i) => (
                       <Box key={i} className={classes.previewImageWrapper}>
@@ -1115,6 +1118,7 @@ const AddProperty = () => {
                   </FormHelperText>
                 </Box>
               </Grid>
+
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
                   Video URL
