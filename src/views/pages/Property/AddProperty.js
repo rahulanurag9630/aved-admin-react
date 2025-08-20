@@ -109,8 +109,10 @@ const validationSchema = yup.object().shape({
   amenities: yup.array().of(yup.string()).nullable().default([]),
   area: yup
     .number()
+    .typeError("Area must be a valid number")
     .nullable()
     .min(0, "Area must be a positive number"),
+
   parkingSpace: yup
     .string()
     .oneOf(["Yes", "No"], "Parking space must be either 'Yes' or 'No'")
@@ -155,6 +157,16 @@ const validationSchema = yup.object().shape({
     .of(yup.mixed().required("Image is required"))
     .min(1, "At least one image is required")
     .required("Images are required"),
+  interiorDesign: yup
+    .array()
+    .of(yup.mixed().required("Interior Design is required"))
+    .min(1, "At least one Interior Design is required")
+    .required("Interior Design are required"),
+  exteriorDesign: yup
+    .array()
+    .of(yup.mixed().required("Exterior Design is required"))
+    .min(1, "At least one Exterior Design is required")
+    .required("Exterior Design are required"),
   partners: yup
     .array()
     .of(yup.mixed())
@@ -163,8 +175,8 @@ const validationSchema = yup.object().shape({
     .array()
     .of(
       yup.object().shape({
-        floorDescription: yup.string().required("Floor description is required"),
-        floorPhoto: yup.string().optional(),
+        floorDescription: yup.string(),
+        floorPhoto: yup.string().required("floor plan photo is required"),
         images: yup
           .array()
           .of(yup.string())
@@ -173,15 +185,15 @@ const validationSchema = yup.object().shape({
       })
     )
     .min(1, "At least one floor is required"),
-  landmarks: yup
-    .array()
-    .of(
-      yup.object().shape({
-        landmarkDescription: yup.string().required("Landmark description is required"),
-        landmarkPhoto: yup.string().required("Landmark photo is required"),
-      })
-    )
-    .min(1, "At least one landmark is required"),
+  // landmarks: yup
+  //   .array()
+  //   .of(
+  //     yup.object().shape({
+  //       landmarkDescription: yup.string().required("Landmark description is required"),
+  //       landmarkPhoto: yup.string().required("Landmark photo is required"),
+  //     })
+  //   )
+  //   .min(1, "At least one landmark is required"),
   metaTitle: yup
     .string()
     .required("Meta title is required")
@@ -192,7 +204,7 @@ const validationSchema = yup.object().shape({
     .min(3, "Meta tags must be at least 3 characters"),
 });
 
-const propertyTypes = ["Apartment", "Studio", "Plot", "Hotel", "Townhouse", "Office"];
+const propertyTypes = ["Villa", "Apartment", "Studio", "Plot", "Hotel", "Townhouse", "Office"];
 const tagOptions = ["For Sale", "For Rent", "New Launch"];
 
 const AddProperty = () => {
@@ -264,25 +276,29 @@ const AddProperty = () => {
     latitude: state?.latitude?.toString() || "",
     longitude: state?.longitude?.toString() || "",
     images: state?.images || [],
+    interiorDesign: state?.interiorDesign || [],
+    exteriorDesign: state?.exteriorDesign || [],
     partners: state?.partners || [],
     floorPlans: (state?.floor_plan || []).map((fp) => ({
       floorDescription: fp.description || "",
       floorPhoto: fp.photo || "",
       images: fp.images || [],
     })),
-    landmarks: (state?.landmarks || []).map((lm) => ({
-      landmarkDescription: lm.description || "",
-      landmarkPhoto: lm.photo || "",
-    })),
+    // landmarks: (state?.landmarks || []).map((lm) => ({
+    //   landmarkDescription: lm.description || "",
+    //   landmarkPhoto: lm.photo || "",
+    // })),
     metaTitle: state?.seo_meta_titles || "",
     metaTags: state?.seo_meta_tags || "",
   };
 
   const handleSubmit = async (values) => {
     setIsSubmitting(true);
-    console.log("clicking")
+    console.log("clicking");
+
     try {
-      const payload = {
+      // Build the base payload
+      let payload = {
         ...(location?.state?._id && { id: location.state._id }),
         property_name: values.propertyName,
         brochure: values.brochure,
@@ -309,21 +325,33 @@ const AddProperty = () => {
         latitude: values.latitude,
         longitude: values.longitude,
         images: values.images,
+        interiorDesign: values.interiorDesign,
+        exteriorDesign: values.exteriorDesign,
         partners: values.partners,
-        floor_plan: values.floorPlans.map((floor) => ({
+        floor_plan: values.floorPlans?.map((floor) => ({
           photo: floor.floorPhoto,
-          description: floor.floorDescription,
           images: floor.images || [],
         })),
-        landmarks: values.landmarks.map((landmark) => ({
-          photo: landmark.landmarkPhoto,
-          description: landmark.landmarkDescription,
-        })),
+        // landmarks: values.landmarks?.map((landmark) => ({
+        //   photo: landmark.landmarkPhoto,
+        //   description: landmark.landmarkDescription,
+        // })),
         seo_meta_titles: values.metaTitle,
         seo_meta_tags: values.metaTags,
-        no_of_floors: values.floorPlans.length,
+        no_of_floors: values.floorPlans?.length,
         publish_status: values.status,
       };
+
+      // 🔍 Remove empty/null/undefined fields
+      payload = Object.fromEntries(
+        Object.entries(payload).filter(
+          ([_, value]) =>
+            value !== undefined &&
+            value !== null &&
+            (typeof value !== "string" || value.trim() !== "") &&
+            (!Array.isArray(value) || value.length > 0)
+        )
+      );
 
       const res = await apiRouterCall({
         method: "POST",
@@ -1057,21 +1085,19 @@ const AddProperty = () => {
                 </Typography>
                 <Box className={classes.imageUploadBox}>
                   <input
-                    id="image-upload"
+                    id="image-upload-images"
                     type="file"
                     accept="image/*"
                     multiple
                     style={{ display: "none" }}
                     onChange={async (e) => {
-                      const files = Array.from(e.target.files); // multiple files
-
-                      console.log(files)
+                      const files = Array.from(e.target.files);
                       if (!files.length) return;
 
                       setIsSubmitting(true);
 
-                      const uploadedUrls = await uploadFiles(files, setIsSubmitting); // ✅ use multi-upload
-                      if (uploadedUrls && uploadedUrls.length) {
+                      const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                      if (uploadedUrls?.length) {
                         setFieldValue("images", [...values.images, ...uploadedUrls]);
                       }
 
@@ -1079,7 +1105,7 @@ const AddProperty = () => {
                     }}
                   />
                   <label
-                    htmlFor="image-upload"
+                    htmlFor="image-upload-images"
                     className="displayCenter"
                     style={{ flexDirection: "column" }}
                   >
@@ -1118,6 +1144,139 @@ const AddProperty = () => {
                   </FormHelperText>
                 </Box>
               </Grid>
+
+              <Grid item xs={12} mt={2}>
+                <Typography variant="body2" color="secondary">
+                  Interior Design
+                </Typography>
+                <Box className={classes.imageUploadBox}>
+                  <input
+                    id="image-upload-interior"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files);
+                      if (!files.length) return;
+
+                      setIsSubmitting(true);
+
+                      const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                      if (uploadedUrls?.length) {
+                        setFieldValue("interiorDesign", [...values.interiorDesign, ...uploadedUrls]);
+                      }
+
+                      setIsSubmitting(false);
+                    }}
+                  />
+                  <label
+                    htmlFor="image-upload-interior"
+                    className="displayCenter"
+                    style={{ flexDirection: "column" }}
+                  >
+                    <Avatar>
+                      <FiUpload />
+                    </Avatar>
+                    <Typography variant="body2" style={{ marginTop: 8 }}>
+                      Click to upload Interior Design
+                    </Typography>
+                  </label>
+
+                  <Box display="flex" flexWrap="wrap" mt={2}>
+                    {values.interiorDesign.map((img, i) => (
+                      <Box key={i} className={classes.previewImageWrapper}>
+                        <IconButton
+                          className={classes.removeIcon}
+                          onClick={() => {
+                            const updatedImages = values.interiorDesign.filter((_, index) => index !== i);
+                            setFieldValue("interiorDesign", updatedImages);
+                          }}
+                          size="small"
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                        <img
+                          src={img}
+                          alt={`preview-${i}`}
+                          className={classes.previewImage}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+
+                  <FormHelperText error>
+                    {touched.interiorDesign && errors.interiorDesign}
+                  </FormHelperText>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} mt={2}>
+                <Typography variant="body2" color="secondary">
+                  Exterior Design
+                </Typography>
+                <Box className={classes.imageUploadBox}>
+                  <input
+                    id="image-upload-exterior"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const files = Array.from(e.target.files);
+                      if (!files.length) return;
+
+                      setIsSubmitting(true);
+
+                      const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                      if (uploadedUrls?.length) {
+                        setFieldValue("exteriorDesign", [...values.exteriorDesign, ...uploadedUrls]);
+                      }
+
+                      setIsSubmitting(false);
+                    }}
+                  />
+                  <label
+                    htmlFor="image-upload-exterior"
+                    className="displayCenter"
+                    style={{ flexDirection: "column" }}
+                  >
+                    <Avatar>
+                      <FiUpload />
+                    </Avatar>
+                    <Typography variant="body2" style={{ marginTop: 8 }}>
+                      Click to upload Exterior Design
+                    </Typography>
+                  </label>
+
+                  <Box display="flex" flexWrap="wrap" mt={2}>
+                    {values.exteriorDesign.map((img, i) => (
+                      <Box key={i} className={classes.previewImageWrapper}>
+                        <IconButton
+                          className={classes.removeIcon}
+                          onClick={() => {
+                            const updatedImages = values.exteriorDesign.filter((_, index) => index !== i);
+                            setFieldValue("exteriorDesign", updatedImages);
+                          }}
+                          size="small"
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                        <img
+                          src={img}
+                          alt={`preview-${i}`}
+                          className={classes.previewImage}
+                        />
+                      </Box>
+                    ))}
+                  </Box>
+
+                  <FormHelperText error>
+                    {touched.exteriorDesign && errors.exteriorDesign}
+                  </FormHelperText>
+                </Box>
+              </Grid>
+
 
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
@@ -1399,7 +1558,7 @@ const AddProperty = () => {
                 )}
               </Grid>
 
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Typography variant="h6">Landmarks</Typography>
                 {values.landmarks.map((landmark, index) => (
                   <Box
@@ -1579,7 +1738,7 @@ const AddProperty = () => {
                     {state?.edit ? "Update" : "Add Landmark"}
                   </Button>
                 )}
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12} mt={2}>
                 <Typography variant="h6" color="secondary" gutterBottom>
@@ -1635,7 +1794,47 @@ const AddProperty = () => {
                   color="primary"
                   type="submit"
                   disabled={isSubmitting}
-                  onClick={() => console.log(errors)}
+                  onClick={() => {
+                    const keys = Object.keys(errors);
+
+                    if (keys.length > 0) {
+                      const firstKey = keys[0];
+                      const firstError = errors[firstKey];
+
+                      let firstErrorMessage = "";
+
+                      if (typeof firstError === "string") {
+                        firstErrorMessage = firstError;
+                      } else if (typeof firstError === "object" && firstError !== null) {
+                        // Try to extract nested message (array or object)
+                        const nestedKey = Object.keys(firstError)[0];
+                        const nestedValue = firstError[nestedKey];
+
+                        if (typeof nestedValue === "string") {
+                          firstErrorMessage = nestedValue;
+                        } else if (Array.isArray(nestedValue)) {
+                          // Handle array of objects, like floorPlans[0].images
+                          const inner = nestedValue?.[0];
+                          if (typeof inner === "string") {
+                            firstErrorMessage = inner;
+                          } else if (typeof inner === "object") {
+                            const deepKey = Object.keys(inner || {})[0];
+                            firstErrorMessage = inner?.[deepKey];
+                          }
+                        }
+                      }
+
+                      // Fallback if no clean message found
+                      if (!firstErrorMessage) {
+                        firstErrorMessage = "Please check the form for errors.";
+                      }
+
+                      toast.error(firstErrorMessage);
+                    }
+                  }}
+
+
+
                 >
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </Button>
