@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Button,
 } from "@material-ui/core";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
@@ -22,6 +23,7 @@ import MostViewedProperty from "./MostViewedProperty";
 import RecentalyAddedProperty from "./RecentalyAddedProperty";
 import DailyPropertyViewChart from "./DailyPropertyViewChart";
 import MonthlyPropertyViewChart from "./MonthlyPropertyViews";
+import toast from "react-hot-toast";
 
 const useStyles = makeStyles((theme) => ({
   dashboardBox: {
@@ -116,6 +118,49 @@ export default function DashdoardHome() {
   const [dashboardData, setDashboardData] = useState();
   const [tradingDashboardData, setTradingDashboardData] = useState();
   const [arrayData, setArrayData] = useState([])
+  const [selectedColor, setSelectedColor] = useState("#000000");
+  const [colorId, setColorId] = useState("");
+
+  // ✅ Fetch current color
+  const fetchColor = async () => {
+    try {
+      const response = await apiRouterCall({
+        method: "GET",
+        endPoint: "getColor",
+      });
+
+      if (response?.data?.responseCode === 200) {
+        setSelectedColor(response?.data?.result?.code || "#000000");
+        setColorId(response?.data?.result?._id);
+      }
+    } catch (error) {
+      console.error("Error fetching color:", error);
+    }
+  };
+
+  // ✅ Update color
+  const updateThemeColor = async () => {
+    try {
+      const response = await apiRouterCall({
+        method: "PUT",
+        endPoint: "updateColor",
+        bodyData: {
+          colorId: colorId,
+          code: selectedColor,
+        },
+      });
+
+      if (response?.data?.responseCode === 200) {
+        toast.success("Color updated successfully!");
+      }
+    } catch (error) {
+      console.error("Error updating color:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchColor();
+  }, []);
 
 
   const getDashboardData = async (source) => {
@@ -243,6 +288,53 @@ export default function DashdoardHome() {
                 </Box>
               </Grid>
             ))}
+          <Grid item xs={12} sm={6} md={4}>
+            <Box
+              className="countBox1"
+              align="left"
+              style={{ background: "#e0f7fa", height: "80%" }}
+            >
+              <Typography
+                variant="h6"
+                style={{
+                  color: "#000 !important",
+                  marginTop: "10px",
+                  fontWeight: "600",
+                }}
+              >
+                Theme Color
+              </Typography>
+
+              <Box mt={2} display="flex" alignItems="center" gap="10px">
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)} // ✅ always HEX
+                  style={{
+                    width: "50px",
+                    height: "40px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                />
+                <Typography variant="body2" style={{ fontWeight: 600 }}>
+                  {selectedColor}
+                </Typography>
+              </Box>
+
+              <Box mt={2}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={updateThemeColor}
+                >
+                  Update
+                </Button>
+              </Box>
+            </Box>
+          </Grid>
+
+
           {isLoading &&
             Array.from({ length: 13 }).map((_) => {
               return (

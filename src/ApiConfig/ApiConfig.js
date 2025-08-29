@@ -1,8 +1,8 @@
 // export const baseurl = process.env.REACT_APP_BASE_URL;
 // export const baseurl = "http://192.168.123.33:2211"
-export const baseurl = "http://localhost:2211"
+// export const baseurl = "http://localhost:2211"
 // export const baseurl = "http://3.20.115.19:2211"
-// export const baseurl = "https://api.aved-sa.com"   // live
+export const baseurl = "https://api.aved-sa.com"   // live
 // export const baseurl = "https://aved-node.onrender.com"  // development production
 
 ///////////////////local///////////////
@@ -61,6 +61,8 @@ const ApiConfig = {
   userDepositData: `${base}/admin/userDepositData`,
   poolData: `${base}/admin/poolData`,
   editUser: `${base}/admin/editUser`,
+  getColor: `${base}/admin/getColor`,
+  updateColor: `${base}/admin/updateColor`,
 
   /////////////User////////////////////////
   checkEmail: `${base}/user/checkEmail`,

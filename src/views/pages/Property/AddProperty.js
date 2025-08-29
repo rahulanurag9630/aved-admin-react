@@ -24,7 +24,8 @@ import { debounce } from "lodash";
 import { apiRouterCall } from "../../../ApiConfig/service/index";
 import toast from "react-hot-toast";
 import FullScreenLoader from "../../../component/FullScreenLoader";
-
+import ObjectViewer from "../../../component/ObjectViewer";
+import Loader from "../../../component/Loader";
 const useStyles = makeStyles((theme) => ({
   formWrapper: {
     padding: theme.spacing(4),
@@ -185,7 +186,31 @@ const validationSchema = yup.object().shape({
       })
     )
     .min(1, "At least one floor is required"),
-  // landmarks: yup
+  bathrooms: yup
+    .array()
+    .of(
+      yup.object().shape({
+        photo: yup.string().optional(),
+        images: yup
+          .array()
+          .of(yup.string())
+          .optional()
+          .default([]),
+      })
+    )
+  , bedrooms: yup
+    .array()
+    .of(
+      yup.object().shape({
+        photo: yup.string().optional(),
+        images: yup
+          .array()
+          .of(yup.string())
+          .optional()
+          .default([]),
+      })
+    )
+  ,  // landmarks: yup
   //   .array()
   //   .of(
   //     yup.object().shape({
@@ -216,6 +241,8 @@ const AddProperty = () => {
   const isEdit = location?.state?.isEdit;
   const [amenitiesOptions, setAmenitiesOptions] = useState([]);
   const history = useHistory();
+  const [objectUrl, setObjectUrl] = useState(location?.state?.virtualTour || "");
+
 
   const editorRefEn = useRef(null);
   const editorRefAr = useRef(null);
@@ -247,6 +274,7 @@ const AddProperty = () => {
   }, []);
 
   const state = location?.state || {};
+
 
   const initialValues = {
     ...(location?.state?._id && { id: location.state._id }),
@@ -282,6 +310,14 @@ const AddProperty = () => {
     floorPlans: (state?.floor_plan || []).map((fp) => ({
       floorDescription: fp.description || "",
       floorPhoto: fp.photo || "",
+      images: fp.images || [],
+    })),
+    bedrooms: (state?.bedrooms || []).map((fp) => ({
+      photo: fp.photo || "",
+      images: fp.images || [],
+    })),
+    bathrooms: (state?.bathrooms || []).map((fp) => ({
+      photo: fp.photo || "",
       images: fp.images || [],
     })),
     // landmarks: (state?.landmarks || []).map((lm) => ({
@@ -332,6 +368,14 @@ const AddProperty = () => {
           photo: floor.floorPhoto,
           images: floor.images || [],
         })),
+        bedrooms: values.bedrooms?.map((floor) => ({
+          photo: floor.photo,
+          images: floor.images || [],
+        })),
+        bathrooms: values.bathrooms?.map((floor) => ({
+          photo: floor.photo,
+          images: floor.images || [],
+        })),
         // landmarks: values.landmarks?.map((landmark) => ({
         //   photo: landmark.landmarkPhoto,
         //   description: landmark.landmarkDescription,
@@ -340,6 +384,7 @@ const AddProperty = () => {
         seo_meta_tags: values.metaTags,
         no_of_floors: values.floorPlans?.length,
         publish_status: values.status,
+        virtualTour: objectUrl
       };
 
       // 🔍 Remove empty/null/undefined fields
@@ -432,6 +477,7 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter property name"
                   name="propertyName"
                   variant="outlined"
                   value={values.propertyName}
@@ -449,6 +495,8 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="أدخل اسم العقار"   // ✅ Arabic placeholder
+
                   name="propertyName_ar"
                   inputProps={{
                     style: { textAlign: "right" },
@@ -471,6 +519,8 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter property overview"   // ✅ English placeholder
+
                   multiline
                   minRows={3}
                   name="description"
@@ -490,6 +540,8 @@ const AddProperty = () => {
                   fullWidth
                   multiline
                   minRows={3}
+                  placeholder="أدخل نظرة عامة عن العقار"
+
                   inputProps={{
                     style: { textAlign: "right" },
                     dir: "rtl",
@@ -566,6 +618,8 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter minimum price"
+
                   name="priceMin"
                   variant="outlined"
                   type="number"
@@ -582,6 +636,8 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter maximum price"
+
                   name="priceMax"
                   variant="outlined"
                   type="number"
@@ -599,6 +655,8 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="apartmentNumber"
+                  placeholder="Enter apartment number"
+
                   variant="outlined"
                   value={values.apartmentNumber}
                   onChange={handleChange}
@@ -615,6 +673,8 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter number of bedrooms"
+
                   type="number"
                   name="noOfBedrooms"
                   variant="outlined"
@@ -632,6 +692,8 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   type="number"
+                  placeholder="Enter number of bathrooms"
+
                   name="noOfBathrooms"
                   variant="outlined"
                   value={values.noOfBathrooms}
@@ -648,6 +710,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   type="number"
+                  placeholder="Enter year of built"
                   name="yearBuilt"
                   variant="outlined"
                   value={values.yearBuilt}
@@ -668,6 +731,7 @@ const AddProperty = () => {
                   variant="outlined"
                   value={values.amenities}
                   onChange={handleChange}
+                  displayEmpty
                   SelectProps={{
                     multiple: true,
                     MenuProps: {
@@ -683,22 +747,28 @@ const AddProperty = () => {
                     },
                   }}
                 >
+                  <MenuItem disabled value="">
+                    Select amenities
+                  </MenuItem>
                   {amenitiesOptions.map((amenity) => (
                     <MenuItem key={amenity._id} value={amenity._id}>
                       {amenity.title}
                     </MenuItem>
                   ))}
                 </TextField>
+
                 <FormHelperText>
                   {touched.amenities && errors.amenities}
                 </FormHelperText>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
-                  Area (sq ft)
+                  Area (m²)
                 </Typography>
+
                 <TextField
                   fullWidth
+                  placeholder="Please enter area"
                   name="area"
                   variant="outlined"
                   value={values.area}
@@ -792,7 +862,42 @@ const AddProperty = () => {
                 <Typography variant="body2" color="secondary">
                   Partner Images
                 </Typography>
-                <Box className={classes.imageUploadBox}>
+                <Box
+                  className={classes.imageUploadBox}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "2px dashed #1976d2";
+                    e.currentTarget.style.backgroundColor = "#f0f8ff";
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+
+                    const files = Array.from(e.dataTransfer.files).filter((file) =>
+                      file.type.startsWith("image/")
+                    );
+
+                    const uploadedPartnerUrls = [];
+                    setIsSubmitting(true);
+                    for (const file of files) {
+                      const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                      if (uploadedUrl) {
+                        uploadedPartnerUrls.push(uploadedUrl);
+                      }
+                    }
+                    setFieldValue("partners", [...(values.partners || []), ...uploadedPartnerUrls]);
+                    setIsSubmitting(false);
+                  }}
+                >
                   <input
                     id="partner-upload"
                     type="file"
@@ -816,13 +921,13 @@ const AddProperty = () => {
                   <label
                     htmlFor="partner-upload"
                     className="displayCenter"
-                    style={{ flexDirection: "column" }}
+                    style={{ flexDirection: "column", cursor: "pointer" }}
                   >
                     <Avatar>
                       <FiUpload />
                     </Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>
-                      Click to upload partner images
+                      Click or Drag & Drop images here
                     </Typography>
                   </label>
 
@@ -852,6 +957,7 @@ const AddProperty = () => {
                     {touched.partners && errors.partners}
                   </FormHelperText>
                 </Box>
+
               </Grid>
 
               <Grid item xs={12}>
@@ -998,6 +1104,7 @@ const AddProperty = () => {
                 </Typography>
                 <TextField
                   fullWidth
+                  placeholder="Enter address"
                   name="address"
                   variant="outlined"
                   value={values.address}
@@ -1014,6 +1121,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="address_ar"
+                  placeholder="أدخل العنوان"
                   variant="outlined"
                   inputProps={{
                     style: { textAlign: "right" },
@@ -1034,6 +1142,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="latitude"
+                  placeholder="Enter latitude"
                   variant="outlined"
                   value={values.latitude}
                   onChange={handleChange}
@@ -1049,6 +1158,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="longitude"
+                  placeholder="Enter longitude"
                   variant="outlined"
                   value={values.longitude}
                   onChange={handleChange}
@@ -1083,7 +1193,41 @@ const AddProperty = () => {
                 <Typography variant="body2" color="secondary">
                   Images
                 </Typography>
-                <Box className={classes.imageUploadBox}>
+                <Box
+                  className={classes.imageUploadBox}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "2px dashed #1976d2";
+                    e.currentTarget.style.backgroundColor = "#f0f8ff";
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+
+                    const files = Array.from(e.dataTransfer.files).filter((file) =>
+                      file.type.startsWith("image/")
+                    );
+
+                    if (!files.length) return;
+                    setIsSubmitting(true);
+
+                    const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                    if (uploadedUrls?.length) {
+                      setFieldValue("images", [...values.images, ...uploadedUrls]);
+                    }
+
+                    setIsSubmitting(false);
+                  }}
+                >
                   <input
                     id="image-upload-images"
                     type="file"
@@ -1107,13 +1251,13 @@ const AddProperty = () => {
                   <label
                     htmlFor="image-upload-images"
                     className="displayCenter"
-                    style={{ flexDirection: "column" }}
+                    style={{ flexDirection: "column", cursor: "pointer" }}
                   >
                     <Avatar>
                       <FiUpload />
                     </Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>
-                      Click to upload images (First image will be Thumbnail image)
+                      Click or Drag & Drop images here (First image will be Thumbnail)
                     </Typography>
                   </label>
 
@@ -1143,13 +1287,46 @@ const AddProperty = () => {
                     {touched.images && errors.images}
                   </FormHelperText>
                 </Box>
+
               </Grid>
 
               <Grid item xs={12} mt={2}>
                 <Typography variant="body2" color="secondary">
                   Interior Design
                 </Typography>
-                <Box className={classes.imageUploadBox}>
+                <Box
+                  className={classes.imageUploadBox}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "2px dashed #1976d2";
+                    e.currentTarget.style.backgroundColor = "#f0f8ff";
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+
+                    const files = Array.from(e.dataTransfer.files).filter((file) =>
+                      file.type.startsWith("image/")
+                    );
+                    if (!files.length) return;
+
+                    setIsSubmitting(true);
+                    const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                    if (uploadedUrls?.length) {
+                      setFieldValue("interiorDesign", [...values.interiorDesign, ...uploadedUrls]);
+                    }
+                    setIsSubmitting(false);
+                  }}
+                >
                   <input
                     id="image-upload-interior"
                     type="file"
@@ -1161,25 +1338,23 @@ const AddProperty = () => {
                       if (!files.length) return;
 
                       setIsSubmitting(true);
-
                       const uploadedUrls = await uploadFiles(files, setIsSubmitting);
                       if (uploadedUrls?.length) {
                         setFieldValue("interiorDesign", [...values.interiorDesign, ...uploadedUrls]);
                       }
-
                       setIsSubmitting(false);
                     }}
                   />
                   <label
                     htmlFor="image-upload-interior"
                     className="displayCenter"
-                    style={{ flexDirection: "column" }}
+                    style={{ flexDirection: "column", cursor: "pointer" }}
                   >
                     <Avatar>
                       <FiUpload />
                     </Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>
-                      Click to upload Interior Design
+                      Click or Drag & Drop Interior Design images
                     </Typography>
                   </label>
 
@@ -1198,7 +1373,7 @@ const AddProperty = () => {
                         </IconButton>
                         <img
                           src={img}
-                          alt={`preview-${i}`}
+                          alt={`interior-${i}`}
                           className={classes.previewImage}
                         />
                       </Box>
@@ -1209,13 +1384,46 @@ const AddProperty = () => {
                     {touched.interiorDesign && errors.interiorDesign}
                   </FormHelperText>
                 </Box>
+
               </Grid>
 
               <Grid item xs={12} mt={2}>
                 <Typography variant="body2" color="secondary">
                   Exterior Design
                 </Typography>
-                <Box className={classes.imageUploadBox}>
+                <Box
+                  className={classes.imageUploadBox}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "2px dashed #1976d2";
+                    e.currentTarget.style.backgroundColor = "#f0f8ff";
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                  onDrop={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.currentTarget.style.border = "1px dashed #ccc";
+                    e.currentTarget.style.backgroundColor = "transparent";
+
+                    const files = Array.from(e.dataTransfer.files).filter((file) =>
+                      file.type.startsWith("image/")
+                    );
+                    if (!files.length) return;
+
+                    setIsSubmitting(true);
+                    const uploadedUrls = await uploadFiles(files, setIsSubmitting);
+                    if (uploadedUrls?.length) {
+                      setFieldValue("exteriorDesign", [...values.exteriorDesign, ...uploadedUrls]);
+                    }
+                    setIsSubmitting(false);
+                  }}
+                >
                   <input
                     id="image-upload-exterior"
                     type="file"
@@ -1227,25 +1435,23 @@ const AddProperty = () => {
                       if (!files.length) return;
 
                       setIsSubmitting(true);
-
                       const uploadedUrls = await uploadFiles(files, setIsSubmitting);
                       if (uploadedUrls?.length) {
                         setFieldValue("exteriorDesign", [...values.exteriorDesign, ...uploadedUrls]);
                       }
-
                       setIsSubmitting(false);
                     }}
                   />
                   <label
                     htmlFor="image-upload-exterior"
                     className="displayCenter"
-                    style={{ flexDirection: "column" }}
+                    style={{ flexDirection: "column", cursor: "pointer" }}
                   >
                     <Avatar>
                       <FiUpload />
                     </Avatar>
                     <Typography variant="body2" style={{ marginTop: 8 }}>
-                      Click to upload Exterior Design
+                      Click or Drag & Drop Exterior Design
                     </Typography>
                   </label>
 
@@ -1264,7 +1470,7 @@ const AddProperty = () => {
                         </IconButton>
                         <img
                           src={img}
-                          alt={`preview-${i}`}
+                          alt={`exterior-${i}`}
                           className={classes.previewImage}
                         />
                       </Box>
@@ -1275,9 +1481,54 @@ const AddProperty = () => {
                     {touched.exteriorDesign && errors.exteriorDesign}
                   </FormHelperText>
                 </Box>
+
               </Grid>
 
+              <Grid item xs={12} mt={2}>
+                <Typography variant="body2" color="secondary">
+                  Virtual Tour
+                </Typography>
 
+                <TextField
+                  type="file"
+                  fullWidth
+                  variant="outlined"
+                  id="inputID"
+                  size="small"
+                  onChange={async (e) => {
+                    const res = await uploadFile(e.target.files[0], setIsLoading)
+                    console.log(res)
+                    if (res) {
+                      setObjectUrl(res)
+                    }
+
+                  }}
+                  name="share"
+                  className={classes.textBox}
+                  inputProps={{ accept: ".glb" }} // Allow only .glb files
+                />
+              </Grid>
+              <Box
+                style={{
+                  width: "40vw",
+                  height: "50vh",
+                  border: "1px solid black",
+                  borderRadius: "10px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: "10PX"
+                  // marginTop: "20px",
+                }}
+              >
+                {objectUrl !== "" ? (
+                  <ObjectViewer url={objectUrl} />
+                ) : isLoading ? (
+                  <Loader />
+                ) : (
+                  "No File selected"
+                )}
+              </Box>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
                   Video URL
@@ -1285,6 +1536,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="videoUrl"
+                  placeholder="Enter Video URL"
                   variant="outlined"
                   value={values.videoUrl}
                   onChange={handleChange}
@@ -1321,6 +1573,36 @@ const AddProperty = () => {
                         borderRadius={4}
                         minHeight={220}
                         overflow="hidden"
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "2px dashed #1976d2";
+                          e.currentTarget.style.backgroundColor = "#f0f8ff";
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                        onDrop={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+
+                          const file = e.dataTransfer.files[0];
+                          if (file && file.type.startsWith("image/")) {
+                            setIsSubmitting(true);
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) {
+                              const updatedFloors = [...values.floorPlans];
+                              updatedFloors[index].floorPhoto = uploadedUrl;
+                              setFieldValue("floorPlans", updatedFloors);
+                            }
+                            setIsSubmitting(false);
+                          }
+                        }}
                       >
                         {!floor.floorPhoto ? (
                           <>
@@ -1332,6 +1614,7 @@ const AddProperty = () => {
                               onChange={async (e) => {
                                 const file = e.target.files[0];
                                 if (file) {
+                                  setIsSubmitting(true);
                                   const uploadedUrl = await uploadFile(file, setIsSubmitting);
                                   if (uploadedUrl) {
                                     const updatedFloors = [...values.floorPlans];
@@ -1360,7 +1643,7 @@ const AddProperty = () => {
                                   <FiUpload />
                                 </Avatar>
                                 <Typography variant="body2" mt={1}>
-                                  Upload Floor Photo
+                                  Click or Drag & Drop Floor Photo
                                 </Typography>
                               </Box>
                             </label>
@@ -1385,6 +1668,7 @@ const AddProperty = () => {
                               onChange={async (e) => {
                                 const file = e.target.files[0];
                                 if (file) {
+                                  setIsSubmitting(true);
                                   const uploadedUrl = await uploadFile(file, setIsSubmitting);
                                   if (uploadedUrl) {
                                     const updatedFloors = [...values.floorPlans];
@@ -1439,7 +1723,48 @@ const AddProperty = () => {
                     </Box>
 
                     {/* RIGHT: Additional Images */}
-                    <Box flex={0.6}>
+                    <Box
+                      flex={0.6}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "2px dashed #1976d2";
+                        e.currentTarget.style.backgroundColor = "#f0f8ff";
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+
+                        const files = Array.from(e.dataTransfer.files).filter((file) =>
+                          file.type.startsWith("image/")
+                        );
+                        if (!files.length) return;
+
+                        setIsSubmitting(true);
+                        const uploadedImageUrls = [];
+                        for (const file of files) {
+                          const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                          if (uploadedUrl) {
+                            uploadedImageUrls.push(uploadedUrl);
+                          }
+                        }
+                        const updatedFloors = [...values.floorPlans];
+                        updatedFloors[index].images = [
+                          ...(updatedFloors[index].images || []),
+                          ...uploadedImageUrls,
+                        ];
+                        setFieldValue("floorPlans", updatedFloors);
+                        setIsSubmitting(false);
+                      }}
+                    >
                       <input
                         id={`floor-images-${index}`}
                         type="file"
@@ -1478,7 +1803,7 @@ const AddProperty = () => {
                           <FiUpload />
                         </Avatar>
                         <Typography variant="body2" mt={1}>
-                          Upload Additional Images
+                          Click or Drag & Drop Additional Images
                         </Typography>
                       </label>
 
@@ -1542,6 +1867,7 @@ const AddProperty = () => {
                     </Box>
                   </Box>
                 ))}
+
                 {state?.view ? null : (
                   <Button
                     variant="contained"
@@ -1556,6 +1882,603 @@ const AddProperty = () => {
                     {state?.edit ? "Update" : "Add Floor"}
                   </Button>
                 )}
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Bedrooms
+                </Typography>
+                {values.bedrooms.map((bedroom, index) => (
+                  <Box
+                    key={index}
+                    mb={3}
+                    p={2}
+                    border={1}
+                    borderColor="grey.300"
+                    borderRadius={4}
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={4}
+                  >
+                    {/* LEFT: Bedroom Photo */}
+                    <Box flex={0.4}>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        position="relative"
+                        border={1}
+                        borderColor="grey.300"
+                        borderRadius={4}
+                        minHeight={220}
+                        overflow="hidden"
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "2px dashed #1976d2";
+                          e.currentTarget.style.backgroundColor = "#f0f8ff";
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                        onDrop={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+
+                          const file = e.dataTransfer.files[0];
+                          if (file && file.type.startsWith("image/")) {
+                            setIsSubmitting(true);
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) {
+                              const updated = [...values.bedrooms];
+                              updated[index].photo = uploadedUrl;
+                              setFieldValue("bedrooms", updated);
+                            }
+                            setIsSubmitting(false);
+                          }
+                        }}
+                      >
+                        {!bedroom.photo ? (
+                          <>
+                            <input
+                              id={`bedroom-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  setIsSubmitting(true);
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updated = [...values.bedrooms];
+                                    updated[index].photo = uploadedUrl;
+                                    setFieldValue("bedrooms", updated);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`bedroom-photo-${index}`}
+                              style={{ cursor: "pointer", width: "100%", height: "100%" }}
+                            >
+                              <Box
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                justifyContent="center"
+                                width="100%"
+                                height="100%"
+                                bgcolor="grey.100"
+                                p={2}
+                              >
+                                <Avatar>
+                                  <FiUpload />
+                                </Avatar>
+                                <Typography variant="body2" mt={1}>
+                                  Click or Drag & Drop Bedroom Photo
+                                </Typography>
+                              </Box>
+                            </label>
+                          </>
+                        ) : (
+                          <Box position="relative" width="100%" height="100%">
+                            <img
+                              src={bedroom.photo}
+                              alt={`bedroom-${index + 1}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: 4,
+                              }}
+                            />
+                            <input
+                              id={`bedroom-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  setIsSubmitting(true);
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updated = [...values.bedrooms];
+                                    updated[index].photo = uploadedUrl;
+                                    setFieldValue("bedrooms", updated);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`bedroom-photo-${index}`}
+                              style={{
+                                position: "absolute",
+                                bottom: 8,
+                                right: 8,
+                                background: "rgba(0,0,0,0.6)",
+                                color: "#fff",
+                                borderRadius: "50%",
+                                padding: 6,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <FiUpload />
+                            </label>
+                          </Box>
+                        )}
+                      </Box>
+
+                      <Box mt={2} display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          startIcon={<FiTrash2 />}
+                          style={{ background: "red", color: "white" }}
+                          onClick={() => {
+                            const updated = values.bedrooms.filter((_, i) => i !== index);
+                            setFieldValue("bedrooms", updated);
+                          }}
+                          disabled={values.bedrooms.length === 1}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    </Box>
+
+                    {/* RIGHT: Additional Images */}
+                    <Box
+                      flex={0.6}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "2px dashed #1976d2";
+                        e.currentTarget.style.backgroundColor = "#f0f8ff";
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+
+                        const files = Array.from(e.dataTransfer.files).filter((file) =>
+                          file.type.startsWith("image/")
+                        );
+                        if (!files.length) return;
+
+                        setIsSubmitting(true);
+                        const uploadedUrls = [];
+                        for (const file of files) {
+                          const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                          if (uploadedUrl) uploadedUrls.push(uploadedUrl);
+                        }
+                        const updated = [...values.bedrooms];
+                        updated[index].images = [...(updated[index].images || []), ...uploadedUrls];
+                        setFieldValue("bedrooms", updated);
+                        setIsSubmitting(false);
+                      }}
+                    >
+                      <input
+                        id={`bedroom-images-${index}`}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files);
+                          const uploadedUrls = [];
+                          setIsSubmitting(true);
+                          for (const file of files) {
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) uploadedUrls.push(uploadedUrl);
+                          }
+                          const updated = [...values.bedrooms];
+                          updated[index].images = [...(updated[index].images || []), ...uploadedUrls];
+                          setFieldValue("bedrooms", updated);
+                          setIsSubmitting(false);
+                        }}
+                      />
+                      <label
+                        htmlFor={`bedroom-images-${index}`}
+                        style={{ cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center" }}
+                      >
+                        <Avatar>
+                          <FiUpload />
+                        </Avatar>
+                        <Typography variant="body2" mt={1}>
+                          Click or Drag & Drop Additional Images
+                        </Typography>
+                      </label>
+
+                      <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+                        {(bedroom.images || []).map((img, i) => (
+                          <Box
+                            key={i}
+                            position="relative"
+                            width={150}
+                            height={150}
+                            borderRadius={2}
+                            overflow="hidden"
+                          >
+                            <IconButton
+                              size="small"
+                              style={{
+                                position: "absolute",
+                                top: 4,
+                                right: 4,
+                                background: "rgba(0,0,0,0.5)",
+                                color: "white",
+                                zIndex: 1,
+                              }}
+                              onClick={() => {
+                                const updated = [...values.bedrooms];
+                                updated[index].images = updated[index].images.filter((_, imgIndex) => imgIndex !== i);
+                                setFieldValue("bedrooms", updated);
+                              }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                            <img
+                              src={img}
+                              alt={`bedroom-image-${index}-${i}`}
+                              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 8 }}
+                            />
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() =>
+                    setFieldValue("bedrooms", [...values.bedrooms, { photo: "", images: [] }])
+                  }
+                >
+                  Add Bedroom
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Bathrooms
+                </Typography>
+                {values.bathrooms.map((bathroom, index) => (
+                  <Box
+                    key={index}
+                    mb={3}
+                    p={2}
+                    border={1}
+                    borderColor="grey.300"
+                    borderRadius={4}
+                    display="flex"
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    gap={4}
+                  >
+                    {/* LEFT: Bathroom Photo */}
+                    <Box flex={0.4}>
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        position="relative"
+                        border={1}
+                        borderColor="grey.300"
+                        borderRadius={4}
+                        minHeight={220}
+                        overflow="hidden"
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "2px dashed #1976d2";
+                          e.currentTarget.style.backgroundColor = "#f0f8ff";
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+                        }}
+                        onDrop={async (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          e.currentTarget.style.border = "1px solid #ccc";
+                          e.currentTarget.style.backgroundColor = "transparent";
+
+                          const file = e.dataTransfer.files[0];
+                          if (file && file.type.startsWith("image/")) {
+                            setIsSubmitting(true);
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) {
+                              const updated = [...values.bathrooms];
+                              updated[index].photo = uploadedUrl;
+                              setFieldValue("bathrooms", updated);
+                            }
+                            setIsSubmitting(false);
+                          }
+                        }}
+                      >
+                        {!bathroom.photo ? (
+                          <>
+                            <input
+                              id={`bathroom-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  setIsSubmitting(true);
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updated = [...values.bathrooms];
+                                    updated[index].photo = uploadedUrl;
+                                    setFieldValue("bathrooms", updated);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`bathroom-photo-${index}`}
+                              style={{ cursor: "pointer", width: "100%", height: "100%" }}
+                            >
+                              <Box
+                                display="flex"
+                                flexDirection="column"
+                                alignItems="center"
+                                justifyContent="center"
+                                width="100%"
+                                height="100%"
+                                bgcolor="grey.100"
+                                p={2}
+                              >
+                                <Avatar>
+                                  <FiUpload />
+                                </Avatar>
+                                <Typography variant="body2" mt={1}>
+                                  Click or Drag & Drop Bathroom Photo
+                                </Typography>
+                              </Box>
+                            </label>
+                          </>
+                        ) : (
+                          <Box position="relative" width="100%" height="100%">
+                            <img
+                              src={bathroom.photo}
+                              alt={`bathroom-${index + 1}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: 4,
+                              }}
+                            />
+                            <input
+                              id={`bathroom-photo-${index}`}
+                              type="file"
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (file) {
+                                  setIsSubmitting(true);
+                                  const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                                  if (uploadedUrl) {
+                                    const updated = [...values.bathrooms];
+                                    updated[index].photo = uploadedUrl;
+                                    setFieldValue("bathrooms", updated);
+                                  }
+                                  setIsSubmitting(false);
+                                }
+                              }}
+                            />
+                            <label
+                              htmlFor={`bathroom-photo-${index}`}
+                              style={{
+                                position: "absolute",
+                                bottom: 8,
+                                right: 8,
+                                background: "rgba(0,0,0,0.6)",
+                                color: "#fff",
+                                borderRadius: "50%",
+                                padding: 6,
+                                cursor: "pointer",
+                              }}
+                            >
+                              <FiUpload />
+                            </label>
+                          </Box>
+                        )}
+                      </Box>
+
+                      <Box mt={2} display="flex" justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          startIcon={<FiTrash2 />}
+                          style={{ background: "red", color: "white" }}
+                          onClick={() => {
+                            const updated = values.bathrooms.filter((_, i) => i !== index);
+                            setFieldValue("bathrooms", updated);
+                          }}
+                          disabled={values.bathrooms.length === 1}
+                        >
+                          Remove
+                        </Button>
+                      </Box>
+                    </Box>
+
+                    {/* RIGHT: Additional Images */}
+                    <Box
+                      flex={0.6}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "2px dashed #1976d2";
+                        e.currentTarget.style.backgroundColor = "#f0f8ff";
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                      onDrop={async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.currentTarget.style.border = "none";
+                        e.currentTarget.style.backgroundColor = "transparent";
+
+                        const files = Array.from(e.dataTransfer.files).filter((file) =>
+                          file.type.startsWith("image/")
+                        );
+                        if (!files.length) return;
+
+                        setIsSubmitting(true);
+                        const uploadedUrls = [];
+                        for (const file of files) {
+                          const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                          if (uploadedUrl) uploadedUrls.push(uploadedUrl);
+                        }
+                        const updated = [...values.bathrooms];
+                        updated[index].images = [...(updated[index].images || []), ...uploadedUrls];
+                        setFieldValue("bathrooms", updated);
+                        setIsSubmitting(false);
+                      }}
+                    >
+                      <input
+                        id={`bathroom-images-${index}`}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        style={{ display: "none" }}
+                        onChange={async (e) => {
+                          const files = Array.from(e.target.files);
+                          const uploadedUrls = [];
+                          setIsSubmitting(true);
+                          for (const file of files) {
+                            const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                            if (uploadedUrl) uploadedUrls.push(uploadedUrl);
+                          }
+                          const updated = [...values.bathrooms];
+                          updated[index].images = [...(updated[index].images || []), ...uploadedUrls];
+                          setFieldValue("bathrooms", updated);
+                          setIsSubmitting(false);
+                        }}
+                      />
+                      <label
+                        htmlFor={`bathroom-images-${index}`}
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Avatar>
+                          <FiUpload />
+                        </Avatar>
+                        <Typography variant="body2" mt={1}>
+                          Click or Drag & Drop Additional Images
+                        </Typography>
+                      </label>
+
+                      <Box display="flex" flexWrap="wrap" gap={2} mt={2}>
+                        {(bathroom.images || []).map((img, i) => (
+                          <Box
+                            key={i}
+                            position="relative"
+                            width={150}
+                            height={150}
+                            borderRadius={2}
+                            overflow="hidden"
+                          >
+                            <IconButton
+                              size="small"
+                              style={{
+                                position: "absolute",
+                                top: 4,
+                                right: 4,
+                                background: "rgba(0,0,0,0.5)",
+                                color: "white",
+                                zIndex: 1,
+                              }}
+                              onClick={() => {
+                                const updated = [...values.bathrooms];
+                                updated[index].images = updated[index].images.filter(
+                                  (_, imgIndex) => imgIndex !== i
+                                );
+                                setFieldValue("bathrooms", updated);
+                              }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                            <img
+                              src={img}
+                              alt={`bathroom-image-${index}-${i}`}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                borderRadius: 8,
+                              }}
+                            />
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                ))}
+
+
+                {/* Add Button */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() =>
+                    setFieldValue("bathrooms", [
+                      ...values.bathrooms,
+                      { photo: "", images: [] },
+                    ])
+                  }
+                >
+                  Add Bathroom
+                </Button>
               </Grid>
 
               {/* <Grid item xs={12}>
@@ -1752,6 +2675,7 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="metaTitle"
+                  placeholder="Please enter SEO meta titles"
                   variant="outlined"
                   value={values.metaTitle}
                   onChange={handleChange}
@@ -1767,6 +2691,8 @@ const AddProperty = () => {
                 <TextField
                   fullWidth
                   name="metaTags"
+                  placeholder="Please enter SEO meta Tags"
+
                   variant="outlined"
                   value={values.metaTags}
                   onChange={handleChange}
