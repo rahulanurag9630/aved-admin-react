@@ -5,6 +5,7 @@ import { apiRouterCall } from "src/ApiConfig/service";
 import * as XLSX from "xlsx";
 import CryptoJS from "crypto-js";
 import toast from "react-hot-toast";
+import ApiConfig from "src/ApiConfig/ApiConfig";
 
 const secret = process.env.REACT_APP_SECRET_KEY || "000x";
 
@@ -580,6 +581,35 @@ const uploadFile = async (file, setLoading) => {
     setLoading(false)
   }
 }
+
+export const uploadFileS3 = async (file, setLoading) => {
+  try {
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", file); // field name must match multer config
+
+    const res = await apiRouterCall({
+      method: "POST",
+      endPoint: ApiConfig.uploadTos3, // e.g. "/user/uploadtos3"
+      bodyData: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res?.data?.success) {
+      return res.data.fileUrl; // return uploaded S3 file URL
+    } else {
+      toast.error(res?.data?.message || "Error while uploading file");
+      return null;
+    }
+  } catch (error) {
+    console.error("Upload error:", error);
+    toast.error("Error while uploading file");
+    return null;
+  } finally {
+    setLoading(false);
+  }
+};
 export const uploadFiles = async (files, setLoading) => {
   try {
     setLoading(true);

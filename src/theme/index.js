@@ -49,7 +49,7 @@ const baseOptions = {
         border: "1px solid #616161",
       },
       selected: {
-        // color: colors.grey[700],
+        color: "white !important",
         backgroundColor: "#000 !important",
       },
     },

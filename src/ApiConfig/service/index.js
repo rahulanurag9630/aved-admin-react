@@ -14,7 +14,7 @@ export const apiRouterCall = async ({
   try {
     return await axios({
       method: method,
-      url: id ? `${ApiConfig[endPoint]}/${id}` : ApiConfig[endPoint],
+      url: id ? `${ApiConfig[endPoint]}/${id}` : ApiConfig[endPoint] || endPoint,
       headers: {
         token: token ? token : localStorage.getItem("token"),
       },

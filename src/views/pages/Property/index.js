@@ -375,7 +375,7 @@ export default function Property() {
           }}
           filterData={{ ...filterData, limit: noOfPages.totalPages }}
           transactionList={transactionList}
-          excelTableName="SubAdminManagement"
+          excelTableName="Properties"
           apiEndPoint="getUserList"
           placeholder="Search by property name"
           tableDataFunction={tableDataFunction}

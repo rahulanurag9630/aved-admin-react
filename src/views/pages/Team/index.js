@@ -175,7 +175,7 @@ export default function Blogs() {
           handleCallApi={() => (page > 1 ? setPage(1) : handleGetTransaction())}
           filterData={{ ...filterData, limit: noOfPages.totalPages }}
           transactionList={transactionList}
-          excelTableName="SubAdminManagement"
+          excelTableName="Teams"
           apiEndPoint="getUserList"
           placeholder="Search by name"
           tableDataFunction={tableDataFunction}

@@ -261,7 +261,7 @@ export default function Blogs() {
           }}
           filterData={{ ...filterData, limit: noOfPages.totalPages }}
           transactionList={transactionList}
-          excelTableName="SubAdminManagement"
+          excelTableName="Amenities"
           apiEndPoint="getUserList"
           placeholder="Search by title"
           tableDataFunction={tableDataFunction}

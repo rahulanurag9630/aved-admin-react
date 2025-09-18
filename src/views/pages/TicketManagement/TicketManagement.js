@@ -25,6 +25,7 @@ import { IoMdEye } from "react-icons/io";
 import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom";
 import axios from "axios";
 import useDebounce from "src/component/customHook/Debounce";
+import TableComp from "src/component/TableComp";
 
 const useStyles = makeStyles((theme) => ({
   "& .MuiIconButton-root.Mui-disabled": {
@@ -191,6 +192,52 @@ const TicketManagement = () => {
             : "";
     setError(errorMsg);
   };
+  // inside TicketManagement.jsx
+
+  const tableHead = [
+    { heading: "S.No." },
+    { heading: "Name" },
+    { heading: "Email" },
+    { heading: "Mobile No" },
+    { heading: "Date & Time" },
+    { heading: "Status" },
+    { heading: "Action" },
+  ];
+
+  // 👇 helper to map data for both table + excel
+  function tableDataFunction(arrayData) {
+    return (
+      arrayData &&
+      arrayData.map((value, i) => ({
+        "S.No.": (page - 1) * 10 + i + 1,
+        Name: value?.name || "--",
+        Email: value?.email || "--",
+        "Mobile No": value?.phoneNumber || "--",
+        "Date & Time": value?.createdAt
+          ? moment(value.createdAt).format("lll")
+          : "--",
+        Status: value?.replayStatus ? "Closed" : "Open",
+        Action: [
+          {
+            icon: IoMdEye,
+            onClick: () =>
+              history.push("/pending-ticket", {
+                state: value,
+              }),
+          },
+          ...(checkEdit && !value?.replayStatus
+            ? [
+              {
+                icon: BsFillReplyFill,
+                onClick: () =>
+                  handleReplyModal(value?._id, value?.replayStatus),
+              },
+            ]
+            : []),
+        ],
+      }))
+    );
+  }
 
   return (
     <Box className={classes.main__wrapper}>
@@ -203,93 +250,38 @@ const TicketManagement = () => {
           <MainFilter
             setSelectFilter={setSelectFilter}
             selectFilter={selectFilter}
-            handleCallApi={(param1, param2) => {
+            handleCallApi={() => {
               page > 1 && setPage(1);
-              page === 1 && getTicketManagementList(param1, param2);
+              page === 1 && getTicketManagementList();
             }}
             filterData={{ ...filterData, limit: noOfPages.totalPages }}
             transactionList={ticketManagementData}
             excelTableName="ticket-management"
-            apiEndPoint="listAllContactUsRequest"
-            type="transactionMgmt"
+            // 🔑 now export is based on tableDataFunction (not backend)
+            tableDataFunction={tableDataFunction}
             placeholder="Search by Name/Email"
             handleClearApi={handleClearFilter}
           />
         </Box>
 
-        <TableContainer>
-          <Table className={classes.tableBox}>
-            <TableHead>
-              <TableRow alignItems="center">
-                <TableCell>S.No.</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Mobile No</TableCell>
-                <TableCell>Date & Time</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>ACTION</TableCell>
-              </TableRow>
-            </TableHead>
+        <TableComp
+          isMobileAdaptive={true}
+          tableHead={tableHead}
+          scoreListData={tableDataFunction(ticketManagementData)}
+          noOfPages={noOfPages}
+          page={page}
+          setPage={setPage}
+          NoDataFoundText="default"
+          isLoading={isLoading}
+        />
 
-            <TableBody>
-              {ticketManagementData &&
-                ticketManagementData.map((value, i) => (
-                  <TableRow>
-                    <TableCell>{value?.srNo}</TableCell>
-                    <TableCell>{value?.name ? value?.name : "--"}</TableCell>
-                    <TableCell>{value?.email ? value?.email : "--"}</TableCell>
-                    <TableCell>
-                      {value?.phoneNumber ? value?.phoneNumber : "--"}
-                    </TableCell>
-                    <TableCell>
-                      {value?.createdAt ? (
-                        <> {moment(value.createdAt).format("lll")}</>
-                      ) : (
-                        "--"
-                      )}
-                    </TableCell>
-                    <TableCell>{value?.isReply ? "Closed" : "Open"}</TableCell>
-                    <TableCell>
-                      <Box key={value._id} className="displayCenter">
-                        <IconButton
-                          onClick={() =>
-                            history.push("/pending-ticket", {
-                              state: value,
-                            })
-                          }
-                        >
-                          <IoMdEye style={{ color: "#475569" }} />
-                        </IconButton>
-                        {checkEdit && !value?.isReply && (
-                          <IconButton
-                            style={{
-                              pointerEvents: value?.isReply ? "none" : "auto",
-                            }}
-                            onClick={() => {
-                              handleReplyModal(value?._id, value?.isReply);
-                            }}
-                          >
-                            <BsFillReplyFill style={{ color: "#475569 " }} />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              {isLoading &&
-                Array.from({ length: 10 }).map((itm) => (
-                  <TopTradingSkeleton skeleton={Array.from({ length: 7 })} />
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
 
         {!isLoading &&
           ticketManagementData &&
           ticketManagementData?.length === 0 && (
             <NoDataFound data={"No data found!"} />
           )}
-        {!isLoading && noOfPages?.pages > 1 && (
+        {/* {!isLoading && noOfPages?.pages > 1 && (
           <Box elevation={2} mt={3} mb={1} style={{ float: "right" }}>
             <Pagination
               count={noOfPages?.pages}
@@ -297,9 +289,15 @@ const TicketManagement = () => {
               onChange={(e, value) => setPage(value)}
               shape="rounded"
               color="primary"
+              sx={{
+                "& .MuiPaginationItem-root.Mui-selected": {
+                  color: "#fff !important",          // ✅ text color white
+                  backgroundColor: "#1976d2", // optional: keep primary background
+                },
+              }}
             />
           </Box>
-        )}
+        )} */}
       </Box>
 
       {openReplyDialog && (

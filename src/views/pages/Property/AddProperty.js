@@ -17,7 +17,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Form, Formik } from "formik";
 import * as yup from "yup";
 import { FiUpload, FiTrash2 } from "react-icons/fi";
-import uploadFile, { getBase64, uploadFiles } from "src/utils";
+import uploadFile, { getBase64, uploadFiles, uploadFileS3 } from "src/utils";
 import JoditEditor from "jodit-react";
 import { useLocation, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { debounce } from "lodash";
@@ -105,8 +105,7 @@ const validationSchema = yup.object().shape({
   yearBuilt: yup
     .number()
     .nullable()
-    .min(1800, "Year built must be after 1800")
-    .max(new Date().getFullYear(), `Year built cannot be in the future`),
+    .min(1800, "Year built must be after 1800"),
   amenities: yup.array().of(yup.string()).nullable().default([]),
   area: yup
     .number()
@@ -130,10 +129,10 @@ const validationSchema = yup.object().shape({
     .string()
     .required("Availability status is required")
     .oneOf(["Available", "Sold", "Rented"], "Invalid availability status"),
-  status: yup
-    .string()
-    .required("Status is required")
-    .oneOf(["Active", "Inactive", "Published", "Draft"], "Status must be either 'Active' or 'Inactive'"),
+  // status: yup
+  //   .string()
+  //   .required("Status is required")
+  //   .oneOf(["Active", "Inactive", "Published", "Draft"], "Status must be either 'Active' or 'Inactive'"),
   address: yup
     .string()
     .required("Address is required")
@@ -298,7 +297,7 @@ const AddProperty = () => {
     propertyType: state?.property_type || "",
     listingType: state?.listing_type || "",
     availabilityStatus: state?.availability_status || "",
-    status: state?.publish_status || "",
+    // status: state?.publish_status || "",
     address: state?.address || "",
     address_ar: state?.address_ar || "",
     latitude: state?.latitude?.toString() || "",
@@ -383,7 +382,7 @@ const AddProperty = () => {
         seo_meta_titles: values.metaTitle,
         seo_meta_tags: values.metaTags,
         no_of_floors: values.floorPlans?.length,
-        publish_status: values.status,
+        // publish_status: values.status,
         virtualTour: objectUrl
       };
 
@@ -763,12 +762,12 @@ const AddProperty = () => {
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
-                  Area (m²)
+                  Build up area (m²)
                 </Typography>
 
                 <TextField
                   fullWidth
-                  placeholder="Please enter area"
+                  placeholder="Please enter build up area"
                   name="area"
                   variant="outlined"
                   value={values.area}
@@ -814,7 +813,7 @@ const AddProperty = () => {
                       const file = e.target.files[0];
                       if (!file) return;
                       setIsSubmitting(true);
-                      const uploadedUrl = await uploadFile(file, setIsSubmitting);
+                      const uploadedUrl = await uploadFileS3(file, setIsSubmitting);
                       if (uploadedUrl) {
                         setFieldValue("brochure", uploadedUrl); // storing single brochure link
                       }
@@ -1070,7 +1069,7 @@ const AddProperty = () => {
                   {touched.availabilityStatus && errors.availabilityStatus}
                 </FormHelperText>
               </Grid>
-              <Grid item xs={6}>
+              {/* <Grid item xs={6}>
                 <Typography variant="body2" color="secondary">
                   Status
                 </Typography>
@@ -1091,7 +1090,7 @@ const AddProperty = () => {
                 <FormHelperText error>
                   {touched.status && errors.status}
                 </FormHelperText>
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12}>
                 <Typography variant="h6" color="secondary" gutterBottom>
@@ -1496,7 +1495,7 @@ const AddProperty = () => {
                   id="inputID"
                   size="small"
                   onChange={async (e) => {
-                    const res = await uploadFile(e.target.files[0], setIsLoading)
+                    const res = await uploadFileS3(e.target.files[0], setIsLoading)
                     console.log(res)
                     if (res) {
                       setObjectUrl(res)
@@ -2707,7 +2706,7 @@ const AddProperty = () => {
                   variant="contained"
                   color="secondary"
                   className="filterButtonCustom"
-                  type="submit"
+
                   onClick={() => {
                     window.history.back();
                   }}

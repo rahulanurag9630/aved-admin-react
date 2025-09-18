@@ -159,7 +159,7 @@ const PendingDetails = () => {
             </Grid>
           </Grid>
         ))}
-        {ticketDetail && ticketDetail.isReply && (
+        {ticketDetail && ticketDetail.replayStatus && (
           <Grid container spacing={2}>
             <Grid item xs={4} sm={3} md={3}>
               <Typography variant="body2" style={{ fontWeight: 500 }}>
@@ -172,7 +172,7 @@ const PendingDetails = () => {
                 variant="body2"
                 style={{ wordBreak: "break-all" }}
                 dangerouslySetInnerHTML={{
-                  __html: ticketDetail.replyMessage,
+                  __html: ticketDetail.replayMessage,
                 }}
               ></Typography>
             </Grid>

@@ -1222,7 +1222,7 @@ body {
 .MuiPaginationItem-page.Mui-selected {
   background: #071c35 !important;
   background-color: #071c35 !important;
-  color: #fff;
+  color: #fff !important;
 }
 
 .MuiPaginationItem-page {

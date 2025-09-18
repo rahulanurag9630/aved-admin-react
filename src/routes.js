@@ -123,6 +123,13 @@ export const routes = [
   {
     exact: true,
     guard: true,
+    path: "/static-image-content",
+    layout: DashboardLayout,
+    component: lazy(() => import("src/views/pages/Admin/Static/StaticImageContent")),
+  },
+  {
+    exact: true,
+    guard: true,
     path: "/faq",
     layout: DashboardLayout,
     component: lazy(() => import("src/views/pages/Admin/Static/FaqManagement")),
@@ -158,7 +165,7 @@ export const routes = [
       import("src/views/pages/Property/index")
     ),
   },
-    {
+  {
     exact: true,
     guard: true,
     path: "/add-property-management",
@@ -176,17 +183,17 @@ export const routes = [
       import("src/views/pages/Amenities/index")
     ),
   },
-    {
+  {
     exact: true,
     guard: true,
     path: "/add-amenities-management",
     layout: DashboardLayout,
-   component: lazy(() =>
+    component: lazy(() =>
       import("src/views/pages/Amenities/AddAmenities")
     ),
   },
 
-   {
+  {
     exact: true,
     guard: true,
     path: "/blog-management",
@@ -195,7 +202,7 @@ export const routes = [
       import("src/views/pages/Blog/index")
     ),
   },
-    {
+  {
     exact: true,
     guard: true,
     path: "/add-blog-management",
@@ -205,7 +212,7 @@ export const routes = [
     ),
   },
 
-   {
+  {
     exact: true,
     guard: true,
     path: "/team-management",
@@ -214,12 +221,12 @@ export const routes = [
       import("src/views/pages/Team/index")
     ),
   },
-    {
+  {
     exact: true,
     guard: true,
     path: "/add-team-management",
     layout: DashboardLayout,
-   component: lazy(() =>
+    component: lazy(() =>
       import("src/views/pages/Team/AddTeam")
     ),
   },
@@ -232,7 +239,7 @@ export const routes = [
       import("src/views/pages/TagManagement/index")
     ),
   },
-    {
+  {
     exact: true,
     guard: true,
     path: "/add-tag-management",

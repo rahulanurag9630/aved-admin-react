@@ -112,15 +112,23 @@ export default function Static() {
                         <>
                           &nbsp; &nbsp; &nbsp;
                           <IconButton
-                            onClick={() =>
-                              history.push({
-                                pathname: "/static-content",
-                                state: { ...value, isEdit: true },
-                              })
-                            }
+                            onClick={() => {
+                              if (value?.contentType === "about" || value?.contentType === "contactus") {
+                                history.push({
+                                  pathname: "/static-image-content",
+                                  state: { ...value, isEdit: true },
+                                });
+                              } else {
+                                history.push({
+                                  pathname: "/static-content",
+                                  state: { ...value, isEdit: true },
+                                });
+                              }
+                            }}
                           >
                             <FiEdit />
                           </IconButton>
+
                         </>
                       ) : (
                         []

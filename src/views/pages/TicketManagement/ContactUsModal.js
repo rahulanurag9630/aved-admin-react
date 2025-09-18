@@ -92,12 +92,14 @@ export default function ContactUsModal({
                   type="text"
                   multiline
                   className="textField"
-                  style={{ color: "#000" }}
+                  style={{ color: "#000", padding: "10px !important" }}
                   rows={5}
                   placeholder="Type message..."
                   inputProps={{
                     maxLength: 600,
+
                   }}
+
                   value={filter?.reason}
                   onBlur={handleBlur}
                   onChange={(e) => {

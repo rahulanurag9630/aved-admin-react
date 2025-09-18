@@ -266,18 +266,22 @@ export default function MainFilter({
             startIcon={<SlLogout style={{ fontSize: "15px" }} />}
             onClick={async () => {
               if (transactionList?.length > 0) {
-                setIsLoading(true);
-                const response = await listUserHandlerExcel({
-                  paramsData: filterData,
-                  endPoint: apiEndPoint,
-                });
-                if (response) {
-                  downloadExcel(
-                    tableDataFunction ? tableDataFunction(response) : response,
-                    excelTableName
-                  );
+                try {
+                  setIsLoading(true);
+
+                  // ✅ Convert the currently shown table data into exportable format
+                  const dataToDownload = tableDataFunction
+                    ? tableDataFunction(transactionList)
+                    : transactionList;
+
+                  // ✅ Download directly without calling API
+                  downloadExcel(dataToDownload, excelTableName);
+
+                } catch (error) {
+                  toast.error("Something went wrong while exporting.");
+                } finally {
+                  setIsLoading(false);
                 }
-                setIsLoading(false);
               } else {
                 toast.error("No data found!");
               }
@@ -285,6 +289,7 @@ export default function MainFilter({
           >
             {isLoading ? "Loading..." : "Download CSV"}
           </Button>
+
         </Grid>
       </Grid>
     </Paper>

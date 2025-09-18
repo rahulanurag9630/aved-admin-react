@@ -287,9 +287,8 @@ const EditProfileForm = React.memo(
                       value={values.description_en}
                       tabIndex={1}
                       config={editorConfigEn}
-                      onChange={(newContent) =>
-                        debounceSetFieldValue("description_en", newContent, setFieldValue)
-                      }
+                      onBlur={(newContent) => setFieldValue("description_en", newContent)} // ✅ update only on blur
+
                     />
                     <FormHelperText error>
                       {touched.description_en && errors.description_en}

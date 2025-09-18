@@ -102,6 +102,7 @@ const ApiConfig = {
   toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
   listAmenities: `${base}/admin/listAmenities`,
   uploadFile: `${base}/user/uploadFile`,
+  uploadTos3: `${base}/user/uploadtos3`,
   uploadMultipleFiles: `${base}/user/uploadMultipleFiles`,
   addUpdateProperty: `${base}/property/addUpdateProperty`,
   listProperties: `${base}/property/listProperties`,

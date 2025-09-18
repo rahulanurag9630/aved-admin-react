@@ -78,7 +78,7 @@ export default function FaqManagement() {
       const response = await apiRouterCall({
         method: "DELETE",
         endPoint: "deleteStaticContent",
-        bodyData: {
+        paramsData: {
           id: deleteBlockId ? deleteBlockId?._id : undefined,
         },
       });
