@@ -31,6 +31,7 @@ export default function Blogs() {
   const [modalOpen, setModalOpen] = useState("");
   const [deleteBlockId, setDeleteBlockId] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [rowsPerPage, setRowsPerPage] = useState(10)
   const [page, setPage] = useState(1);
   const [transactionList, setTransactionList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -42,7 +43,7 @@ export default function Blogs() {
 
   const filterData = {
     page,
-    limit: 10,
+    limit: rowsPerPage,
     fromDate: selectFilter.fromDate?.toISOString(),
     toDate: selectFilter.toDate?.toISOString(),
     search: deb?.trim() || undefined,
@@ -161,7 +162,7 @@ export default function Blogs() {
     const source = axios.CancelToken.source();
     handleGetTransaction(source);
     return () => source.cancel();
-  }, [page, deb, selectFilter.fromDate, selectFilter.toDate, selectFilter.status]);
+  }, [page, deb, selectFilter.fromDate, selectFilter.toDate, selectFilter.status, rowsPerPage]);
 
   return (
     <Box>
@@ -194,6 +195,8 @@ export default function Blogs() {
         setPage={setPage}
         NoDataFoundText="default"
         isLoading={isLoading}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
       />
       {modalOpen && deleteBlockId && (
         <ConfirmationDialogBox

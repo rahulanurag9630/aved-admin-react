@@ -27,6 +27,7 @@ const ApiConfig = {
   toggleBlockStatus: `${base}/admin/toggleBlockStatus`,
   deleteBlog: `${base}/admin/deleteBlog`,
   listBlogs: `${base}/admin/listBlogs`,
+  updateBlogOrder: `${base}/admin/updateBlogOrder`,
   addOrUpdateTeam: `${base}/admin/addOrUpdateTeam`,
   listTeam: `${base}/admin/listTeam`,
   toggleBlockTeamStatus: `${base}/admin/toggleBlockTeamStatus`,
@@ -101,6 +102,7 @@ const ApiConfig = {
   addUpdateAmenities: `${base}/admin/addUpdateAmenities`,
   toggleAmenityStatus: `${base}/admin/toggleAmenityStatus`,
   listAmenities: `${base}/admin/listAmenities`,
+  updateAmenityOrder: `${base}/admin/updateOrder`,
   uploadFile: `${base}/user/uploadFile`,
   uploadTos3: `${base}/user/uploadtos3`,
   uploadMultipleFiles: `${base}/user/uploadMultipleFiles`,
@@ -108,6 +110,7 @@ const ApiConfig = {
   listProperties: `${base}/property/listProperties`,
   toggleBlockProperty: `${base}/property/toggleBlockProperty`,
   deleteProperty: `${base}/property/deleteProperty`,
+  updatePropertyOrder: `${base}/property/updatePropertyOrder`,
   getDashboardData: `${base}/admin/getDashboardData`,
 
 

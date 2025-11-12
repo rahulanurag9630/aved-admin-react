@@ -1,56 +1,34 @@
 import React, { useEffect, useState } from "react";
 import MainFilter from "src/component/MainFilter";
-import { Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from "@material-ui/icons/Delete";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import Topheading from "src/component/TopHeading";
 import { useHistory, useLocation } from "react-router-dom";
 import ConfirmationDialogBox from "src/component/ConfirmationDialogBox";
 import TableComp from "src/component/TableComp";
 import { apiRouterCall } from "src/ApiConfig/service";
 import axios from "axios";
-import moment from "moment";
 import { FaEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useDebounce from "src/component/customHook/Debounce";
-import { formatDate } from "../../../utils/index";
+import { formatDate } from "../../../utils";
 
 const tableHead = [
-  {
-    heading: "Sr No.",
-    column: 0,
-    isMobile: true,
-  },
-  {
-    heading: "Title",
-    column: 0,
-    isMobile: true,
-  },
-  {
-    heading: "Description",
-    column: 0,
-    isMobile: true,
-    isCopy: true,
-  },
-  {
-    heading: "Created Date & Time",
-    column: 1,
-    isMobile: true,
-  },
-  {
-    heading: "Action",
-    column: 1,
-    isMobile: true,
-  },
+  { heading: "Sr No.", column: 0, isMobile: true },
+  { heading: "Title", column: 0, isMobile: true },
+  { heading: "Description", column: 0, isMobile: true },
+  { heading: "Created Date & Time", column: 1, isMobile: true },
+  { heading: "Action", column: 1, isMobile: true },
 ];
-
-
-
 
 export default function Blogs() {
   const history = useHistory();
   const location = useLocation();
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [modalOpen, setModalOpen] = useState("");
   const [deleteBlockId, setDeleteBlockId] = useState();
@@ -59,9 +37,7 @@ export default function Blogs() {
   const [transactionList, setTransactionList] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isClear, setIsClear] = useState(false);
-
   const checkEdit = location?.state?.isEdit;
-  console.log("checkEdit", checkEdit);
 
   const [selectFilter, setSelectFilter] = useState({
     fromDate: null,
@@ -71,59 +47,30 @@ export default function Blogs() {
   });
   const deb = useDebounce(selectFilter?.search, 1000);
 
-  const [noOfPages, setNoOfPages] = useState({
-    pages: 1,
-    totalPages: 1,
-  });
+  const [noOfPages, setNoOfPages] = useState({ pages: 1, totalPages: 1 });
 
-  // let filterData = {
-  //   page: page,
-  //   limit: 10,
-  //   fromDate: selectFilter.fromDate
-  //     ? selectFilter.fromDate.toISOString()
-  //     : undefined,
-  //   toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
-  //   search: selectFilter.search !== "" ? selectFilter.search : undefined,
-  //   status: selectFilter.status !== "All" ? selectFilter.status : undefined,
-  // };
-
-  const filterData = {
-    page: page,
-    limit: 10,
-    fromDate: selectFilter.fromDate
-      ? selectFilter.fromDate.toISOString()
-      : undefined,
-    toDate: selectFilter.toDate ? selectFilter.toDate.toISOString() : undefined,
-    search: deb && deb.trim() !== "" ? deb.trim() : undefined,
+  let filterData = {
+    page,
+    limit: rowsPerPage,
+    fromDate: selectFilter.fromDate?.toISOString(),
+    toDate: selectFilter.toDate?.toISOString(),
+    search: deb?.trim() || undefined,
     status: selectFilter.status !== "All" ? selectFilter.status : undefined,
   };
 
-
-  function getTextSnippetFromHTML(html, limit = 65) {
-    if (!html) return "";
-
-    // Create a temporary DOM element to extract plain text
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-
-    const plainText = tempDiv.textContent || tempDiv.innerText || "";
-
-    // Trim and limit to `limit` characters
-    return plainText.length > limit
-      ? plainText.substring(0, limit).trim() + "..."
-      : plainText.trim();
-  }
-
-  const handleGetTransaction = async (source, checkFilter) => {
+  // Fetch Blogs
+  const handleGetTransaction = async (source) => {
     try {
       const response = await apiRouterCall({
         method: "GET",
         endPoint: "listBlogs",
-        source: source,
+        source,
         paramsData: filterData,
       });
+
       if (response.data.responseCode === 200) {
-        setTransactionList(response.data.result.docs);
+        const sorted = [...response.data.result.docs].sort((a, b) => a.order - b.order);
+        setTransactionList(sorted);
         setNoOfPages({
           pages: response.data.result.pages,
           totalPages: response.data.result.total,
@@ -133,91 +80,106 @@ export default function Blogs() {
       }
     } catch (err) {
       setTransactionList([]);
-      console.log(err);
+      console.error(err);
     } finally {
       setIsClear(false);
       setIsLoading(false);
     }
   };
 
+  // Move blog up/down
+  const moveItem = (index, direction) => {
+    const newList = [...transactionList];
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= transactionList.length) return;
+    [newList[index], newList[newIndex]] = [newList[newIndex], newList[index]];
+    setTransactionList(newList);
+  };
 
-  const handleBlockDeleteApi = async (reason) => {
-    console.log("blocking")
+  // Save order
+  const handleSaveOrder = async () => {
     try {
-      setIsUpdating(true);
+      const orderedBlogs = transactionList.map((b, index) => ({
+        id: b._id,
+        order: index,
+      }));
 
-      const isDelete = modalOpen === "delete";
-      const endPoint = isDelete ? "deleteBlog" : "toggleBlockStatus";
-      const method = "POST";
-
-      const response = await apiRouterCall({
-        method,
-        endPoint,
-        bodyData: {
-          id: deleteBlockId?._id,
-          reason: reason || undefined,
-        },
-        headers: {
-          authToken: localStorage.getItem("authToken"), // ✅ Add this line to send authToken
-        },
+      const res = await apiRouterCall({
+        method: "POST",
+        endPoint: "updateBlogOrder",
+        bodyData: { orderedBlogs, page, limit: rowsPerPage },
+        token: localStorage.getItem("authToken"),
       });
 
-      console.log("API Response:", response);
+      if (res?.data?.responseCode === 200) {
+        toast.success("Order saved successfully.");
+      }
+      else {
+        toast.error("Somthing went wrong")
+      }
+      handleGetTransaction();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save order.");
+    }
+  };
 
-      if (response?.data?.responseCode === 200) {
+  // Block/Delete Blog
+  const handleBlockDeleteApi = async () => {
+    try {
+      setIsUpdating(true);
+      const response = await apiRouterCall({
+        method: modalOpen === "delete" ? "DELETE" : "PUT",
+        endPoint: modalOpen === "delete" ? "deleteBlog" : "toggleBlockBlog",
+        bodyData: { blogId: deleteBlockId?._id },
+      });
+
+      if (response.data.responseCode === 200) {
         toast.success(response.data.responseMessage);
         setModalOpen("");
         handleGetTransaction();
-        if (isDelete && page > 1 && transactionList.length === 1) {
-          setPage((prevPage) => {
-            const newPage = prevPage - 1;
-            setTimeout(() => handleGetTransaction(), 0);
-            return newPage;
-          });
-        } else {
-          await handleGetTransaction();
-        }
       } else {
-        toast.error(response?.data?.responseMessage || "Something went wrong.");
+        toast.error(response.data.responseMessage);
       }
     } catch (error) {
-      console.error("API Error:", error);
+      console.error(error);
       toast.error("Server error. Please try again later.");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  function tableDataFunction(arrayData, condition) {
+  // Table data
+  function tableDataFunction(arrayData) {
     return (
       arrayData &&
       arrayData.map((value, i) => ({
-        "Sr No.": (page - 1) * 10 + i + 1,
+        "Sr No.": (page - 1) * rowsPerPage + i + 1,
         Title: value?.title,
-        Description: getTextSnippetFromHTML(value?.description),
-        Price: `$${value?.price}`,
-        Duration: value?.durationLabel,
-        Badge: value?.badge,
-
+        Description: value?.description?.length > 60 ? value.description.slice(0, 60) + "..." : value.description,
         "Created Date & Time": formatDate(value?.createdAt),
         Action: [
           {
+            icon: ArrowUpwardIcon,
+            onClick: () => moveItem(i, -1),
+            style: { color: "blue" },
+          },
+          {
+            icon: ArrowDownwardIcon,
+            onClick: () => moveItem(i, 1),
+            style: { color: "blue" },
+          },
+          {
             icon: VisibilityIcon,
             onClick: () =>
-              history.push({
-                pathname: "/add-blog-management",
-                state: { ...value, isView: true },
-              }),
+              history.push({ pathname: "/add-blog-management", state: { ...value, view: true } }),
           },
           ...(checkEdit
             ? [
               {
                 icon: FaEdit,
                 onClick: () =>
-                  history.push({
-                    pathname: "/add-blog-management",
-                    state: { ...value, isEdit: true },
-                  }),
+                  history.push({ pathname: "/add-blog-management", state: { ...value, edit: true } }),
               },
               {
                 icon: BlockIcon,
@@ -225,7 +187,7 @@ export default function Blogs() {
                   setDeleteBlockId(value);
                   setModalOpen("block");
                 },
-                style: { color: value.status === "ACTIVE" ? "green" : "red" }
+                style: { color: value.status === "ACTIVE" ? "green" : "red" },
               },
               {
                 icon: DeleteIcon,
@@ -241,15 +203,9 @@ export default function Blogs() {
     );
   }
 
-
   const handleClearFilter = () => {
     if (!isClear) {
-      setSelectFilter({
-        fromDate: null,
-        toDate: null,
-        search: "",
-        status: "All",
-      });
+      setSelectFilter({ fromDate: null, toDate: null, search: "", status: "All" });
       setPage(1);
       setIsClear(true);
     }
@@ -257,43 +213,27 @@ export default function Blogs() {
 
   useEffect(() => {
     const source = axios.CancelToken.source();
-    if (isClear) {
-      handleGetTransaction(source);
-    }
+    if (isClear) handleGetTransaction(source);
     return () => source.cancel();
   }, [isClear]);
 
   useEffect(() => {
     const source = axios.CancelToken.source();
     handleGetTransaction(source);
-    return () => {
-      source.cancel();
-    };
-  }, [
-    page,
-    deb,
-    selectFilter.fromDate,
-    selectFilter.toDate,
-    selectFilter.status,
-  ]);
+    return () => source.cancel();
+  }, [page, deb, selectFilter.fromDate, selectFilter.toDate, selectFilter.status, rowsPerPage]);
 
   return (
     <Box>
       <Box className="tophead">
-        <Topheading
-          heading="Blog Management"
-          pathname={checkEdit ? "/add-blog-management" : undefined}
-          addButton={"Add Blog"}
-        />
+        <Topheading heading="Blog Management" pathname="/add-blog-management" addButton="Add Blog" />
       </Box>
+
       <Box my={3}>
         <MainFilter
           setSelectFilter={setSelectFilter}
           selectFilter={selectFilter}
-          handleCallApi={() => {
-            page > 1 && setPage(1);
-            page === 1 && handleGetTransaction();
-          }}
+          handleCallApi={() => (page > 1 ? setPage(1) : handleGetTransaction())}
           filterData={{ ...filterData, limit: noOfPages.totalPages }}
           transactionList={transactionList}
           excelTableName="Blogs"
@@ -303,39 +243,36 @@ export default function Blogs() {
           handleClearApi={handleClearFilter}
         />
       </Box>
+
+      <Button variant="contained" color="primary" onClick={handleSaveOrder} style={{ marginBottom: 16 }}>
+        Save Order
+      </Button>
+
       <TableComp
-        isMobileAdaptive={true}
+        isMobileAdaptive
         tableHead={tableHead}
         scoreListData={tableDataFunction(transactionList)}
         noOfPages={noOfPages}
         page={page}
         setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
         NoDataFoundText="default"
         isLoading={isLoading}
       />
+
       {modalOpen && deleteBlockId && (
         <ConfirmationDialogBox
           openModal={["delete", "block"].includes(modalOpen)}
           handleClose={() => setModalOpen("")}
-          heading={`${modalOpen === "delete"
-            ? "Delete"
-            : deleteBlockId?.status === "BLOCK"
-              ? "Unblock"
-              : "Block"
-            } Blog`}
-          description={`Are you sure you want to ${modalOpen === "delete"
-            ? "delete"
-            : deleteBlockId?.status === "BLOCK"
-              ? "unblock"
-              : "block"
-            } this blog?`}
+          heading={`${modalOpen === "delete" ? "Delete" : deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"} Blog`}
+          description={`Are you sure, you want to ${modalOpen === "delete" ? "Delete" : deleteBlockId.status !== "BLOCK" ? "Block" : "Unblock"} this blog?`}
           HandleConfirm={handleBlockDeleteApi}
           isLoading={isUpdating}
-          blockDescription={"Are you sure, you want to block this blog?"}
-          showBlock={modalOpen === "block"}
+          blockDescription="Are you sure, you want to block this blog?"
+          showBlock
         />
       )}
-
     </Box>
   );
 }

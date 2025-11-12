@@ -21,8 +21,8 @@ import { apiRouterCall } from "src/ApiConfig/service";
 import toast from "react-hot-toast";
 import { AuthContext } from "src/context/Auth";
 import ButtonCircularProgress from "src/component/ButtonCircularProgress";
-import { encrypt } from "src/utils";
-import { sections } from "src/layouts/DashboardLayout/NavBar";
+// import { encrypt } from "src/utils";
+// import { sections } from "src/layouts/DashboardLayout/NavBar";
 
 const useStyles = makeStyles((theme) => ({
   bannerBox: {
@@ -44,9 +44,41 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   paperCustom: {
-    backgroundColor: "#071c359c !important",
-    backdropFilter: "blur(2px) !important",
-
+    backgroundColor: "rgba(255, 255, 255, 0.95) !important",
+    backdropFilter: "blur(20px) !important",
+    borderRadius: "20px !important",
+    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1) !important",
+    border: "1px solid rgba(255, 255, 255, 0.2) !important",
+    paddingTop: "2.5rem !important",
+    paddingBottom: "2.5rem !important",
+    paddingLeft: "2.5rem !important",
+    paddingRight: "2.5rem !important",
+    maxWidth: "450px !important",
+    width: "100% !important",
+    margin: "0 auto !important",
+    display: "flex !important",
+    flexDirection: "column !important",
+    alignItems: "center !important",
+    justifyContent: "flex-start !important",
+    minHeight: "480px !important",
+    "@media(max-width: 768px)": {
+      paddingTop: "2rem !important",
+      paddingBottom: "2rem !important",
+      paddingLeft: "2rem !important",
+      paddingRight: "2rem !important",
+      margin: "1rem !important",
+      maxWidth: "calc(100% - 2rem) !important",
+      minHeight: "420px !important",
+    },
+    "@media(max-width: 480px)": {
+      paddingTop: "1.5rem !important",
+      paddingBottom: "1.5rem !important",
+      paddingLeft: "1.5rem !important",
+      paddingRight: "1.5rem !important",
+      margin: "0.5rem !important",
+      maxWidth: "calc(100% - 1rem) !important",
+      minHeight: "380px !important",
+    },
   },
 
 }));
@@ -96,7 +128,7 @@ export default function Login() {
 
         auth.userLogIn(true, res?.data?.result?.token);
         localStorage.setItem("id", res?.data?.result?._id);
-        console.log("fmdmfg,mgfgfgfgf",res?.data?.result?._id)
+        console.log("fmdmfg,mgfgfgfgf", res?.data?.result?._id)
         auth.setUserData(res?.data?.result || {})
         console.log(auth)
         history.push(
@@ -148,20 +180,50 @@ export default function Login() {
     if (RememberMe) {
       setCheck(true);
     }
-  }, []);
+  }, [RememberMe]);
   return (
 
 
-    <Paper elevation={2} className={classes.paperCustom} sx={{
-      zIndex: 1000,
-      backdropFilter: "blur(2px) !important",
-      backgroundColor: "rgba(255, 255, 255, 0.7)", // semi-transparent for blur to show
-      WebkitBackdropFilter: "blur(10px)" // for Safari support
-
-    }}>
-      <Box className="displayCenter" mb={3}>
-        <Typography variant="h2" color="primary">
-          Login
+    <Paper elevation={0} className={`${classes.paperCustom} glass-effect login-transition`}>
+      <Box
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingTop: "2rem",
+          // paddingBottom: "2rem",
+          marginBottom: "1.5rem",
+          width: "100%"
+        }}
+      >
+        <Typography
+          variant="h2"
+          className="gradient-text"
+          style={{
+            fontWeight: 700,
+            fontSize: "2.5rem",
+            marginBottom: "1rem",
+            textAlign: "center",
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em"
+          }}
+        >
+          Welcome Back
+        </Typography>
+        <Typography
+          variant="body1"
+          style={{
+            color: "#7f8c8d",
+            textAlign: "center",
+            fontSize: "1rem",
+            fontWeight: 400,
+            lineHeight: 1.5,
+            marginBottom: "0.5rem",
+            maxWidth: "280px"
+          }}
+        >
+          Sign in to your account
         </Typography>
       </Box>
       <Formik
@@ -170,12 +232,12 @@ export default function Login() {
         onSubmit={loginSubmit}
       >
         {({ errors, handleBlur, handleChange, touched, values }) => (
-          <Form autoComplete="off">
-            <Grid container spacing={2}>
+          <Form autoComplete="off" style={{ width: "100%", paddingTop: "1rem" }}>
+            <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Box mb={1}>
-                  <Typography variant="body2" color="primary">
-                    Email <span style={{ color: "#FD3124" }}>*</span>
+                  <Typography variant="body2" style={{ color: "#2c3e50", fontWeight: 600 }}>
+                    Email <span style={{ color: "#e74c3c" }}>*</span>
                   </Typography>
                 </Box>
                 <FormControl fullWidth className="formControl">
@@ -187,11 +249,14 @@ export default function Login() {
                     type="email"
                     value={values.email}
                     error={Boolean(touched.email && errors.email)}
-                    // onBlur={handleBlur}
                     onChange={handleChange}
                     autoComplete="new-email"
                     InputProps={{
                       autoComplete: "off",
+                      style: {
+                        borderRadius: "12px",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      }
                     }}
                     disabled={isLoading}
                   />
@@ -202,8 +267,8 @@ export default function Login() {
               </Grid>
               <Grid item xs={12}>
                 <Box mt={1} mb={1}>
-                  <Typography variant="body2" color="primary">
-                    Password <span style={{ color: "#FD3124" }}>*</span>
+                  <Typography variant="body2" style={{ color: "#2c3e50", fontWeight: 600 }}>
+                    Password <span style={{ color: "#e74c3c" }}>*</span>
                   </Typography>
                 </Box>
 
@@ -221,14 +286,19 @@ export default function Login() {
                     autoComplete="new-password"
                     InputProps={{
                       autoComplete: "off",
+                      style: {
+                        borderRadius: "12px",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      },
                       endAdornment: (
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
+                          style={{ color: "#667eea" }}
                         >
                           {showPassword ? (
-                            <BsEyeFill style={{ color: "9e9d9d" }} />
+                            <BsEyeFill />
                           ) : (
-                            <BsFillEyeSlashFill style={{ color: "9e9d9d" }} />
+                            <BsFillEyeSlashFill />
                           )}
                         </IconButton>
                       ),

@@ -106,6 +106,7 @@ const EditProfileForm = React.memo(
       async (values) => {
         try {
           setIsLoading(true);
+          console.log(values)
           const response = await apiRouterCall({
             method: addFaq ? "POST" : "PUT",
             endPoint: addFaq ? "addStaticContent" : "updateStaticContent",
@@ -118,6 +119,7 @@ const EditProfileForm = React.memo(
               answer: addFaq || editFaq ? values.description_en : undefined,
               answer_ar: addFaq || editFaq ? values.description_ar : undefined,
               description: !(addFaq || editFaq) ? values.description_en : undefined,
+              description_ar: !(addFaq || editFaq) ? values.description_ar : undefined,
             },
           });
           if (response?.data?.responseCode === 200) {
