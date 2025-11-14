@@ -227,29 +227,29 @@ const useStyles = makeStyles((theme) => ({
 const validationSchema = yup.object().shape({
   propertyName: yup
     .string()
-    .required("Property name is required")
+    //.required("Property name is required")
     .min(3, "Property name must be at least 3 characters"),
   brochure: yup
     .string(),
   propertyName_ar: yup
     .string()
-    .required("Property name (Arabic) is required")
+    //.required("Property name (Arabic) is required")
     .min(3, "Property name (Arabic) must be at least 3 characters"),
   description: yup
     .string()
-    .required("Description is required")
+    //.required("Description is required")
     .min(10, "Description must be at least 10 characters"),
   description_ar: yup
     .string()
-    .required("Description (Arabic) is required")
+    //.required("Description (Arabic) is required")
     .min(10, "Description (Arabic) must be at least 10 characters"),
   detailDescription: yup
     .string()
-    .required("Detailed description is required")
+    //.required("Detailed description is required")
     .min(20, "Detailed description must be at least 20 characters"),
   detailDescription_ar: yup
     .string()
-    .required("Detailed description (Arabic) is required")
+    //.required("Detailed description (Arabic) is required")
     .min(20, "Detailed description (Arabic) must be at least 20 characters"),
   priceMin: yup
     .number()
@@ -273,11 +273,11 @@ const validationSchema = yup.object().shape({
     .nullable(),
   noOfBedrooms: yup
     .string()
-    .required("Number of bedrooms is required")
+  //.required("Number of bedrooms is required")
   ,
   noOfBathrooms: yup
-    .string()
-    .required("Number of bathrooms is required"),
+    .string(),
+  //.required("Number of bathrooms is required"),
   videoUrl: yup
     .string(),
   yearBuilt: yup
@@ -287,107 +287,107 @@ const validationSchema = yup.object().shape({
   amenities: yup.array().of(yup.string()).nullable().default([]),
   area: yup
     .string()
-    .required("Area must be a valid number and it is required")
+  //.required("Area must be a valid number and it is required")
   ,
 
   parkingSpace: yup
     .string()
-    .oneOf(["Yes", "No"], "Parking space must be either 'Yes' or 'No'")
-    .required("Parking space selection is required"),
+    .oneOf(["Yes", "No"], "Parking space must be either 'Yes' or 'No'"),
+  //.required("Parking space selection is required"),
   no_of_parking_space: yup
     .string()
   , propertyType: yup
     .string()
-    .required("Property type is required")
+    //.required("Property type is required")
     .min(3, "Property type must be at least 3 characters"),
   listingType: yup
     .string()
-    .required("Listing type is required")
+    //.required("Listing type is required")
     .oneOf(["For Sale", "Rent", "Featured", "Sold", "Soon"], "Listing type must be either 'Sale' or 'Rent'"),
   availabilityStatus: yup
     .string()
-    .required("Availability status is required")
+    //.required("Availability status is required")
     .oneOf(["Available", "Sold", "Rented"], "Invalid availability status"),
   // status: yup
   //   .string()
-  //   .required("Status is required")
+  //   //.required("Status is required")
   //   .oneOf(["Active", "Inactive", "Published", "Draft"], "Status must be either 'Active' or 'Inactive'"),
   address: yup
     .string()
-    .required("Address is required")
+    //.required("Address is required")
     .min(5, "Address must be at least 5 characters"),
   address_ar: yup
     .string()
-    .required("Address is required")
+    //.required("Address is required")
     .min(5, "Address must be at least 5 characters"),
   latitude: yup
     .string()
-    .required("Latitude is required")
+    //.required("Latitude is required")
     .matches(/^-?([1-8]?\d(\.\d+)?|90(\.0+)?)/, "Invalid latitude format"),
   longitude: yup
     .string()
-    .required("Longitude is required")
+    //.required("Longitude is required")
     .matches(
       /^-?((1[0-7]\d)|(\d{1,2}))(\.\d+)?|180(\.0+)?/,
       "Invalid longitude format"
     ),
   images: yup
     .array()
-    .of(yup.mixed().required("Image is required"))
-    .min(1, "At least one image is required")
-    .required("Images are required"),
+    .of(yup.mixed()),
+  // .min(1, "At least one image is required")
+  // .required("Images are required"),
   interiorDesign: yup
-    .array()
-    .of(yup.mixed().required("Interior Design is required"))
-    .min(1, "At least one Interior Design is required")
-    .required("Interior Design are required"),
+    .array(),
+  // .of(yup.mixed().required("Interior Design is required"))
+  // .min(1, "At least one Interior Design is required")
+  // .required("Interior Design are required"),
   exteriorDesign: yup
-    .array()
-    .of(yup.mixed().required("Exterior Design is required"))
-    // .min(1, "At least one Exterior Design is required")
-    .required("Exterior Design are required"),
+    .array(),
+  // .of(yup.mixed().required("Exterior Design is required"))
+  // .min(1, "At least one Exterior Design is required")
+  // .required("Exterior Design are required"),
   partners: yup
     .array()
     .of(yup.mixed())
   ,
   floorPlans: yup
-    .array()
-    .of(
-      yup.object().shape({
-        floorDescription: yup.string(),
-        floorPhoto: yup.string().required("floor plan photo is required"),
-        images: yup
-          .array()
-          .of(yup.string())
-          .optional()
-          .default([]),
-      })
-    )
-    .min(1, "At least one floor is required"),
+    .array(),
+  // .of(
+  //   yup.object().shape({
+  //     floorDescription: yup.string(),
+  //     floorPhoto: yup.string().required("floor plan photo is required"),
+  //     images: yup
+  //       .array()
+  //       .of(yup.string())
+  //       .optional()
+  //       .default([]),
+  //   })
+  // )
+  // .min(1, "At least one floor is required"),
   bathrooms: yup
+    .array(),
+  // .of(
+  //   yup.object().shape({
+  //     photo: yup.string().optional(),
+  //     images: yup
+  //       .array()
+  //       .of(yup.string())
+  //       .optional()
+  //       .default([]),
+  //   })
+  // )
+  bedrooms: yup
     .array()
-    .of(
-      yup.object().shape({
-        photo: yup.string().optional(),
-        images: yup
-          .array()
-          .of(yup.string())
-          .optional()
-          .default([]),
-      })
-    )
-  , bedrooms: yup
-    .array()
-    .of(
-      yup.object().shape({
-        photo: yup.string().optional(),
-        images: yup
-          .array()
-          .of(yup.string())
-          .optional()
-          .default([]),
-      })
-    )
+  // .of(
+  //   yup.object().shape({
+  //     photo: yup.string().optional(),
+  //     images: yup
+  //       .array()
+  //       .of(yup.string())
+  //       .optional()
+  //       .default([]),
+  //   })
+  // )
   ,  // landmarks: yup
   //   .array()
   //   .of(
@@ -399,11 +399,11 @@ const validationSchema = yup.object().shape({
   //   .min(1, "At least one landmark is required"),
   metaTitle: yup
     .string()
-    .required("Meta title is required")
+    // .required("Meta title is required")
     .min(3, "Meta title must be at least 3 characters"),
   metaTags: yup
     .string()
-    .required("Meta tags are required")
+    // .required("Meta tags are required")
     .min(3, "Meta tags must be at least 3 characters"),
 });
 
@@ -659,7 +659,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Property Name <span className={classes.required}>*</span>
+                        Property Name  {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -681,7 +681,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabelArabic}>
-                        اسم العقار <span className={classes.required}>*</span>
+                        اسم العقار {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -709,7 +709,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Overview <span className={classes.required}>*</span>
+                        Overview {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -732,7 +732,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabelArabic}>
-                        نظرة عامة <span className={classes.required}>*</span>
+                        نظرة عامة {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -760,7 +760,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Detailed Description (English) <span className={classes.required}>*</span>
+                        Detailed Description (English) {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <Box className={classes.editorContainer}>
                         <JoditEditor
@@ -784,7 +784,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabelArabic}>
-                        الوصف المفصل (العربية) <span className={classes.required}>*</span>
+                        الوصف المفصل (العربية) {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <Box className={classes.editorContainer}>
                         <JoditEditor
@@ -887,7 +887,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Number of Bedrooms <span className={classes.required}>*</span>
+                        Number of Bedrooms {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -908,7 +908,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Number of Bathrooms <span className={classes.required}>*</span>
+                        Number of Bathrooms {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -1017,7 +1017,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Parking Space <span className={classes.required}>*</span>
+                        Parking Space {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         select
@@ -1356,7 +1356,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Property Type <span className={classes.required}>*</span>
+                        Property Type {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         select
@@ -1395,7 +1395,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Listing Type <span className={classes.required}>*</span>
+                        Listing Type {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         select
@@ -1434,7 +1434,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Availability Status <span className={classes.required}>*</span>
+                        Availability Status {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         select
@@ -1484,7 +1484,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Address <span className={classes.required}>*</span>
+                        Address {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -1504,7 +1504,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabelArabic}>
-                        العنوان <span className={classes.required}>*</span>
+                        العنوان {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -1529,7 +1529,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Latitude <span className={classes.required}>*</span>
+                        Latitude {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -1549,7 +1549,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Longitude <span className={classes.required}>*</span>
+                        Longitude {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
@@ -1679,7 +1679,7 @@ const AddProperty = () => {
                   <Grid item xs={12}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Images <span className={classes.required}>*</span>
+                        Images {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <Box className={classes.imageUploadBox} style={{ position: "relative" }}>
                         {isSubmitting && (
@@ -1827,7 +1827,7 @@ const AddProperty = () => {
                   <Grid item xs={12}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Interior Design <span className={classes.required}>*</span>
+                        Interior Design {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <Box className={classes.imageUploadBox} style={{ position: "relative" }}>
                         {isSubmitting && (
@@ -1957,7 +1957,7 @@ const AddProperty = () => {
                   <Grid item xs={12}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        Exterior Design <span className={classes.required}>*</span>
+                        Exterior Design {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <Box className={classes.imageUploadBox} style={{ position: "relative" }}>
                         {isSubmitting && (
@@ -3200,7 +3200,7 @@ const AddProperty = () => {
                   <Grid item xs={12} sm={6}>
                     <Box className={classes.fieldGroup}>
                       <Typography className={classes.fieldLabel}>
-                        SEO Meta Title <span className={classes.required}>*</span>
+                        SEO Meta Title {/* <span className={classes.required}>*</span> */}
                       </Typography>
                       <TextField
                         fullWidth
