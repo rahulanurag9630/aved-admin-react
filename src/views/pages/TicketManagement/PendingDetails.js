@@ -71,10 +71,14 @@ const ticketData = [
     key: "message",
     label: "Description",
   },
-  // {
-  //   key: "firstName",
-  //   label: "Customer Name",
-  // },
+  {
+    key: "propertyName",
+    label: "Property Name",
+  },
+  {
+    key: "propertyType",
+    label: "Property Type",
+  },
   {
     key: "email",
     label: "Customer Email",

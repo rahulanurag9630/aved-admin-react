@@ -199,6 +199,7 @@ const TicketManagement = () => {
     { heading: "Name" },
     { heading: "Email" },
     { heading: "Mobile No" },
+    { heading: "Property" },
     { heading: "Date & Time" },
     { heading: "Status" },
     { heading: "Action" },
@@ -213,6 +214,7 @@ const TicketManagement = () => {
         Name: value?.name || "--",
         Email: value?.email || "--",
         "Mobile No": value?.phoneNumber || "--",
+        "Property": value?.propertyName || "--",
         "Date & Time": value?.createdAt
           ? moment(value.createdAt).format("lll")
           : "--",
